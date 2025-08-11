@@ -1,22 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getCourts } from "../../api/auth";
+import { Court } from "../../types/types";
 import { Search, Filter, MapPin } from "lucide-react";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { Button } from "../../components/UI/Button";
-import { FIELDS } from "../../constants";
-import { Field } from "../../types";
 import { AnimatePresence, motion } from "../../utils/depencies";
 
 export const Fields: React.FC = () => {
+  const [courts, setCourts] = useState<Court[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedTypeVisibility, setSelectedTypeVisibility] =
-    useState<string>("all");
   const [priceRange, setPriceRange] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
   const [city, setCity] = useState("all");
 
+  useEffect(() => {
+    const fetchCourts = async () => {
+      try {
+        const fetchedCourts = await getCourts();
+        console.log(fetchedCourts);
+        setCourts(fetchedCourts);
+      } catch (err) {
+        setError("No se pudieron cargar las canchas.");
+        console.error("Error fetching courts:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCourts();
+  }, []);
+
   const fieldTypes = [
-    { value: "todos", label: "Todos" },
+    { value: "all", label: "Todos" },
     { value: "football", label: "Fútbol" },
     { value: "basketball", label: "Básquet" },
     { value: "tennis", label: "Tenis" },
@@ -30,7 +48,6 @@ export const Fields: React.FC = () => {
     { value: "Barranquilla", label: "Barranquilla" },
     { value: "Cartagena", label: "Cartagena" },
   ];
-
   const priceRanges = [
     { value: "all", label: "Todos los precios" },
     { value: "low", label: "Hasta $30,000" },
@@ -38,51 +55,41 @@ export const Fields: React.FC = () => {
     { value: "high", label: "Más de $50,000" },
   ];
 
-  const filteredFields = FIELDS.filter((field) => {
+  const filteredFields = courts.filter((court) => {
     const matchesSearch =
-      field.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      field.location.city.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === "all" || field.type === selectedType;
-    const matchesByCity = city === "all" || field.location.city === city;
+      court.court_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      court.city.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType === "all" || court.court_type === selectedType;
+    const matchesByCity = city === "all" || court.city === city;
     const matchesPrice =
-      priceRange === "all" ||
-      (priceRange === "low" && field.price <= 30000) ||
-      (priceRange === "medium" &&
-        field.price > 30000 &&
-        field.price <= 50000) ||
-      (priceRange === "high" && field.price > 50000);
-    const matchedTypeVisbility =
-      selectedTypeVisibility === "all" ||
-      (selectedTypeVisibility === "public" && field.isPublic) ||
-      (selectedTypeVisibility === "private" && !field.isPublic);
+  priceRange === "all" ||
+  (priceRange === "low" && court.court_prices.some(cp => cp.price <= 30000)) ||
+  (priceRange === "medium" && court.court_prices.some(cp => cp.price > 30000 && cp.price <= 50000)) ||
+  (priceRange === "high" && court.court_prices.some(cp => cp.price > 50000));
 
     return (
       matchesByCity &&
       matchesSearch &&
       matchesType &&
-      matchesPrice &&
-      matchedTypeVisbility
+      matchesPrice
     );
   });
 
-  const handleBookField = (field: Field) => {
-    // Aquí implementarías la lógica de reserva
-    console.log("Reservar cancha:", field);
+  const handleBookField = (court: Court) => {
+    console.log("Reservar cancha:", court);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Nuestras Canchas
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              Encuentra la cancha perfecta para tu práctica deportiva
-            </p>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Nuestras Canchas
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Encuentra la cancha perfecta para tu práctica deportiva
+          </p>
         </div>
       </div>
 
@@ -90,19 +97,16 @@ export const Fields: React.FC = () => {
         {/* Search and Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Buscar por nombre o ubicación..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
-            {/* Filter Toggle */}
             <Button
               variant="outline-solid"
               onClick={() => setShowFilters(!showFilters)}
@@ -112,8 +116,6 @@ export const Fields: React.FC = () => {
               Filtros
             </Button>
           </div>
-
-          {/* Filters */}
           {showFilters && (
             <AnimatePresence>
               <motion.div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -122,7 +124,7 @@ export const Fields: React.FC = () => {
                     Tipo de Cancha
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     value={selectedType}
                     onChange={(e) => setSelectedType(e.target.value)}
                   >
@@ -135,24 +137,10 @@ export const Fields: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    publica o privada
-                  </label>
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    value={selectedTypeVisibility}
-                    onChange={(e) => setSelectedTypeVisibility(e.target.value)}
-                  >
-                    <option value="all">Todas</option>
-                    <option value="public">Públicas</option>
-                    <option value="private">Privadas</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Rango de Precio
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     value={priceRange}
                     onChange={(e) => setPriceRange(e.target.value)}
                   >
@@ -168,7 +156,7 @@ export const Fields: React.FC = () => {
                     Ciudad
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                   >
@@ -179,7 +167,6 @@ export const Fields: React.FC = () => {
                     ))}
                   </select>
                 </div>
-
                 <div className="flex items-end">
                   <Button
                     variant="ghost"
@@ -187,6 +174,7 @@ export const Fields: React.FC = () => {
                       setSearchTerm("");
                       setSelectedType("all");
                       setPriceRange("all");
+                      setCity("all");
                     }}
                   >
                     Limpiar Filtros
@@ -200,18 +188,22 @@ export const Fields: React.FC = () => {
         {/* Results */}
         <div className="mb-6">
           <p className="text-gray-600 dark:text-gray-300">
-            {filteredFields.length} cancha
-            {filteredFields.length !== 1 ? "s" : ""} encontrada
-            {filteredFields.length !== 1 ? "s" : ""}
+            {filteredFields.length} cancha{filteredFields.length !== 1 ? "s" : ""} encontrada{filteredFields.length !== 1 ? "s" : ""}
           </p>
         </div>
 
         {/* Fields Grid */}
-        {filteredFields.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12 text-gray-500">Cargando canchas...</div>
+        ) : error ? (
+          <div className="text-center py-12 text-red-500">
+            Error: {error}
+          </div>
+        ) : filteredFields.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredFields.map((field) => (
               <FieldCard
-                key={field.id}
+                key={field.court_id}
                 field={field}
                 onBook={handleBookField}
               />

@@ -1,13 +1,36 @@
+import { useState, useEffect } from "react";
+import { getCourts } from "../../api/auth";
+import { Court } from "../../types/types";
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Clock, Star, Users } from "lucide-react";
 import { Button } from "../../components/UI/Button";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { ServiceCard } from "../../components/Cards/ServiceCard";
-import { FIELDS, SERVICES } from "../../constants";
+import { SERVICES } from "../../constants";
 import { FC } from "../../utils/depencies";
 
+
 export const Home: FC = () => {
-  const featuredFields = FIELDS.slice(0, 3);
+  const [courts, setCourts] = useState<Court[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCourts = async () => {
+      try {
+        const fetchedCourts = await getCourts();
+        setCourts(fetchedCourts);
+      } catch (err) {
+        setError("No se pudieron cargar las canchas.");
+        console.error("Error fetching courts:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCourts();
+  }, []);
+
+  const featuredFields = courts.slice(0, 3);
   const featuredServices = SERVICES.slice(0, 3);
 
   const features = [
@@ -37,7 +60,7 @@ export const Home: FC = () => {
   return (
     <div className="space-y-16">
       {/* Hero Section */}
-      <section className="relative -bg-conic-120  from-green-800 to-green-600 text-white">
+      <section className="relative -bg-conic-120 from-green-800 to-green-600 text-white">
         <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
@@ -108,9 +131,24 @@ export const Home: FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredFields.map((field) => (
-            <FieldCard key={field.id} field={field} />
+          {isLoading && (
+            <div className="col-span-full text-center text-gray-500">
+              Cargando canchas...
+            </div>
+          )}
+          {error && (
+            <div className="col-span-full text-center text-red-500">
+              Error: {error}
+            </div>
+          )}
+          {!isLoading && !error && featuredFields.length > 0 && featuredFields.map((field) => (
+            <FieldCard key={field.court_id} field={field} />
           ))}
+          {!isLoading && !error && featuredFields.length === 0 && (
+            <div className="col-span-full text-center text-gray-500">
+              No hay canchas destacadas disponibles.
+            </div>
+          )}
         </div>
 
         <div className="text-center mt-12">

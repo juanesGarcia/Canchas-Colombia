@@ -1,55 +1,44 @@
 import React from "react";
 import { MapPin, Users, Star, Clock } from "lucide-react";
-import { Field } from "../../types";
+import { Court } from "../../types/types"; // Importa la interfaz Court
 import { Button } from "../UI/Button";
 import { useNavigate } from "react-router-dom";
 
 interface FieldCardProps {
-  field: Field;
-  onBook?: (field: Field) => void;
+  field: Court; // <-- Cambiado a Court
+  onBook?: (field: Court) => void; // <-- Cambiado a Court
 }
 
 export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
   const navigate = useNavigate();
 
-  // const formatPrice = (price: number) => {
-  //   return new Intl.NumberFormat("es-CO", {
-  //     style: "currency",
-  //     currency: "COP",
-  //     minimumFractionDigits: 0,
-  //   }).format(price);
-  // };
+  // Asume que la primera foto es la principal
+  const imageUrl = field.photos && field.photos.length > 0 ? field.photos[0].url : "ruta-a-imagen-por-defecto.jpg";
+
+  // Aquí necesitas adaptar las propiedades según tu interfaz Court
+  // Por ejemplo, `field.name` no existe en `Court`, pero sí `field.court_name`.
+  // La ubicación (`field.location`) también debe ser adaptada si Court no la tiene
+  // de la misma manera que Field. En tu interfaz Court tienes `address` y `city`.
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
       <div className="relative">
         <img
-          src={field.image}
-          alt={field.name}
+          src={imageUrl} // <-- Adaptado para usar las fotos de Court
+          alt={field.court_name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 left-4">
           <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-            {field.type}
+            {field.court_type} {/* <-- Cambiado a court_type */}
           </span>
-        </div>
-        <div className="absolute top-4 right-4">
-          {/* <div
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              field.available
-                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-            }`}
-          >
-            {field.available ? "Disponible" : "Ocupada"}
-          </div> */}
         </div>
       </div>
 
       <div className="p-6">
         <div className="flex items-start justify-between mb-3">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            {field.name}
+            {field.court_name} {/* <-- Cambiado a court_name */}
           </h3>
           <div className="flex items-center text-yellow-500">
             <Star className="w-4 h-4 fill-current" />
@@ -64,55 +53,43 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
         <div className="space-y-2 mb-4">
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <MapPin className="w-4 h-4 mr-2" />
-            {field.location.city}, {field.location.address}
+            {field.city}, {field.address} {/* <-- Adaptado a las propiedades de Court */}
           </div>
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <Users className="w-4 h-4 mr-2" />
-            Hasta {field.capacity} personas
+            {/* Si no tienes una propiedad `capacity` en Court, esto podría dar error */}
+            Hasta X personas
           </div>
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <Clock className="w-4 h-4 mr-2" />
-            Por hora
+            {field.phone}
+          </div>
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+            <Clock className="w-4 h-4 mr-2" />
+            {field.price}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">
-          {field.features.slice(0, 3).map((feature, index) => (
-            <span
-              key={index}
-              className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs"
-            >
-              {feature}
-            </span>
-          ))}
-          {field.features.length > 3 && (
-            <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs">
-              +{field.features.length - 3} más
-            </span>
-          )}
+          {/* Si Court tiene una propiedad `features`, úsala aquí */}
+          {/* De lo contrario, este bloque podría necesitar ser eliminado o adaptado */}
         </div>
 
         <div className="flex items-center justify-end space-x-2">
-          {/* <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-            {formatPrice(field.price)}
-            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              /hora
-            </span>
-          </div> */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(`/fields/${field.id}`)}
+            onClick={() => navigate(`/fields/${field.court_id}`)}
           >
             {"Detalles"}
           </Button>
           <Button
             variant="primary"
             size="md"
-            disabled={!field.available}
+            disabled={!field.state}
             onClick={() => onBook?.(field)}
           >
-            {field.available ? "Reservar" : "disponible"}
+            {"Reservar"}
           </Button>
         </div>
       </div>
