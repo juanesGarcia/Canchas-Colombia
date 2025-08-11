@@ -55,7 +55,7 @@ export const PrivateLayout = () => {
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
         <div className="flex flex-col w-64 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          {/* Logo */}
+           {/* Logo */}
           <div className="flex items-center justify-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">

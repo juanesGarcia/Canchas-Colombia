@@ -4,7 +4,8 @@ import {
   RegistrationData,
   Court,
   Post,
-  Photo
+  Photo,
+  LoginData 
 } from '../types/types.ts';
 
 axios.defaults.withCredentials = true;
@@ -16,15 +17,27 @@ interface GetCourtsResponse {
   courts: Court[];
 }
 
+interface LoginResponse {
+  token: string;
+  info: User; 
+  success:boolean;
+
+}
+
 export async function onRegister(registrationData: RegistrationData) {
   return await axios.post(`${backendUrl}/register`, registrationData);
 }
 
 // Inicio de sesión
-export async function onLogin(loginData: Pick<User, 'email' | 'password'>) {
-  return await axios.post(`${backendUrl}/login`, loginData);
+export async function onLogin(loginData: LoginData) {
+  // Aquí solo especificas el tipo de la respuesta (LoginResponse)
+  try {
+    const response = await axios.post<LoginResponse>(`${backendUrl}/login`, loginData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 }
-
 // Cierre de sesión
 export async function onLogout() {
   return await axios.get(`${backendUrl}/logout`);

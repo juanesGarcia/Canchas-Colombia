@@ -79,3 +79,9 @@ export interface CourtSocial {
   platform: string; // Ejemplo: 'Facebook', 'Instagram', 'WhatsApp'
   url: string;      // La URL completa al perfil
 }
+
+// En tu archivo de tipos (ej. types.ts)
+export interface LoginData {
+  email: string;
+  password: string;
+}

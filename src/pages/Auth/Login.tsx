@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext'; // Mantén el AuthContext si es necesario para gestionar el estado global del usuario
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,29 +10,30 @@ export const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth(); // Mantenemos el contexto si necesitas actualizar el estado de autenticación.
 
   const from = location.state?.from?.pathname || '/dashboard';
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+// En tu componente Login.tsx
+// ...
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      const success = await login(email, password);
-      if (success) {
+  try {
+        await login(email, password);
         navigate(from, { replace: true });
-      }
-    } catch (err) {
-      setError('Error al iniciar sesión. Verifica tus credenciales.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err) {
+    setError('Error al iniciar sesión. Verifica tus credenciales.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
