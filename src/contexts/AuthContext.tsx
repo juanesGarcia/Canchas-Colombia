@@ -1,7 +1,7 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { AuthContextType, User } from "../types";
-import { onLogin, onRegister } from "../api/auth";
+import { onLogin, onRegister , onLogout} from "../api/auth";
 import { RegistrationData } from "../types/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,9 +73,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const logout = () => {
+    onLogout();
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem("authData");
+    
   };
 
   const value = { user, login, logout, isAuthenticated, register };

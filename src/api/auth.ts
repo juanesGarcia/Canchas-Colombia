@@ -80,6 +80,12 @@ export async function getCourts(): Promise<Court[]> {
   return response.data.courts;
 }
 
+export async function getServices(): Promise<Court[]> {
+  const response = await axios.get<GetCourtsResponse>(`${backendUrl}/services`);
+  console.log(response.data.courts);
+  return response.data.courts;
+}
+
 // Obtener una cancha específica por su ID
 export async function getCourtById(id: string): Promise<Court> {
   // Le dices a Axios que la respuesta completa es de tipo GetCourtByIdResponse

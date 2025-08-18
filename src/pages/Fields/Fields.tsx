@@ -66,12 +66,13 @@ export const Fields: React.FC = () => {
   (priceRange === "low" && court.court_prices.some(cp => cp.price <= 30000)) ||
   (priceRange === "medium" && court.court_prices.some(cp => cp.price > 30000 && cp.price <= 50000)) ||
   (priceRange === "high" && court.court_prices.some(cp => cp.price > 50000));
-
+const isCourt = court.is_court === true;
     return (
       matchesByCity &&
       matchesSearch &&
       matchesType &&
-      matchesPrice
+      matchesPrice &&
+      isCourt
     );
   });
 

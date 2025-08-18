@@ -10,6 +10,8 @@ export interface User {
 }
 
 
+
+
 export interface RegistrationData {
   email: string;
   password: string;
@@ -33,6 +35,22 @@ export interface Subcourt {
   state: boolean;
 }
 
+export interface RegistrationDataService {
+  email: string;
+  password?: string;
+  name: string;
+  role: "admin";
+  phone: string;
+  courtName: string;
+  courtAddress: string;
+  courtCity: string;
+  courtPhone: string;
+  price: number;
+  description: string;
+  state: boolean;
+  is_court: false; // Clave para identificar que es un servicio
+}
+
 export interface Court {
   court_id: string;
   court_name: string;
@@ -45,16 +63,31 @@ export interface Court {
   is_public: boolean;
   default_price: number;
   description: string;
+  price: number;
   state: boolean;
   subcourts: Subcourt[];
   court_prices: CourtPrice[]; // Define esta interfaz según tu tabla
   court_socials: CourtSocial[]; // Define esta interfaz según tu tabla
   photos: Photo[];
+  is_court: boolean
 }
 
 export interface Photo {
   id: string;
   url: string;
+}
+
+export interface Service {
+  court_id: string; // O service_id si tienes uno
+  court_name: string;
+  city: string;
+  address: string;
+  description: string;
+  phone: string;
+  court_prices: Array<{ price: number }>;
+  photos: Array<{ id: string; url: string }>;
+  state: boolean;
+  // Agrega cualquier otra propiedad que un servicio pueda tener
 }
 
 export interface Post {

@@ -9,8 +9,7 @@ import {
   Menu as MenuIcon,
   Moon as MoonIcon,
   Sun as SunIcon,
-  Volleyball,
- FileText as FileTextIcon,
+  Volleyball
 } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useTheme } from "../../../contexts/ThemeContext";

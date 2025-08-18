@@ -1,37 +1,57 @@
 import { useState, useEffect } from "react";
 import { getCourts } from "../../api/auth";
-import { Court } from "../../types/types";
+import { Court, Service } from "../../types/types"; // Importa los dos tipos
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Clock, Star, Users } from "lucide-react";
 import { Button } from "../../components/UI/Button";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { ServiceCard } from "../../components/Cards/ServiceCard";
-import { SERVICES } from "../../constants";
 import { FC } from "../../utils/depencies";
 
 
 export const Home: FC = () => {
   const [courts, setCourts] = useState<Court[]>([]);
+  const [services, setServices] = useState<Service[]>([]); // Nuevo estado para los servicios
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCourts = async () => {
+    const fetchCourtsAndServices = async () => {
       try {
-        const fetchedCourts = await getCourts();
-        setCourts(fetchedCourts);
+        const fetchedItems = await getCourts();
+
+        // Filtra la data para separar canchas y servicios
+        const courtsData = fetchedItems.filter(item => item.is_court);
+        const servicesData = fetchedItems
+          .filter(item => !item.is_court)
+          .map(item => ({
+            // Mapea las propiedades para que coincidan con la interfaz Service
+            court_id: item.court_id,
+            court_name: item.court_name,
+            city: item.city,
+            address: item.address,
+            description: item.description,
+            phone: item.phone,
+            photos: item.photos,
+            court_prices: item.court_prices,
+            state: item.state,
+          }));
+
+        setCourts(courtsData);
+        setServices(servicesData);
       } catch (err) {
-        setError("No se pudieron cargar las canchas.");
-        console.error("Error fetching courts:", err);
+        setError("No se pudieron cargar los datos.");
+        console.error("Error fetching data:", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCourts();
+    fetchCourtsAndServices();
   }, []);
 
+  // Extrae 3 canchas y 3 servicios para mostrar en la página de inicio
   const featuredFields = courts.slice(0, 3);
-  const featuredServices = SERVICES.slice(0, 3);
+  const featuredServices = services.slice(0, 3);
 
   const features = [
     {
@@ -178,9 +198,24 @@ export const Home: FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredServices.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+            {isLoading && (
+              <div className="col-span-full text-center text-gray-500">
+                Cargando servicios...
+              </div>
+            )}
+            {error && (
+              <div className="col-span-full text-center text-red-500">
+                Error: {error}
+              </div>
+            )}
+            {!isLoading && !error && featuredServices.length > 0 && featuredServices.map((service) => (
+              <ServiceCard key={service.court_id} service={service} />
             ))}
+            {!isLoading && !error && featuredServices.length === 0 && (
+              <div className="col-span-full text-center text-gray-500">
+                No hay servicios adicionales destacados disponibles.
+              </div>
+            )}
           </div>
 
           <div className="text-center mt-12">
