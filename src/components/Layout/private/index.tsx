@@ -49,6 +49,8 @@ export const PrivateLayout = () => {
           :         item.name === "Registro"
           ? CalendarIcon:      
             item.name === "Imagenes"
+          ? CalendarIcon:  
+          item.name === "RegisterServices"
           ? CalendarIcon:undefined,
     })),
   ];

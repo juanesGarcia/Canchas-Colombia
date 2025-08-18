@@ -5,7 +5,8 @@ import {
   Court,
   Post,
   Photo,
-  LoginData 
+  LoginData, 
+  RegistrationDataService
 } from '../types/types.ts';
 
 axios.defaults.withCredentials = true;
@@ -28,6 +29,9 @@ export async function onRegister(registrationData: RegistrationData) {
   return await axios.post(`${backendUrl}/register`, registrationData);
 }
 
+export async function onRegisterServices(registrationData: RegistrationDataService , userId:string) {
+  return await axios.post(`${backendUrl}/registerServices/${userId}`, registrationData);
+}
 // Inicio de sesión
 export async function onLogin(loginData: LoginData) {
   // Aquí solo especificas el tipo de la respuesta (LoginResponse)

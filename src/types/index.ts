@@ -1,5 +1,6 @@
 import {
-  RegistrationData
+  RegistrationData,
+  RegistrationDataService
 } from '../types/types.ts';
 
 export interface Field {
@@ -69,6 +70,7 @@ export interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
  register: (data: RegistrationData) => Promise<boolean>; 
+ registerServices: (data: RegistrationDataService,userId:string) => Promise<boolean>; 
   logout: () => void;
   isAuthenticated: boolean;
 }

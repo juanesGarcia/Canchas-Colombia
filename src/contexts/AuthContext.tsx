@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { AuthContextType, User } from "../types";
-import { onLogin, onRegister , onLogout} from "../api/auth";
-import { RegistrationData } from "../types/types";
+import { onLogin, onRegister, onLogout, onRegisterServices } from "../api/auth";
+import { RegistrationData, RegistrationDataService } from "../types/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         if (storedUser && token) {
           // Asegúrate de que el objeto 'storedUser' también tenga el token
           // para cumplir con la interfaz 'User'
-          const userWithToken = { ...storedUser, token }; 
+          const userWithToken = { ...storedUser, token };
           setUser(userWithToken);
           setIsAuthenticated(true);
         }
@@ -45,12 +45,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const response = await onLogin({ email, password });
       const { token, info } = response;
-      
+
       // Crea un nuevo objeto que combine la información del usuario y el token
       const userWithToken = { ...info, token };
-      
+
       localStorage.setItem("authData", JSON.stringify({ token, user: info }));
-      
+
       // Usa el nuevo objeto con el token para actualizar el estado
       setUser(userWithToken);
       setIsAuthenticated(true);
@@ -60,8 +60,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       return false;
     }
   };
-  
-  const register = async (userData: RegistrationData): Promise<boolean> => { 
+
+  const register = async (userData: RegistrationData): Promise<boolean> => {
     try {
       const response = await onRegister(userData);
       console.log(response);
@@ -72,15 +72,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const registerServices = async (userData: RegistrationDataService, userId: string): Promise<boolean> => {
+    try {
+      // Pasa el userId a la función de la API
+      const response = await onRegisterServices(userData, userId);
+      console.log(response);
+      return true;
+    } catch (error) {
+      console.error("Registration failed:", error);
+      return false;
+    }
+  };
   const logout = () => {
     onLogout();
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem("authData");
-    
+
   };
 
-  const value = { user, login, logout, isAuthenticated, register };
+  const value = { user, login, logout, isAuthenticated, register, registerServices };
 
   if (loading) {
     return <div>Cargando...</div>;

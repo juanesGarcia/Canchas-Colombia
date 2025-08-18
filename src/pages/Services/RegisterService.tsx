@@ -2,28 +2,20 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ImageSelector from '../images/ImageSelector';
 import {
-    Mail,
-    Lock,
-    User,
-    Eye,
-    EyeOff,
-    Smartphone,
     MapPin,
     Tag,
     Info,
     CheckCircle,
     CircleOff,
-    Wrench, // Icono para representar un servicio
+    Wrench,
+    Smartphone,
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { onRegisterServices } from '../../api/auth';
+import Swal from 'sweetalert2'; // <-- Importa SweetAlert2 aquí
 
 export const RegisterService: React.FC = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [phone, setPhone] = useState('');
     const [courtName, setCourtName] = useState('');
     const [courtAddress, setCourtAddress] = useState('');
     const [courtCity, setCourtCity] = useState('');
@@ -32,11 +24,10 @@ export const RegisterService: React.FC = () => {
     const [description, setDescription] = useState('');
     const [state, setState] = useState(true);
 
-    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const { register } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -44,24 +35,24 @@ export const RegisterService: React.FC = () => {
         setLoading(true);
         setError('');
 
-        if (password !== confirmPassword) {
-            setError('Las contraseñas no coinciden');
-            setLoading(false);
-            return;
+        const authDataString = localStorage.getItem("authData");
+        let userId: string | null = null;
+        if (authDataString) {
+            try {
+                const authData = JSON.parse(authDataString);
+                userId = authData.user?.id;
+            } catch (error) {
+                console.error("Error al parsear authData del localStorage:", error);
+            }
         }
 
-        if (password.length < 6) {
-            setError('La contraseña debe tener al menos 6 caracteres');
+        if (!userId) {
+            setError('No se pudo obtener el ID del usuario. Por favor, inicia sesión de nuevo.');
             setLoading(false);
             return;
         }
 
         const dataToSend = {
-            email,
-            password,
-            name,
-            role: "admin",
-            phone,
             courtName,
             courtAddress,
             courtCity,
@@ -69,23 +60,53 @@ export const RegisterService: React.FC = () => {
             price: Number(price),
             description,
             state,
-            is_court: false, // ¡Campo clave para diferenciarlo de una cancha!
+            court_type: 'servicio',
+            is_public: true,
+            is_court: false,
         };
 
+        console.log(dataToSend);
+        console.log(userId);
+
         try {
-            const success = await register(dataToSend);
+            const success = await onRegisterServices(dataToSend, userId);
 
             if (success) {
-                navigate('/login');
+                // Alerta de éxito
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Registro Exitoso!',
+                    text: 'El servicio ha sido registrado correctamente.',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    navigate('/dashboard'); // Redirige al dashboard después de la alerta
+                });
+            } else {
+                // Si la función `onRegisterServices` no lanza una excepción pero devuelve `false` o `null`
+                setError('No se pudo completar el registro del servicio.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Registro Incompleto',
+                    text: 'No se pudo completar el registro del servicio. Intenta de nuevo.',
+                });
             }
         } catch (err) {
-            setError('Error al crear el servicio. Intenta de nuevo.' + err);
+            // Alerta de error
+            const errorMessage = err.message || 'Error desconocido al crear el servicio.';
+            setError('Error al crear el servicio. Intenta de nuevo. ' + errorMessage);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Registro',
+                text: errorMessage,
+            });
         } finally {
             setLoading(false);
         }
     };
 
     return (
+        // Resto del JSX del componente
         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
                 <div>
@@ -95,13 +116,10 @@ export const RegisterService: React.FC = () => {
                         </div>
                     </div>
                     <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
-                        Registrar Servicio
+                        Registrar Nuevo Servicio
                     </h2>
                     <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-                        ¿Ya tienes cuenta?{' '}
-                        <Link to="/login" className="font-medium text-green-600 hover:text-green-500">
-                            Inicia sesión aquí
-                        </Link>
+                        Completa la información para registrar tu servicio
                     </p>
                 </div>
 
@@ -112,110 +130,6 @@ export const RegisterService: React.FC = () => {
                                 {error}
                             </div>
                         )}
-
-                        {/* Campos de usuario */}
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Nombre del responsable
-                            </label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="Tu nombre completo"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Email
-                            </label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="tu@email.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Número de teléfono
-                            </label>
-                            <div className="relative">
-                                <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    id="phone"
-                                    type="tel"
-                                    required
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="Ej: 3101234567"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Contraseña
-                            </label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    id="password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    required
-                                    className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="Mínimo 6 caracteres"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-                                <button
-                                    type="button"
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Confirmar contraseña
-                            </label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    id="confirmPassword"
-                                    type={showPassword ? 'text' : 'password'}
-                                    required
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="Confirma tu contraseña"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Campos del Servicio */}
-                        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Información del Servicio</h3>
-                        </div>
-
                         <div>
                             <label htmlFor="courtName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Nombre del Servicio
@@ -355,6 +269,7 @@ export const RegisterService: React.FC = () => {
                             </label>
                         </div>
                     </div>
+
                     <ImageSelector />
 
                     <div>

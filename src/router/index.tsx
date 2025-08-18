@@ -49,10 +49,15 @@ const Dashboard = lazy(() =>
   }))
 );
 
-
 const FieldDetailPage = lazy(() =>
   import("../pages/Fields/FieldDetailPage/FieldDetailPage").then((module) => ({
     default: module.FieldDetailPage,
+  }))
+);
+
+const RegisterService = lazy(() =>
+  import("../pages/Services/RegisterService").then((module) => ({
+    default: module.RegisterService,
   }))
 );
 
@@ -187,6 +192,7 @@ export const AppRouter: React.FC = () => {
               
             /><Route path="/register" element={<Register />} />
              <Route path="/ImageSelector" element={<ImageSelector />} />
+             <Route path="/RegisterService" element={<RegisterService />} />
             {" "}
           
           </Route>

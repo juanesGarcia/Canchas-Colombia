@@ -36,11 +36,6 @@ export interface Subcourt {
 }
 
 export interface RegistrationDataService {
-  email: string;
-  password?: string;
-  name: string;
-  role: "admin";
-  phone: string;
   courtName: string;
   courtAddress: string;
   courtCity: string;
@@ -48,7 +43,9 @@ export interface RegistrationDataService {
   price: number;
   description: string;
   state: boolean;
-  is_court: false; // Clave para identificar que es un servicio
+  court_type: string;
+  is_public:boolean;
+  is_court: boolean; // Clave para identificar que es un servicio
 }
 
 export interface Court {
