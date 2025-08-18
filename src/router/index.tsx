@@ -75,7 +75,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/contact" element={<Contact />} />
 
           <Route path="/login" element={<Login />} />
-          <Route path="/fields/:id" element={<FieldDetailPage />} />
+          <Route path="/fields/:id" element={<FieldDetailPage/>} />
           {/* Legal Pages */}
           <Route
             path="/terms"

@@ -31,7 +31,8 @@ export interface RegistrationData {
 }
 
 export interface Subcourt {
-  subcourtName: string;
+  id?:string;
+  name: string;
   state: boolean;
 }
 
