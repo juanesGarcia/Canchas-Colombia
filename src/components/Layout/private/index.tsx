@@ -10,6 +10,7 @@ import {
   Moon as MoonIcon,
   Sun as SunIcon,
   Volleyball,
+ FileText as FileTextIcon,
 } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useTheme } from "../../../contexts/ThemeContext";
@@ -34,7 +35,7 @@ export const PrivateLayout = () => {
     navigate("/login");
   };
 
-  const privateNavItems: NavigationItem[] = [
+  let privateNavItems: NavigationItem[] = [
     ...PRIVATE_NAVIGATION_ITEMS.map((item) => ({
       ...item,
       icon:
@@ -46,9 +47,14 @@ export const PrivateLayout = () => {
           ? HomeIcon
           : item.name === "Canchas"
           ? Volleyball
-          : undefined,
+          :         item.name === "Registro"
+          ? CalendarIcon:      
+            item.name === "Imagenes"
+          ? CalendarIcon:undefined,
     })),
   ];
+
+
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">

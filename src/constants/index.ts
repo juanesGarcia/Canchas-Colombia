@@ -190,4 +190,6 @@ export const PRIVATE_NAVIGATION_ITEMS: navigateElement[] = [
   { name: "Mis Reservas", path: "/bookings", public: false },
   { name: "Perfil", path: "/profile", public: false },
   { name: "Canchas", path: "/fieldsManage", public: false },
+  { name: "Registro", path: "/register", public: false },
+  { name: "Imagenes", path: "/ImageSelector", public: false }
 ];

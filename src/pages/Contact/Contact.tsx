@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Send, Clock } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { COMPANY_INFO } from '../../constants';
+import Swal from 'sweetalert2';
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -14,17 +15,59 @@ export const Contact: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    // Simular envío
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    alert('Mensaje enviado correctamente. Te contactaremos pronto.');
-    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    setLoading(false);
-  };
+  e.preventDefault();
+  setLoading(true);
 
+  try {
+    const { name, email, phone, subject, message } = formData;
+    const myWhatsappNumber = '573186699925';
+
+    const whatsappMessage = `
+    ¡Hola! 👋
+
+    Tengo un mensaje de contacto a través de la página web. Aquí están los detalles:
+
+    Nombre: ${name}
+    Email: ${email}
+    Teléfono: ${phone}
+    Asunto: ${subject}
+
+    Mensaje:
+    ${message}
+
+    ¡Espero tu respuesta!
+    `;
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
+
+    // Paso 1: Redirigir a WhatsApp
+    window.location.href = whatsappUrl;
+
+    // Simula el tiempo que el usuario podría tomar en WhatsApp y volver
+    // Para que la alerta se muestre de forma asíncrona después de la redirección
+    setTimeout(() => {
+        // Paso 2: Mostrar la alerta de éxito al regresar
+        Swal.fire({
+            icon: 'success',
+            title: '¡Mensaje enviado!',
+            text: 'Tu mensaje ha sido enviado a WhatsApp. Revisa la conversación para confirmar el envío.',
+            confirmButtonText: 'Aceptar'
+        });
+    }, 2000); // 2 segundos de retraso para simular la vuelta del usuario
+
+  } catch (error) {
+    // Si hay un error (por ejemplo, si la redirección falla por alguna razón)
+    Swal.fire({
+      icon: 'error',
+      title: 'Error al enviar',
+      text: 'Hubo un problema al intentar abrir WhatsApp. Por favor, inténtalo de nuevo.'+error,
+      confirmButtonText: 'Aceptar'
+    });
+  } finally {
+    setLoading(false);
+    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+  }
+};
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,

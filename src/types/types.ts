@@ -9,6 +9,7 @@ export interface User {
   state?: boolean;
 }
 
+
 export interface RegistrationData {
   email: string;
   password: string;

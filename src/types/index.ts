@@ -1,3 +1,7 @@
+import {
+  RegistrationData
+} from '../types/types.ts';
+
 export interface Field {
   id: string;
   name: string;
@@ -40,8 +44,9 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "user";
+  role: "admin" | "user" | "superadmin";
   avatar?: string;
+  token: string; 
 }
 
 export interface Booking {
@@ -63,7 +68,7 @@ export interface ThemeContextType {
 export interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+ register: (data: RegistrationData) => Promise<boolean>; 
   logout: () => void;
   isAuthenticated: boolean;
 }

@@ -31,12 +31,10 @@ export async function onRegister(registrationData: RegistrationData) {
 // Inicio de sesión
 export async function onLogin(loginData: LoginData) {
   // Aquí solo especificas el tipo de la respuesta (LoginResponse)
-  try {
+
     const response = await axios.post<LoginResponse>(`${backendUrl}/login`, loginData);
     return response.data;
-  } catch (error) {
-    throw error;
-  }
+
 }
 // Cierre de sesión
 export async function onLogout() {
@@ -104,11 +102,10 @@ export async function onUpdateCourt(updateData: { id: string; courtData: Partial
 export async function onUploadImages(uploadData: { id: string; files: File[]; description: string; token: string }) {
   const formData = new FormData();
   uploadData.files.forEach(file => {
-    formData.append('images', file);
+    formData.append('photo', file);
   });
-  formData.append('description', uploadData.description);
 
-  return await axios.post(`${backendUrl}/upload-images/${uploadData.id}`, formData, {
+  return await axios.post(`${backendUrl}/upload/${uploadData.id}`, formData, {
     headers: {
       'Authorization': `Bearer ${uploadData.token}`,
       'Content-Type': 'multipart/form-data'

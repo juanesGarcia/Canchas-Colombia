@@ -13,6 +13,11 @@ const FieldsManage = lazy(() =>
     default: module.FieldsManage,
   }))
 );
+const ImageSelector = lazy(() =>
+ import("../pages/images/ImageSelector").then((module) => ({
+ default: module.ImageSelector,
+ }))
+);
 const Fields = lazy(() =>
   import("../pages/Fields/Fields").then((module) => ({
     default: module.Fields,
@@ -44,6 +49,7 @@ const Dashboard = lazy(() =>
   }))
 );
 
+
 const FieldDetailPage = lazy(() =>
   import("../pages/Fields/FieldDetailPage/FieldDetailPage").then((module) => ({
     default: module.FieldDetailPage,
@@ -64,7 +70,6 @@ export const AppRouter: React.FC = () => {
           <Route path="/contact" element={<Contact />} />
 
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route path="/fields/:id" element={<FieldDetailPage />} />
           {/* Legal Pages */}
           <Route
@@ -177,8 +182,13 @@ export const AppRouter: React.FC = () => {
                     </div>
                   </>
                 </>
+                
               }
-            />{" "}
+              
+            /><Route path="/register" element={<Register />} />
+             <Route path="/ImageSelector" element={<ImageSelector />} />
+            {" "}
+          
           </Route>
         </Route>
 
