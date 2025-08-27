@@ -61,6 +61,17 @@ const RegisterService = lazy(() =>
   }))
 );
 
+const ReservationRegister = lazy(() =>
+  import("../pages/Reservation/ReservationRegister").then((module) => ({
+    default: module.ReservationRegister,
+  }))
+);
+
+const FieldsById = lazy(() =>
+  import("../pages/Fields/FieldsById").then((module) => ({
+    default: module.FieldsById,
+  }))
+);
 import NotFound from "../pages/NotFound";
 
 export const AppRouter: React.FC = () => {
@@ -130,7 +141,7 @@ export const AppRouter: React.FC = () => {
               </>
             }
           />
-
+<Route path="/ReservationRegister/:subcourtId" element={<ReservationRegister />} />
           <Route
             path="/faq"
             element={
@@ -172,23 +183,7 @@ export const AppRouter: React.FC = () => {
             <Route path="/fieldsManage" element={<FieldsManage />} />
             <Route
               path="/bookings"
-              element={
-                <>
-                  <>
-                    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                      <div className="text-center">
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                          Mis Reservas
-                        </h1>
-                        <p className="text-gray-600 dark:text-gray-300">
-                          Próximamente disponible
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                </>
-                
-              }
+              element={<FieldsById/>}
               
             /><Route path="/register" element={<Register />} />
              <Route path="/ImageSelector" element={<ImageSelector />} />
@@ -197,7 +192,6 @@ export const AppRouter: React.FC = () => {
           
           </Route>
         </Route>
-
         {/* Catch all route */}
         <Route path="/*" element={<NotFound />} />
       </Routes>

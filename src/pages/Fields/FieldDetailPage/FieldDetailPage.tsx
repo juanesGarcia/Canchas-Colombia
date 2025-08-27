@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation , useNavigate} from "react-router-dom";
 import {
   CheckCircle,
   XCircle,
   Plus,
+  CalendarCheck, // Importamos el nuevo ícono de reserva
 } from "lucide-react";
 import { Court } from "../../../types/types";
 
 export const FieldDetailPage: React.FC = () => {
   const location = useLocation();
   const court = location.state?.court as Court;
+  const navigate = useNavigate();
 
   const [showForm, setShowForm] = useState(false);
 
@@ -24,6 +26,11 @@ export const FieldDetailPage: React.FC = () => {
   const handleDeleteSubcourt = (subcourtId: string) => {
     // Lógica para eliminar la subcancha
     console.log(`Eliminar subcancha con ID: ${subcourtId}`);
+  };
+
+  const handleReserveSubcourt = (subcourtId: string) => {
+    // Lógica para redirigir a la página de reserva o abrir un modal
+   navigate(`/ReservationRegister/${subcourtId}`);
   };
 
   const handleSubmitForm = (newSubcourtData: any) => {
@@ -66,12 +73,23 @@ export const FieldDetailPage: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleDeleteSubcourt(subcourt.id)}
-                    className="p-2 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
-                  >
-                    <XCircle className="w-5 h-5" />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    {subcourt.state && (
+                      <button
+                        onClick={() => handleReserveSubcourt(subcourt.id)}
+                        className="px-3 py-1.5 bg-green-600 text-white rounded-md flex items-center hover:bg-green-700 transition-colors"
+                      >
+                        <CalendarCheck className="w-4 h-4 mr-2" />
+                        Reservar
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDeleteSubcourt(subcourt.id)}
+                      className="p-2 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
+                    >
+                      <XCircle className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

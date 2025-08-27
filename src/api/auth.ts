@@ -6,7 +6,9 @@ import {
   Post,
   Photo,
   LoginData, 
-  RegistrationDataService
+  RegistrationDataService,
+  ReservationData,
+  Subcourt
 } from '../types/types.ts';
 
 axios.defaults.withCredentials = true;
@@ -25,10 +27,25 @@ interface LoginResponse {
 
 }
 
+interface GetSubcourtsResponse {
+  success: boolean;
+  subcourts: Subcourt[]; // El backend ahora devuelve directamente este campo
+}
+
 export async function onRegister(registrationData: RegistrationData) {
   return await axios.post(`${backendUrl}/register`, registrationData);
 }
 
+export async function onReservationRegister(registrationData: ReservationData, subcourtId: string) {
+  try {
+    const response = await axios.post(`${backendUrl}/reservations/${subcourtId}`, registrationData);
+    return response.status >= 200 && response.status < 300;
+  } catch (error) {
+ 
+    console.error('Error al registrar la reserva:', error);
+    throw error;
+  }
+}
 export async function onRegisterServices(registrationData: RegistrationDataService , userId:string) {
   return await axios.post(`${backendUrl}/registerServices/${userId}`, registrationData);
 }
@@ -89,15 +106,26 @@ export async function getServices(): Promise<Court[]> {
   console.log(response.data.courts);
   return response.data.courts;
 }
+export async function getSubcourtsByUserId(userId: string): Promise<Subcourt[]> {
+  try {
+    const response = await axios.get<GetSubcourtsResponse>(`${backendUrl}/subCourts/${userId}`);
 
-// Obtener una cancha específica por su ID
-export async function getCourtById(id: string): Promise<Court> {
-  // Le dices a Axios que la respuesta completa es de tipo GetCourtByIdResponse
-  const response = await axios.get<Court>(`${backendUrl}/court/${id}`);
-  // Ahora, TypeScript sabe que 'response.data' tiene una propiedad 'court'
-  return response.data;
+    console.log('Respuesta de la API para subcanchas:', response.data);
+
+    // FIX: Extrae el array de subcanchas del objeto 'court'
+    const fetchedSubcourts = response.data.subcourts || [];
+
+    if (response.data.success && Array.isArray(fetchedSubcourts)) {
+      return fetchedSubcourts;
+    } else {
+      console.error("La respuesta de la API no contiene un array de subcanchas válido.");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error al obtener subcanchas por ID de usuario:", error);
+    throw error;
+  }
 }
-
 // Actualizar una cancha
 export async function onUpdateCourt(updateData: { id: string; courtData: Partial<Court>; token: string }) {
   return await axios.put(`${backendUrl}/court/${updateData.id}`, updateData.courtData, {

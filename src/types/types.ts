@@ -30,6 +30,20 @@ export interface RegistrationData {
   subcourts?: Subcourt[];
 }
 
+export interface ReservationData {
+  user_id: string;
+  user_name: string;
+  phone: string;
+  subcourt_id: string; // Este campo es crucial
+  reservation_date: string;
+  reservation_time: string;
+  duration: number; // Debe ser 'number'
+  price_reservation: number;    // Debe ser 'number'
+  transfer: number;
+  state:boolean;
+}
+
+
 export interface Subcourt {
   id:string;
   name: string;
