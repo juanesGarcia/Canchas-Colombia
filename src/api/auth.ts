@@ -113,8 +113,8 @@ export async function getSubcourtsByUserId(userId: string): Promise<Subcourt[]> 
     console.log('Respuesta de la API para subcanchas:', response.data);
 
     // FIX: Extrae el array de subcanchas del objeto 'court'
+    
     const fetchedSubcourts = response.data.subcourts || [];
-
     if (response.data.success && Array.isArray(fetchedSubcourts)) {
       return fetchedSubcourts;
     } else {
