@@ -8,11 +8,10 @@ import {
   MapPin,
   Loader,
 } from "lucide-react";
-// Asegúrate de que estas importaciones son correctas en tu proyecto
-import { Subcourt } from "../../types/types";
+import Swal from "sweetalert2";
+import { Subcourt, RegistrationSubCourt } from "../../types/types";
 import { useAuth } from "../../contexts/AuthContext";
-import { getSubcourtsByUserId } from "../../api/auth";
-
+import { getSubcourtsByUserId, onSubCourt, deleteSubcourt } from "../../api/auth";
 
 /**
  * Componente que muestra la lista de subcanchas de un usuario y un formulario para añadir nuevas.
@@ -24,13 +23,12 @@ export const FieldsById: React.FC = () => {
   const [subcourts, setSubcourts] = useState<Subcourt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Estados para el formulario de agregar subcancha
+
   const [showForm, setShowForm] = useState(false);
   const [newSubcourtName, setNewSubcourtName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  // useEffect para cargar las subcanchas del usuario
+  // useEffect para cargar las subcanchas del usuario al montar el componente
   useEffect(() => {
     const fetchSubcourts = async () => {
       if (!user || !user.id) {
@@ -46,7 +44,9 @@ export const FieldsById: React.FC = () => {
         setError(null);
       } catch (err) {
         console.error("Error fetching subcourts:", err);
-        setError("No se pudieron cargar las subcanchas. Por favor, inténtalo de nuevo más tarde.");
+        setError(
+          "No se pudieron cargar las subcanchas. Por favor, inténtalo de nuevo más tarde."
+        );
       } finally {
         setIsLoading(false);
       }
@@ -54,47 +54,110 @@ export const FieldsById: React.FC = () => {
     fetchSubcourts();
   }, [user]);
 
-  const handleDeleteSubcourt = (subcourtId: string) => {
-    // Lógica para eliminar la subcancha de la API y del estado local
-    console.log(`Eliminar subcancha con ID: ${subcourtId}`);
-    // Simulación:
-    setSubcourts((prevSubcourts) => prevSubcourts.filter((subcourt) => subcourt.id !== subcourtId));
+  const handleDeleteSubcourt = async (subcourt: Subcourt) => {
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: `¿Quieres eliminar la subcancha "${subcourt.subcourt_name}"? ¡No podrás revertir esto!`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, ¡borrarla!",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        if (!user || !user.token) {
+          console.error("Authentication error: No user or token available.");
+          Swal.fire(
+            "Error de autenticación",
+            "No se pudo completar la acción. Por favor, inicia sesión de nuevo.",
+            "error"
+          );
+          return;
+        }
+
+        const isDeleted = await deleteSubcourt(subcourt.subcourt_id, user.token);
+        if (isDeleted) {
+          setSubcourts((prevSubcourts) =>
+            prevSubcourts.filter((s) => s.subcourt_id !== subcourt.subcourt_id)
+          );
+          Swal.fire(
+            "¡Borrado!",
+            `La subcancha "${subcourt.subcourt_name}" ha sido eliminada correctamente.`,
+            "success"
+          );
+        } else {
+          Swal.fire(
+            "Error",
+            "No se pudo eliminar la subcancha. Inténtalo de nuevo.",
+            "error"
+          );
+        }
+      } catch (err) {
+        console.error("Error al eliminar la subcancha:", err);
+        Swal.fire(
+          "Error",
+          "Hubo un problema al intentar eliminar la subcancha.",
+          "error"
+        );
+      }
+    }
   };
 
   const handleReserveSubcourt = (subcourtId: string) => {
-    navigate(`/ReservationRegister/${subcourtId}`);
+    navigate(`/ReservationRegisterDashboard/${subcourtId}`);
   };
 
   const handleAddSubcourt = () => {
-    // Muestra el formulario en lugar de navegar
     setShowForm(true);
   };
 
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newSubcourtName.trim() === "") {
-      setError("El nombre de la subcancha no puede estar vacío.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "El nombre de la subcancha no puede estar vacío.",
+      });
       return;
     }
 
     setIsSaving(true);
     try {
-      // Simulación de guardar en la API. En tu proyecto, llamarías a una función real como 'saveNewSubcourt'
-      // const newSubcourt = await saveNewSubcourt(user.id, newSubcourtName);
-      const newSubcourt = {
-        id: `sub_${Date.now()}`,
+      if (!user || !user.id || !user.token) {
+        throw new Error("User ID or token is not available.");
+      }
+
+      const newSubcourtData: RegistrationSubCourt = {
         name: newSubcourtName,
         state: true,
       };
 
+      // Se llama a la API para crear la cancha.
+      // ⚠️ ¡IMPORTANTE! Tu API debe retornar el objeto completo de la cancha creada.
+      const newSubcourt = await onSubCourt(user.id, newSubcourtData, user.token);
+
+      // Si la API devuelve el objeto, se actualiza el estado localmente.
       setSubcourts((prevSubcourts) => [...prevSubcourts, newSubcourt]);
+
       setNewSubcourtName("");
       setShowForm(false);
       setError(null);
-      console.log("Nueva subcancha agregada:", newSubcourt);
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: `La subcancha "${newSubcourt.subcourt_name}" ha sido agregada correctamente.`,
+      });
     } catch (err) {
       console.error("Error saving new subcourt:", err);
-      setError("No se pudo guardar la subcancha. Inténtalo de nuevo.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo guardar la subcancha. Inténtalo de nuevo.",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -130,12 +193,12 @@ export const FieldsById: React.FC = () => {
         <div className="space-y-4">
           {subcourts.map((subcourt) => (
             <div
-              key={subcourt.id}
+              key={subcourt.subcourt_id}
               className="p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-between border border-gray-200 dark:border-gray-600 shadow-sm"
             >
               <div className="flex-1">
                 <p className="font-bold text-gray-900 dark:text-white">
-                  {subcourt.name}
+                  {subcourt.subcourt_name}
                 </p>
                 <div className="flex items-center space-x-2 mt-1">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mr-2">
@@ -155,7 +218,7 @@ export const FieldsById: React.FC = () => {
               <div className="flex items-center space-x-2">
                 {subcourt.state && (
                   <button
-                    onClick={() => handleReserveSubcourt(subcourt.id)}
+                    onClick={() => handleReserveSubcourt(subcourt.subcourt_id)}
                     className="px-3 py-1.5 bg-green-600 text-white rounded-md flex items-center hover:bg-green-700 transition-colors"
                   >
                     <CalendarCheck className="w-4 h-4 mr-2" />
@@ -163,7 +226,7 @@ export const FieldsById: React.FC = () => {
                   </button>
                 )}
                 <button
-                  onClick={() => handleDeleteSubcourt(subcourt.id)}
+                  onClick={() => handleDeleteSubcourt(subcourt)}
                   className="p-2 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
                 >
                   <XCircle className="w-5 h-5" />
@@ -183,8 +246,7 @@ export const FieldsById: React.FC = () => {
           </p>
         </div>
       )}
-      
-      {/* Formulario de agregar subcancha (condicional) */}
+
       {showForm && (
         <div className="mt-6 p-6 border rounded-lg shadow-md bg-gray-50 dark:bg-gray-700">
           <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
@@ -219,7 +281,9 @@ export const FieldsById: React.FC = () => {
                 type="submit"
                 disabled={isSaving}
                 className={`px-4 py-2 text-white rounded-md transition-colors ${
-                  isSaving ? "bg-indigo-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+                  isSaving
+                    ? "bg-indigo-400 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-700"
                 }`}
               >
                 {isSaving ? "Guardando..." : "Guardar"}

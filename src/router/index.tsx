@@ -72,6 +72,14 @@ const FieldsById = lazy(() =>
     default: module.FieldsById,
   }))
 );
+
+const ServicesDetail = lazy(() =>
+  import("../pages/Services/ServiceDetail").then((module) => ({
+    default: module.ServiceDetail,
+  }))
+);
+
+
 import NotFound from "../pages/NotFound";
 
 export const AppRouter: React.FC = () => {
@@ -87,6 +95,7 @@ export const AppRouter: React.FC = () => {
 
           <Route path="/login" element={<Login />} />
           <Route path="/fields/:id" element={<FieldDetailPage/>} />
+          <Route path="/ServicesDetail/:id" element={<ServicesDetail/>} />
           {/* Legal Pages */}
           <Route
             path="/terms"
@@ -188,6 +197,7 @@ export const AppRouter: React.FC = () => {
             /><Route path="/register" element={<Register />} />
              <Route path="/ImageSelector" element={<ImageSelector />} />
              <Route path="/RegisterService" element={<RegisterService />} />
+             <Route path="/ReservationRegisterDashboard/:subcourtId" element={<ReservationRegister />} />
             {" "}
           
           </Route>

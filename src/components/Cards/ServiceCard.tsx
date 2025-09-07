@@ -56,7 +56,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
           </div>
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <Clock className="w-4 h-4 mr-2" />
-            Precio: {service.court_prices[0]?.price} {/* Adaptado para mostrar el precio del servicio */}
+            Precio: {service.price} {/* Adaptado para mostrar el precio del servicio */}
           </div>
         </div>
 
@@ -66,19 +66,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
 
         <div className="flex items-center justify-end space-x-2">
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(`/services/${service.court_id}`)}
-          >
-            {"Detalles"}
-          </Button>
-          <Button
             variant="primary"
             size="md"
-            disabled={!service.state}
-            onClick={() => onSelect?.(service)}
+            onClick={() => navigate(`/ServicesDetail/${service.court_id}`)}
           >
-            {"Contratar"}
+            {"Detalles"}
           </Button>
         </div>
       </div>

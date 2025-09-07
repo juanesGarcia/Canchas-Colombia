@@ -25,6 +25,7 @@ export const Services: React.FC = () => {
             photos: item.photos,
             court_prices: item.court_prices,
             state: item.state,
+            price:item.price
           }));
         setServices(fetchedServices);
       } catch (err) {

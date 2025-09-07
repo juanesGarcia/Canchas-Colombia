@@ -25,7 +25,7 @@ export const ReservationRegister: React.FC = () => {
     const [reservationTime, setReservationTime] = useState('');
     const [duration, setDuration] = useState<number | ''>('');
     const [price, setPrice] = useState<number | ''>('');
-    const [transferCode, setTransferCode] = useState('');
+    const [transferCode, setTransferCode] = useState<number | ''>('');
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -62,7 +62,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         reservation_time: reservationTime,
         duration: Number(duration),
         price_reservation: Number(price),
-        transfer: transferCode,
+        transfer: Number(transferCode),
         state:true
     };
 
@@ -251,9 +251,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                                     id="transferCode"
                                     type="number"
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="Código de confirmación de pago"
+                                    placeholder="ej: 10000"
                                     value={transferCode}
-                                    onChange={(e) => setTransferCode(e.target.value)}
+                                    onChange={(e) => setTransferCode(Number(e.target.value))}
                                 />
                             </div>
                         </div>

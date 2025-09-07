@@ -8,7 +8,9 @@ import {
   LoginData, 
   RegistrationDataService,
   ReservationData,
-  Subcourt
+  Subcourt,
+  Service,
+  RegistrationSubCourt
 } from '../types/types.ts';
 
 axios.defaults.withCredentials = true;
@@ -18,6 +20,11 @@ const backendUrl = 'http://localhost:3000';
 interface GetCourtsResponse {
   success: boolean;
   courts: Court[];
+}
+
+interface GetServicesDetailResponse {
+  success: boolean;
+  court: Service;
 }
 
 interface LoginResponse {
@@ -30,6 +37,16 @@ interface LoginResponse {
 interface GetSubcourtsResponse {
   success: boolean;
   subcourts: Subcourt[]; // El backend ahora devuelve directamente este campo
+}
+
+interface GetSubcourtResponse {
+  success: boolean;
+  subcourt: Subcourt; // El backend ahora devuelve directamente este campo
+}
+
+interface DeleteResponse {
+  success: boolean;
+  message?: string;
 }
 
 export async function onRegister(registrationData: RegistrationData) {
@@ -224,90 +241,34 @@ export async function onUpdateLocation(data: { id: string; latitude: number; lon
   return await axios.post(`${backendUrl}/updatelocation`, data);
 }
 
-// --- Rutas de Calificación (Rating) ---
 
-// Calificar a un usuario o cancha
-export async function onRating(data: { id: string; rating: number; type: 'user' | 'court' }) {
-  return await axios.post(`${backendUrl}/rating`, data);
+export async function getCourtById(id: string): Promise<Service>{
+  const response = await axios.get<GetServicesDetailResponse>(`${backendUrl}/courts/${id}`);
+  console.log(response.data.court);
+  return response.data.court;
 }
 
-// Obtener la calificación de un usuario
-export async function getRating(id: string) {
-  return await axios.get(`${backendUrl}/getRating/${id}`);
+
+export async function onSubCourt(id:string,RegistrationSubCourt: RegistrationSubCourt): Promise<Subcourt>{
+  const response = await axios.post<GetSubcourtResponse>(`${backendUrl}/subcourt/${id}`,RegistrationSubCourt);
+  console.log(response.data.subcourt);
+  return response.data.subcourt;
 }
 
-// Verificar si ya se ha calificado a un usuario/cancha
-export async function yetRating(data: { userId: string; targetId: string }) {
-  return await axios.post(`${backendUrl}/yetrating`, data);
+export async function deleteSubcourt(subcourtId: string, token : string): Promise<boolean> {
+    try {
+        const response = await axios.delete<DeleteResponse>(`${backendUrl}/subcourts/${subcourtId}`,{
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+        // We return true if the API indicates a successful deletion.
+        return response.data.success;
+    } catch (error) {
+        console.error("Error deleting subcourt:", error);
+        // Return false to indicate that the deletion failed.
+        return false;
+    }
 }
 
-// --- Rutas de Seguimiento (Follow) ---
-
-// Seguir a un usuario
-export async function onFollow(data: { followerId: string; followedId: string }) {
-  return await axios.post(`${backendUrl}/follow`, data);
-}
-
-// Dejar de seguir a un usuario
-export async function onUnfollow(data: { followerId: string; followedId: string }) {
-  return await axios.post(`${backendUrl}/unfollow`, data);
-}
-
-// Obtener los seguidores de un usuario
-export async function getFollowers(id: string) {
-  return await axios.get(`${backendUrl}/followers/${id}`);
-}
-
-// Obtener los usuarios seguidos por un usuario
-export async function getFollowed(id: string) {
-  return await axios.get(`${backendUrl}/followed/${id}`);
-}
-
-// Verificar el estado de seguimiento entre dos usuarios
-export async function getStatusFollow(data: { followerId: string; followedId: string }) {
-  return await axios.post(`${backendUrl}/checkfollowing`, data);
-}
-
-// --- Rutas de Reacciones (Reactions) ---
-
-// Reaccionar a un post
-export async function onReaction(data: { userId: string; postId: string; reactionType: string }) {
-  return await axios.post(`${backendUrl}/reaction`, data);
-}
-
-// Deshacer una reacción a un post
-export async function unReaction(data: { userId: string; postId: string }) {
-  return await axios.post(`${backendUrl}/unreaction`, data);
-}
-
-// Obtener las reacciones de un post
-export async function getReactions(post_id: string) {
-  return await axios.get(`${backendUrl}/getreactions/${post_id}`);
-}
-
-// Verificar el estado de las reacciones de un usuario en un post
-export async function getStatusReactions(data: { userId: string; postId: string }) {
-  return await axios.post(`${backendUrl}/checkreactions`, data);
-}
-
-// --- Rutas de Horarios y Disponibilidad ---
-
-// Crear un nuevo horario disponible
-export async function onCreateAvailability(data: { courtId: string; day: string; time: string; price: number }) {
-  return await axios.post(`${backendUrl}/availability`, data);
-}
-
-// Obtener los horarios de disponibilidad de una cancha
-export async function getAvailability(courtId: string) {
-  return await axios.get(`${backendUrl}/availability/${courtId}`);
-}
-
-// Actualizar un horario disponible
-export async function onUpdateAvailability(updateData: { id: string; availabilityData: { day?: string; time?: string; price?: number } }) {
-  return await axios.put(`${backendUrl}/availability/${updateData.id}`, updateData.availabilityData);
-}
-
-// Eliminar un horario disponible
-export async function onDeleteAvailability(id: string) {
-  return await axios.delete(`${backendUrl}/availability/${id}`);
-}

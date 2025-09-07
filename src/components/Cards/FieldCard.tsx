@@ -77,19 +77,11 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
 
         <div className="flex items-center justify-end space-x-2">
           <Button
-            variant="ghost"
-            size="sm"
+            variant="primary"
+            size="md"
             onClick={() => navigate(`/fields/${field.court_id}`, { state: { court: field } })}
           >
             {"Detalles"}
-          </Button>
-          <Button
-            variant="primary"
-            size="md"
-            disabled={!field.state}
-            onClick={() => onBook?.(field)}
-          >
-            {"Reservar"}
           </Button>
         </div>
       </div>

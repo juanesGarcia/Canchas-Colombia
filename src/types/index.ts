@@ -47,7 +47,7 @@ export interface User {
   email: string;
   role: "admin" | "user" | "superadmin";
   avatar?: string;
-  token: string; 
+  token?: string; 
 }
 
 export interface Booking {

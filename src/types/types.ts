@@ -46,9 +46,11 @@ export interface ReservationData {
 
 export interface Subcourt {
   id:string;
-  name: string;
+  subcourt_name: string;
   state: boolean;
+  subcourt_id:string;
 }
+
 
 export interface RegistrationDataService {
   courtName: string;
@@ -97,8 +99,9 @@ export interface Service {
   description: string;
   phone: string;
   court_prices: Array<{ price: number }>;
-  photos: Array<{ id: string; url: string }>;
+  photos: Photo[];
   state: boolean;
+  price: number;
   // Agrega cualquier otra propiedad que un servicio pueda tener
 }
 
@@ -130,4 +133,9 @@ export interface CourtSocial {
 export interface LoginData {
   email: string;
   password: string;
+}
+
+export interface RegistrationSubCourt {
+  name:string;
+  state:boolean;
 }
