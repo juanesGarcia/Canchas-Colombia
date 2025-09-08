@@ -3,6 +3,7 @@ import { Layout } from "../components/Layout";
 import { PrivateLayout } from "../components/Layout/private";
 import { lazy } from "../utils/depencies";
 import { ProtectedRoute } from "../components/ProtectedRoute";
+import { AdminRoute } from "./AdminRoute";
 
 // Pages
 const Home = lazy(() =>
@@ -70,6 +71,12 @@ const ReservationRegister = lazy(() =>
 const FieldsById = lazy(() =>
   import("../pages/Fields/FieldsById").then((module) => ({
     default: module.FieldsById,
+  }))
+);
+
+const CourtPriceForm = lazy(() =>
+  import("../pages/Fields/CourtPriceForm").then((module) => ({
+    default: module.CourtPriceForm,
   }))
 );
 
@@ -194,10 +201,14 @@ export const AppRouter: React.FC = () => {
               path="/bookings"
               element={<FieldsById/>}
               
-            /><Route path="/register" element={<Register />} />
+            />
+              <Route element={<AdminRoute />}>
+                <Route path="/register" element={<Register />} />
+            </Route>
              <Route path="/ImageSelector" element={<ImageSelector />} />
              <Route path="/RegisterService" element={<RegisterService />} />
              <Route path="/ReservationRegisterDashboard/:subcourtId" element={<ReservationRegister />} />
+             <Route path="/SubcourtForm/:subcourtId" element={<CourtPriceForm />} />
             {" "}
           
           </Route>

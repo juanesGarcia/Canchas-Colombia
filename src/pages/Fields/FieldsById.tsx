@@ -7,10 +7,12 @@ import {
   CalendarCheck,
   MapPin,
   Loader,
+  Pencil, // ✅ Agregado el ícono de lápiz para modificar
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { Subcourt, RegistrationSubCourt } from "../../types/types";
 import { useAuth } from "../../contexts/AuthContext";
+// Asume que estas funciones están correctamente implementadas para retornar los datos
 import { getSubcourtsByUserId, onSubCourt, deleteSubcourt } from "../../api/auth";
 
 /**
@@ -28,7 +30,6 @@ export const FieldsById: React.FC = () => {
   const [newSubcourtName, setNewSubcourtName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  // useEffect para cargar las subcanchas del usuario al montar el componente
   useEffect(() => {
     const fetchSubcourts = async () => {
       if (!user || !user.id) {
@@ -113,6 +114,11 @@ export const FieldsById: React.FC = () => {
   const handleAddSubcourt = () => {
     setShowForm(true);
   };
+  
+  // ✅ Nueva función para manejar la navegación a la página de modificación
+  const handleModifySubcourt = (subcourtId: string) => {
+    navigate(`/SubcourtForm/${subcourtId}`);
+  };
 
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,27 +142,30 @@ export const FieldsById: React.FC = () => {
         state: true,
       };
 
-      // Se llama a la API para crear la cancha.
-      // ⚠️ ¡IMPORTANTE! Tu API debe retornar el objeto completo de la cancha creada.
-      const newSubcourt = await onSubCourt(user.id, newSubcourtData, user.token);
+      const addedSubcourtFromApi = await onSubCourt(user.id, newSubcourtData, user.token);
 
-      // Si la API devuelve el objeto, se actualiza el estado localmente.
-      setSubcourts((prevSubcourts) => [...prevSubcourts, newSubcourt]);
+      const formattedSubcourt: Subcourt = {
+        subcourt_id: addedSubcourtFromApi.subcourt_id,
+        subcourt_name: addedSubcourtFromApi.name,
+        state: addedSubcourtFromApi.state,
+        id: addedSubcourtFromApi.id,
+      };
 
+      setSubcourts((prevSubcourts) => [...prevSubcourts, formattedSubcourt]);
       setNewSubcourtName("");
       setShowForm(false);
       setError(null);
       Swal.fire({
         icon: "success",
         title: "¡Éxito!",
-        text: `La subcancha "${newSubcourt.subcourt_name}" ha sido agregada correctamente.`,
+        text: `La subcancha "${formattedSubcourt.subcourt_name}" ha sido agregada correctamente.`,
       });
     } catch (err) {
       console.error("Error saving new subcourt:", err);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "No se pudo guardar la subcancha. Inténtalo de nuevo.",
+        text: "Hubo un problema al intentar guardar la subcancha.",
       });
     } finally {
       setIsSaving(false);
@@ -225,6 +234,14 @@ export const FieldsById: React.FC = () => {
                     Reservar
                   </button>
                 )}
+                {/* ✅ Nuevo botón de modificar */}
+                <button
+                  onClick={() => handleModifySubcourt(subcourt.subcourt_id)}
+                  className="px-3 py-1.5 bg-yellow-500 text-white rounded-md flex items-center hover:bg-yellow-600 transition-colors"
+                >
+                  <Pencil className="w-4 h-4 mr-2" />
+                  Modificar
+                </button>
                 <button
                   onClick={() => handleDeleteSubcourt(subcourt)}
                   className="p-2 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"

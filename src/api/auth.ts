@@ -10,7 +10,8 @@ import {
   ReservationData,
   Subcourt,
   Service,
-  RegistrationSubCourt
+  RegistrationSubCourt,
+  SubcourtAdd
 } from '../types/types.ts';
 
 axios.defaults.withCredentials = true;
@@ -37,6 +38,11 @@ interface LoginResponse {
 interface GetSubcourtsResponse {
   success: boolean;
   subcourts: Subcourt[]; // El backend ahora devuelve directamente este campo
+}
+
+interface GetSubcourtsResponseAdd {
+  success: boolean;
+  subcourts: SubcourtAdd[]; // El backend ahora devuelve directamente este campo
 }
 
 interface GetSubcourtResponse {
@@ -226,13 +232,25 @@ export async function onUpdatePost(updateData: { id: string; postData: Partial<P
 }
 
 // Eliminar un post
-export async function onDeletePost(data: { id: string; token: string }) {
-  return await axios.delete(`${backendUrl}/post/${data.id}`, {
-    headers: {
-      'Authorization': `Bearer ${data.token}`
+export async function onSubCourt(id: string, RegistrationSubCourt: RegistrationSubCourt, token: string): Promise<Subcourt> {
+  try {
+    const response = await axios.post<GetSubcourtResponse>(
+      `${backendUrl}/subcourt/${id}`,
+      RegistrationSubCourt,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    console.log(response.data.subcourt);
+    return response.data.subcourt;
+  } catch (error) {
+      console.error("Error inesperado:", error);
+      throw new Error("Error inesperado al crear la subcancha");
     }
-  });
-}
+  }
+
 
 // --- Rutas de Localización ---
 
@@ -248,12 +266,6 @@ export async function getCourtById(id: string): Promise<Service>{
   return response.data.court;
 }
 
-
-export async function onSubCourt(id:string,RegistrationSubCourt: RegistrationSubCourt): Promise<Subcourt>{
-  const response = await axios.post<GetSubcourtResponse>(`${backendUrl}/subcourt/${id}`,RegistrationSubCourt);
-  console.log(response.data.subcourt);
-  return response.data.subcourt;
-}
 
 export async function deleteSubcourt(subcourtId: string, token : string): Promise<boolean> {
     try {

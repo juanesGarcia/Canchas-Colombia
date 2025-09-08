@@ -52,6 +52,15 @@ export interface Subcourt {
 }
 
 
+
+export interface SubcourtAdd{
+  id:string;
+  name: string;
+  state: boolean;
+  subcourt_id:string;
+}
+
+
 export interface RegistrationDataService {
   courtName: string;
   courtAddress: string;

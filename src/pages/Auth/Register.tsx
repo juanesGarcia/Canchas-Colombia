@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'; // Importa SweetAlert2
 import ImageSelector from '../images/ImageSelector';
 import { 
   Mail, 
@@ -15,8 +16,8 @@ import {
   CheckCircle,
   CircleOff,
   ClipboardList,
-  PlusCircle, // Nuevo icono para agregar
-  MinusCircle, // Nuevo icono para eliminar
+  PlusCircle,
+  MinusCircle,
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -37,7 +38,6 @@ export const Register: React.FC = () => {
   const [description, setDescription] = useState('');
   const [state, setState] = useState(true);
   
-  // Estado para gestionar las subcanchas
   const [subcourts, setSubcourts] = useState([{ subcourtName: '', state: true }]);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -47,12 +47,10 @@ export const Register: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  // Función para agregar una nueva subcancha
   const handleAddSubcourt = () => {
     setSubcourts([...subcourts, { subcourtName: '', state: true }]);
   };
 
-  // Función para manejar cambios en una subcancha específica
   const handleSubcourtChange = (index: number, field: string, value: string | boolean) => {
     const newSubcourts = [...subcourts];
     if (field === 'subcourtName') {
@@ -63,7 +61,6 @@ export const Register: React.FC = () => {
     setSubcourts(newSubcourts);
   };
   
-  // Función para eliminar una subcancha
   const handleRemoveSubcourt = (index: number) => {
     const newSubcourts = subcourts.filter((_, i) => i !== index);
     setSubcourts(newSubcourts);
@@ -75,45 +72,67 @@ export const Register: React.FC = () => {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
       setLoading(false);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de registro',
+        text: 'Las contraseñas no coinciden.',
+      });
       return;
     }
 
     if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
       setLoading(false);
+      Swal.fire({
+        icon: 'warning',
+        title: 'Contraseña débil',
+        text: 'La contraseña debe tener al menos 6 caracteres.',
+      });
       return;
     }
 
- const dataToSend = {
-  email,
-  password,
-  name,
-  role: "admin", // O el rol por defecto que vayas a usar, ya que lo excluíste del formulario.
-  phone,
-  courtName,
-  courtAddress,
-  courtCity,
-  courtPhone,
-  court_type: courtType,
-  price: Number(price), // Asegura que el precio es un número.
-  is_public: isPublic,
-  description,
-  state,
-  subcourts: subcourts.map(subcourt => ({
-    subcourtName: subcourt.subcourtName,
-    state: subcourt.state,
-  })),
-};
+    const dataToSend = {
+      email,
+      password,
+      name,
+      role: "admin",
+      phone,
+      courtName,
+      courtAddress,
+      courtCity,
+      courtPhone,
+      court_type: courtType,
+      price: Number(price),
+      is_public: isPublic,
+      description,
+      state,
+      subcourts: subcourts.map(subcourt => ({
+        subcourtName: subcourt.subcourtName,
+        state: subcourt.state,
+      })),
+    };
+
     try {
       const success = await register(dataToSend);
       
       if (success) {
-        navigate('/login');
+        Swal.fire({
+          icon: 'success',
+          title: '¡Registro exitoso!',
+          text: 'Tu cuenta ha sido creada y tu cancha registrada. Serás redirigido para iniciar sesión.',
+          timer: 3000,
+          timerProgressBar: true,
+        }).then(() => {
+          navigate('/login');
+        });
       }
     } catch (err) {
-      setError('Error al crear la cuenta. Intenta de nuevo.'+err);
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error en el registro',
+        text: 'Hubo un problema al crear tu cuenta. Por favor, intenta de nuevo.',
+      });
     } finally {
       setLoading(false);
     }
