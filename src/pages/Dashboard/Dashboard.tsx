@@ -2,9 +2,27 @@ import React from "react";
 import { Calendar, Clock, MapPin, TrendingUp, Star } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../../components/UI/Button";
+import { useNavigate } from 'react-router-dom';
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
+   const navigate = useNavigate();
+  const handleNewReservationClick = () => {
+    navigate('/bookings');
+  };
+
+  const handleMyReservationsClick = () => {
+    navigate('/');
+  };
+
+  const handleHistoryClick = () => {
+    navigate('/');
+  };
+
+  const handleSettingsClick = () => {
+    navigate('/');
+  };
+
 
   const stats = [
     {
@@ -188,18 +206,18 @@ export const Dashboard: React.FC = () => {
                 Acciones Rápidas
               </h2>
               <div className="space-y-3">
-                <Button variant="primary" size="sm" className="w-full">
-                  Nueva Reserva
-                </Button>
-                <Button size="sm" className="w-full">
-                  Mis Reservas
-                </Button>
-                <Button size="sm" className="w-full">
-                  Historial
-                </Button>
-                <Button size="sm" className="w-full">
-                  Configuración
-                </Button>
+                  <Button variant="primary" size="sm" className="w-full" onClick={handleNewReservationClick}>
+                  Nueva Reserva
+                </Button>
+                <Button size="sm" className="w-full" onClick={handleMyReservationsClick}>
+                  Mis Reservas
+                </Button>
+                <Button size="sm" className="w-full" onClick={handleHistoryClick}>
+                  Historial
+                </Button>
+                <Button size="sm" className="w-full" onClick={handleSettingsClick}>
+                  Configuración
+                </Button>
               </div>
             </div>
 

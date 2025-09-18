@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { ServiceCard } from "../../components/Cards/ServiceCard"; // Importa el nuevo componente
+import { ServiceCard } from "../../components/Cards/ServiceCard";
 import { getCourts } from "../../api/auth";
 import { Court, Service } from "../../types/types";
-import { MapPin } from "lucide-react";
+import { MapPin, Search, Filter } from "lucide-react";
+import { AnimatePresence, motion } from "../../utils/depencies";
+import { Button } from "../../components/UI/Button";
 
 export const Services: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedService, setSelectedService] = useState<string>("all");
+  const [priceRange, setPriceRange] = useState<string>("all");
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -19,13 +26,14 @@ export const Services: React.FC = () => {
             court_id: item.court_id,
             court_name: item.court_name,
             city: item.city,
-            address: item.address, // Asegúrate de incluir todas las propiedades de la interfaz Service
+            address: item.address,
             description: item.description,
             phone: item.phone,
             photos: item.photos,
             court_prices: item.court_prices,
             state: item.state,
-            price:item.price
+            price: item.price,
+            services: item.court_type // Asegúrate de que esta propiedad existe en tu tipo Court
           }));
         setServices(fetchedServices);
       } catch (err) {
@@ -38,6 +46,39 @@ export const Services: React.FC = () => {
     fetchServices();
   }, []);
 
+  const serviceTypes = [
+    { value: "all", label: "Todos los servicios" },
+    { value: "equipacion", label: "Equipación" },
+    { value: "entrenamiento", label: "Entrenamiento" },
+    { value: "iluminacion", label: "Iluminación" },
+    { value: "camerinos", label: "Camerinos" },
+    { value: "arbitraje", label: "Arbitraje" },
+  ];
+
+  const priceRanges = [
+    { value: "all", label: "Todos los precios" },
+    { value: "low", label: "Hasta $30,000" },
+    { value: "medium", label: "$30,000 - $50,000" },
+    { value: "high", label: "Más de $50,000" },
+  ];
+
+  const filteredServices = services.filter((service) => {
+    const matchesSearch =
+      service.court_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.city?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesServiceType =
+      selectedService === "all" || service.court_type?.toLowerCase().includes(selectedService);
+
+    const matchesPrice =
+      priceRange === "all" ||
+      (priceRange === "low" && service.price <= 30000) ||
+      (priceRange === "medium" && service.price > 30000 && service.price <= 50000) ||
+      (priceRange === "high" && service.price > 50000);
+
+    return matchesSearch && matchesServiceType && matchesPrice;
+  });
+
   const handleSelectService = (service: Service) => {
     console.log("Contratar servicio:", service);
   };
@@ -46,31 +87,114 @@ export const Services: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Servicios Adicionales
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              Completa tu experiencia deportiva con nuestros servicios profesionales
-            </p>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Servicios Adicionales
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Completa tu experiencia deportiva con nuestros servicios profesionales
+          </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search and Filters */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Buscar por nombre o ubicación..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button
+              variant="outline-solid"
+              onClick={() => setShowFilters(!showFilters)}
+              icon={Filter}
+              iconPosition="left"
+            >
+              Filtros
+            </Button>
+          </div>
+          {showFilters && (
+            <AnimatePresence>
+              <motion.div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Service Type Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Tipo de Servicio
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    value={selectedService}
+                    onChange={(e) => setSelectedService(e.target.value)}
+                  >
+                    {serviceTypes.map((service) => (
+                      <option key={service.value} value={service.value}>
+                        {service.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Price Range Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Rango de Precio
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    value={priceRange}
+                    onChange={(e) => setPriceRange(e.target.value)}
+                  >
+                    {priceRanges.map((range) => (
+                      <option key={range.value} value={range.value}>
+                        {range.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-end">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setSelectedService("all");
+                      setPriceRange("all");
+                    }}
+                  >
+                    Limpiar Filtros
+                  </Button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </div>
+
+        {/* Results */}
+        <div className="mb-6">
+          <p className="text-gray-600 dark:text-gray-300">
+            {filteredServices.length} servicio{filteredServices.length !== 1 ? "s" : ""} encontrado{filteredServices.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+
         {isLoading ? (
           <div className="text-center py-12 text-gray-500">Cargando servicios...</div>
         ) : error ? (
           <div className="text-center py-12 text-red-500">
             Error: {error}
           </div>
-        ) : services.length > 0 ? (
+        ) : filteredServices.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
-              <ServiceCard // <-- Usa el nuevo componente
+            {filteredServices.map((service) => (
+              <ServiceCard
                 key={service.court_id}
-                service={service} // <-- Pasa la prop service
+                service={service}
                 onSelect={handleSelectService}
               />
             ))}

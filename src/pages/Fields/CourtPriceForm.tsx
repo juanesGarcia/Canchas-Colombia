@@ -3,53 +3,27 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     DollarSign,
     Calendar,
-    PenTool,
-    CreditCard
+    PenTool
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import Swal from 'sweetalert2';
 import {
-    fetchCourtPriceData,
-    updateCourtPrices
-} from '../../api/auth'; // Asegúrate de que estas funciones existan
-
-interface CourtPriceData {
-    name: string;
-    prices: {
-        monday: number;
-        tuesday: number;
-        wednesday: number;
-        thursday: number;
-        friday: number;
-        saturday: number;
-        sunday: number;
-    };
-    state: boolean;
-}
+    getSubCourtPrice,
+    updateSubCourt // ✅ IMPORT THE NEW API FUNCTION
+} from '../../api/auth';
+import { SubCourtPrice } from "../../types/types";
 
 export const CourtPriceForm: React.FC = () => {
     const { subcourtId } = useParams<{ subcourtId: string }>();
     const navigate = useNavigate();
 
-    const [courtName, setCourtName] = useState('');
-    const [prices, setPrices] = useState < Record < string, number >> ({
-        monday: 0,
-        tuesday: 0,
-        wednesday: 0,
-        thursday: 0,
-        friday: 0,
-        saturday: 0,
-        sunday: 0,
-    });
-    const [state, setState] = useState(true);
-
+    const [courtData, setCourtData] = useState<SubCourtPrice | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [dataFetched, setDataFetched] = useState(false);
 
     useEffect(() => {
         if (!subcourtId) {
-            setError('ID de subcancha no encontrado. No se puede cargar la información.');
+            setError('ID de subcancha no encontrado.');
             return;
         }
 
@@ -57,15 +31,17 @@ export const CourtPriceForm: React.FC = () => {
             setLoading(true);
             setError('');
             try {
-                // Suponiendo que `fetchCourtPriceData` es una función en tu API que trae la info.
-                const data: CourtPriceData = await fetchCourtPriceData(subcourtId);
-                setCourtName(data.name);
-                setPrices(data.prices);
-                setState(data.state);
-                setDataFetched(true);
+                const data: SubCourtPrice[] = await getSubCourtPrice(subcourtId);
+                
+                if (data.length > 0) {
+                    setCourtData(data[0]);
+                } else {
+                    setCourtData(null);
+                    setError('No se encontraron datos para esta cancha.');
+                }
             } catch (err: any) {
                 const errorMessage = err.response?.data?.error || err.message || 'Error desconocido al cargar los datos.';
-                setError('Error al cargar la información de la cancha. ' + errorMessage);
+                setError('Error al cargar la información: ' + errorMessage);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error de carga',
@@ -80,10 +56,27 @@ export const CourtPriceForm: React.FC = () => {
     }, [subcourtId]);
 
     const handlePriceChange = (day: string, value: string) => {
-        setPrices(prevPrices => ({
-            ...prevPrices,
-            [day]: Number(value)
-        }));
+        if (courtData) {
+            setCourtData({
+                ...courtData,
+                price: {
+                    ...courtData.price,
+                    [day]: Number(value)
+                }
+            });
+        }
+    };
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (courtData) {
+            setCourtData({ ...courtData, name: e.target.value });
+        }
+    };
+
+    const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (courtData) {
+            setCourtData({ ...courtData, state: e.target.value === 'true' });
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -91,35 +84,36 @@ export const CourtPriceForm: React.FC = () => {
         setLoading(true);
         setError('');
 
-        if (!subcourtId) {
-            setError('ID de subcancha no encontrado. No se puede actualizar el precio.');
+        if (!subcourtId || !courtData) {
+            setError('Datos de la subcancha no disponibles.');
             setLoading(false);
             return;
         }
 
         const dataToSend = {
-            name: courtName,
-            prices,
-            state
+            name: courtData.name,
+            price: courtData.price,
+            state: courtData.state
         };
 
         try {
-            // `updateCourtPrices` sería tu función API para actualizar los datos.
-            const success = await updateCourtPrices(dataToSend, subcourtId);
+            // ✅ CALL THE API TO UPDATE THE DATA
+            await updateSubCourt(subcourtId, dataToSend);
+            
+            Swal.fire({
+                icon: 'success',
+                title: '¡Actualización Exitosa!',
+                text: 'Los datos de la cancha se han actualizado correctamente.',
+                showConfirmButton: false,
+                timer: 2000
+            });
+            
+            // Redirect or go back after a successful update
+            navigate(-1);
 
-            if (success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Actualización Exitosa!',
-                    text: 'Los precios y el estado de la subcancha han sido actualizados.',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-                navigate('/');
-            }
         } catch (err: any) {
-            const errorMessage = err.response?.data?.error || err.message || 'Error desconocido al actualizar la información.';
-            setError('Error al actualizar los precios. ' + errorMessage);
+            const errorMessage = err.response?.data?.error || err.message || 'Error desconocido al actualizar los datos.';
+            setError('Error al actualizar la información: ' + errorMessage);
             Swal.fire({
                 icon: 'error',
                 title: 'Error de Actualización',
@@ -130,17 +124,27 @@ export const CourtPriceForm: React.FC = () => {
         }
     };
 
-    const dayLabels: {
-        [key: string]: string
-    } = {
-        monday: 'Lunes',
-        tuesday: 'Martes',
-        wednesday: 'Miércoles',
-        thursday: 'Jueves',
-        friday: 'Viernes',
-        saturday: 'Sábado',
-        sunday: 'Domingo',
+    const dayLabels: { [key: string]: string } = {
+        Friday: 'Viernes',
+        Monday: 'Lunes',
+        Saturday: 'Sábado',
+        Sunday: 'Domingo',
+        Thursday: 'Jueves',
+        Wednesday: 'Miércoles',
+        martes: 'Martes',
     };
+
+    if (loading && !courtData) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <p className="text-gray-500 dark:text-gray-400">Cargando datos de la cancha...</p>
+            </div>
+        );
+    }
+    
+    if (!courtData) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -155,7 +159,7 @@ export const CourtPriceForm: React.FC = () => {
                         Actualizar Precios y Estado de Cancha
                     </h2>
                     <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-                        {dataFetched ? `Editando la subcancha: ${courtName}` : 'Cargando...'}
+                        Editando la subcancha: **{courtData.name}**
                     </p>
                 </div>
 
@@ -179,15 +183,14 @@ export const CourtPriceForm: React.FC = () => {
                                     required
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                     placeholder="Nombre de la cancha"
-                                    value={courtName}
-                                    onChange={(e) => setCourtName(e.target.value)}
+                                    value={courtData.name}
+                                    onChange={handleNameChange}
                                 />
                             </div>
                         </div>
 
-                        {/* Precios por día */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {Object.entries(prices).map(([day, priceValue]) => (
+                            {Object.entries(courtData.price).map(([day, priceValue]) => (
                                 <div key={day}>
                                     <label htmlFor={day} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Precio para {dayLabels[day]}
@@ -208,7 +211,6 @@ export const CourtPriceForm: React.FC = () => {
                             ))}
                         </div>
 
-                        {/* Estado de la cancha */}
                         <div>
                             <label htmlFor="state" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Estado de la Cancha
@@ -218,8 +220,8 @@ export const CourtPriceForm: React.FC = () => {
                                 <select
                                     id="state"
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    value={state.toString()}
-                                    onChange={(e) => setState(e.target.value === 'true')}
+                                    value={courtData.state.toString()}
+                                    onChange={handleStateChange}
                                 >
                                     <option value="true">Disponible</option>
                                     <option value="false">No Disponible</option>

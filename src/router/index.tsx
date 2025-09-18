@@ -68,6 +68,19 @@ const ReservationRegister = lazy(() =>
   }))
 );
 
+
+const ReservationCalendar = lazy(() =>
+  import("../pages/Reservation/ReservationCalendar").then((module) => ({
+    default: module.ReservationCalendar,
+  }))
+);
+
+const UserUpdateForm = lazy(() =>
+  import("../pages/Fields/UserUpdateForm").then((module) => ({
+    default: module.UserUpdateForm,
+  }))
+);
+
 const FieldsById = lazy(() =>
   import("../pages/Fields/FieldsById").then((module) => ({
     default: module.FieldsById,
@@ -80,9 +93,21 @@ const CourtPriceForm = lazy(() =>
   }))
 );
 
+const FieldForm = lazy(() =>
+  import("../pages/Fields/FieldForm").then((module) => ({
+    default: module.FieldForm,
+  }))
+);
+
 const ServicesDetail = lazy(() =>
   import("../pages/Services/ServiceDetail").then((module) => ({
     default: module.ServiceDetail,
+  }))
+);
+
+const CourtDetail = lazy(() =>
+  import("../pages/Fields/FieldDetailPage/CourtDetail").then((module) => ({
+    default: module.CourtDetail,
   }))
 );
 
@@ -103,6 +128,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/fields/:id" element={<FieldDetailPage/>} />
           <Route path="/ServicesDetail/:id" element={<ServicesDetail/>} />
+          <Route path="/CourtDetail/:id" element={<CourtDetail/>} />
           {/* Legal Pages */}
           <Route
             path="/terms"
@@ -158,6 +184,7 @@ export const AppRouter: React.FC = () => {
             }
           />
 <Route path="/ReservationRegister/:subcourtId" element={<ReservationRegister />} />
+<Route path="/ReservationCalendar/:subcourtId" element={<ReservationCalendar />} />
           <Route
             path="/faq"
             element={
@@ -184,16 +211,7 @@ export const AppRouter: React.FC = () => {
             <Route
               path="/profile"
               element={
-                <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                  <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                      Mi Perfil
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Próximamente disponible
-                    </p>
-                  </div>
-                </div>
+<UserUpdateForm/>
               }
             />
             <Route path="/fieldsManage" element={<FieldsManage />} />
@@ -209,6 +227,8 @@ export const AppRouter: React.FC = () => {
              <Route path="/RegisterService" element={<RegisterService />} />
              <Route path="/ReservationRegisterDashboard/:subcourtId" element={<ReservationRegister />} />
              <Route path="/SubcourtForm/:subcourtId" element={<CourtPriceForm />} />
+             <Route path="/UserUpdate" element={<UserUpdateForm />} />
+             <Route path="/FieldForm" element={<FieldForm />} />
             {" "}
           
           </Route>

@@ -11,9 +11,14 @@ import {
   Subcourt,
   Service,
   RegistrationSubCourt,
-  SubcourtAdd
-} from '../types/types.ts';
+  SubcourtAdd,
+  SubCourtPrice,
+  UserUpdate,
+  CourtUpdate,
+  Reservation
 
+} from '../types/types.ts';
+import { format } from 'date-fns';
 axios.defaults.withCredentials = true;
 
 const backendUrl = 'http://localhost:3000';
@@ -40,9 +45,9 @@ interface GetSubcourtsResponse {
   subcourts: Subcourt[]; // El backend ahora devuelve directamente este campo
 }
 
-interface GetSubcourtsResponseAdd {
+interface GetSubcourtsResponsePrice {
   success: boolean;
-  subcourts: SubcourtAdd[]; // El backend ahora devuelve directamente este campo
+  subcourts: SubCourtPrice[]; // El backend ahora devuelve directamente este campo
 }
 
 interface GetSubcourtResponse {
@@ -90,13 +95,24 @@ export async function getUsers(): Promise<User[]> {
   return response.data;
 }
 
+export async function getReservationsBySubcourtAndDate(subcourtId: string, date: Date): Promise<Reservation[]> {
+  const formattedDate = format(date, 'yyyy-MM-dd');
+  
+  // Use a GET request and pass the date as a URL query parameter
+  const response = await axios.get<{ reservations: Reservation[] }>(
+    `${backendUrl}/ReservationDate/${subcourtId}?reservationDate=${formattedDate}`
+  );
+  
+  return response.data.reservations;
+}
+
 // Obtener un usuario por su ID
 export async function getUser(id: string): Promise<User> {
   const response = await axios.get(`${backendUrl}/user/${id}`);
   return response.data as User; // Le dices a TypeScript: "confía en mí, esto es un User"
 }
 // Actualizar un usuario
-export async function onUpdateUser(updateData: { id: string; userData: Pick<User, 'name' | 'password'>; token: string }) {
+export async function onUpdateUser(updateData: { id: string; userData: UserUpdate; token: string }) {
   return await axios.put(`${backendUrl}/user/${updateData.id}`, updateData.userData, {
     headers: {
       'Authorization': `Bearer ${updateData.token}`,
@@ -104,6 +120,17 @@ export async function onUpdateUser(updateData: { id: string; userData: Pick<User
     }
   });
 }
+
+export const updateSubCourt = async (subcourtId: string, data: Partial<SubCourtPrice>) => {
+    try {
+        const response = await axios.put(`${backendUrl}/subcourtPrice/${subcourtId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating subcourt:', error);
+        throw error;
+    }
+};
+
 
 // Eliminar un usuario
 export async function onDeleteUser(data: { id: string; token: string }) {
@@ -122,6 +149,20 @@ export async function getCourts(): Promise<Court[]> {
   const response = await axios.get<GetCourtsResponse>(`${backendUrl}/courts`);
   console.log(response.data.courts);
   return response.data.courts;
+}
+export async function getSubCourtPrice(id: string): Promise<SubCourtPrice[]> {
+    try {
+        const response = await axios.get<SubCourtPrice[]>(`${backendUrl}/subcourtPrice/${id}`);
+        
+        // Log the data directly, not the `subcourts` property.
+        console.log(response.data);
+        
+        // The data is the array you need, so return it directly.
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener el precio de la subcancha:", error);
+        throw error;
+    }
 }
 
 export async function getServices(): Promise<Court[]> {
@@ -150,8 +191,8 @@ export async function getSubcourtsByUserId(userId: string): Promise<Subcourt[]> 
   }
 }
 // Actualizar una cancha
-export async function onUpdateCourt(updateData: { id: string; courtData: Partial<Court>; token: string }) {
-  return await axios.put(`${backendUrl}/court/${updateData.id}`, updateData.courtData, {
+export async function onUpdateCourt(updateData: { id: string; fieldData : CourtUpdate; token: string }) {
+  return await axios.put(`${backendUrl}/courts/${updateData.id}`, updateData.fieldData, {
     headers: {
       'Authorization': `Bearer ${updateData.token}`,
       'Content-Type': 'application/json'

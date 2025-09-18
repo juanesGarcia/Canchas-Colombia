@@ -15,7 +15,6 @@ export const Fields: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
-  const [city, setCity] = useState("all");
 
   useEffect(() => {
     const fetchCourts = async () => {
@@ -35,7 +34,7 @@ export const Fields: React.FC = () => {
 
   const fieldTypes = [
     { value: "all", label: "Todos" },
-    { value: "football", label: "Fútbol" },
+    { value: "futbol", label: "futbol" },
     { value: "basketball", label: "Básquet" },
     { value: "tennis", label: "Tenis" },
     { value: "volleyball", label: "Voleibol" },
@@ -55,27 +54,26 @@ export const Fields: React.FC = () => {
     { value: "high", label: "Más de $50,000" },
   ];
 
-  const filteredFields = courts.filter((court) => {
-    const matchesSearch =
-      court.court_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      court.city.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === "all" || court.court_type === selectedType;
-    const matchesByCity = city === "all" || court.city === city;
-    const matchesPrice =
-  priceRange === "all" ||
-  (priceRange === "low" && court.court_prices.some(cp => cp.price <= 30000)) ||
-  (priceRange === "medium" && court.court_prices.some(cp => cp.price > 30000 && cp.price <= 50000)) ||
-  (priceRange === "high" && court.court_prices.some(cp => cp.price > 50000));
-const isCourt = court.is_court === true;
-    return (
-      matchesByCity &&
-      matchesSearch &&
-      matchesType &&
-      matchesPrice &&
-      isCourt
-    );
-  });
+const filteredFields = courts.filter((court) => {
+  const matchesSearch =
+    court.court_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    court.city?.toLowerCase().includes(searchTerm.toLowerCase())
+  const matchesType =
+      selectedType === "all" || court.court_type?.toLowerCase().includes(selectedType);
+  const matchesPrice =
+    priceRange === "all" ||
+    (priceRange === "low" && court.price <= 30000) ||
+    (priceRange === "medium" && court.price > 30000 && court.price <= 50000) ||
+    (priceRange === "high" && court.price > 50000);
+  const isCourt = court.is_court === true;
 
+  return (
+    matchesSearch &&
+    matchesType &&
+    matchesPrice &&
+    isCourt
+  );
+});
   const handleBookField = (court: Court) => {
     console.log("Reservar cancha:", court);
   };
@@ -152,22 +150,7 @@ const isCourt = court.is_court === true;
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Ciudad
-                  </label>
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                  >
-                    {cities.map((city) => (
-                      <option key={city.value} value={city.value}>
-                        {city.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+
                 <div className="flex items-end">
                   <Button
                     variant="ghost"

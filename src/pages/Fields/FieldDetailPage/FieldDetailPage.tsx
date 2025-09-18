@@ -19,24 +19,9 @@ export const FieldDetailPage: React.FC = () => {
     return <div>Cancha no encontrada.</div>;
   }
 
-  const handleAddSubcourt = () => {
-    setShowForm(true);
-  };
-
-  const handleDeleteSubcourt = (subcourtId: string) => {
-    // Lógica para eliminar la subcancha
-    console.log(`Eliminar subcancha con ID: ${subcourtId}`);
-  };
-
   const handleReserveSubcourt = (subcourtId: string) => {
     // Lógica para redirigir a la página de reserva o abrir un modal
-   navigate(`/ReservationRegister/${subcourtId}`);
-  };
-
-  const handleSubmitForm = (newSubcourtData: any) => {
-    // Lógica para enviar la nueva subcancha a la API
-    console.log("Nueva subcancha a agregar:", newSubcourtData);
-    setShowForm(false);
+   navigate(`/ReservationCalendar/${subcourtId}`);
   };
 
   return (
@@ -83,66 +68,10 @@ export const FieldDetailPage: React.FC = () => {
                         Reservar
                       </button>
                     )}
-                    <button
-                      onClick={() => handleDeleteSubcourt(subcourt.id)}
-                      className="p-2 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
-                    >
-                      <XCircle className="w-5 h-5" />
-                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Botón para agregar subcancha */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={handleAddSubcourt}
-            className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center font-medium"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Agregar Subcancha
-          </button>
-        </div>
-
-        {/* Formulario de agregar subcancha (condicional) */}
-        {showForm && (
-          <div className="mt-6 p-6 border rounded-lg shadow-md bg-gray-50 dark:bg-gray-700">
-            <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              Nueva Subcancha
-            </h4>
-            {/* Aquí iría tu formulario real */}
-            <form onSubmit={(e) => { e.preventDefault(); handleSubmitForm({}); }}>
-              {/* Ejemplo de campos del formulario */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Nombre de la Subcancha
-                </label>
-                <input
-                  type="text"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 
-             dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="Ej. Cancha Pequeña 3"
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-                >
-                  Guardar
-                </button>
-              </div>
-            </form>
           </div>
         )}
       </div>

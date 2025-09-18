@@ -9,8 +9,17 @@ export interface User {
   state?: boolean;
 }
 
+export interface UserUpdate {
+  name: string;
+  password?: string;
+}
 
-
+export interface CourtUpdate {
+  name: string;
+  description: string;
+  phone: string; 
+  court_type: string;
+}
 
 export interface RegistrationData {
   email: string;
@@ -52,7 +61,13 @@ export interface Subcourt {
 }
 
 
-
+export interface SubCourtPrice {
+    id: string;
+    name: string;
+    state: boolean;
+    day_of_week:string;
+    price: number;
+}
 export interface SubcourtAdd{
   id:string;
   name: string;
@@ -111,6 +126,7 @@ export interface Service {
   photos: Photo[];
   state: boolean;
   price: number;
+  court_type: string;
   // Agrega cualquier otra propiedad que un servicio pueda tener
 }
 
@@ -129,7 +145,9 @@ export interface Post {
 export interface CourtPrice {
   id?: string;
   day_of_week: string; // Ejemplo: 'Lunes', 'Martes', 'Domingo'
-  price: number;       // El precio en pesos
+    price: { 
+        [key: string]: number;
+    };     // El precio en pesos
 }
 
 export interface CourtSocial {
@@ -147,4 +165,28 @@ export interface LoginData {
 export interface RegistrationSubCourt {
   name:string;
   state:boolean;
+}
+
+export interface Reservation {
+  reservation_id: string;
+  reservation_date: string;
+  reservation_time: string;
+  duration: number;
+  end_time: string;
+  state: string;
+  price_reservation: number;
+  transfer: boolean;
+  client_name: string;
+  client_phone: string;
+  subcourt_id: string;
+  subcourt_name: string;
+  court_id: string;
+  court_name: string;
+}
+
+
+export interface UseReservationsResult {
+  reservations: Reservation[];
+  loading: boolean;
+  error: string | null;
 }

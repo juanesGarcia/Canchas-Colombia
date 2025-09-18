@@ -7,12 +7,11 @@ import {
   CalendarCheck,
   MapPin,
   Loader,
-  Pencil, // ✅ Agregado el ícono de lápiz para modificar
+  Pencil,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { Subcourt, RegistrationSubCourt } from "../../types/types";
 import { useAuth } from "../../contexts/AuthContext";
-// Asume que estas funciones están correctamente implementadas para retornar los datos
 import { getSubcourtsByUserId, onSubCourt, deleteSubcourt } from "../../api/auth";
 
 /**
@@ -115,7 +114,6 @@ export const FieldsById: React.FC = () => {
     setShowForm(true);
   };
   
-  // ✅ Nueva función para manejar la navegación a la página de modificación
   const handleModifySubcourt = (subcourtId: string) => {
     navigate(`/SubcourtForm/${subcourtId}`);
   };
@@ -174,13 +172,13 @@ export const FieldsById: React.FC = () => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 max-w-4xl mx-auto my-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Mis Subcanchas
         </h2>
         <button
           onClick={handleAddSubcourt}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors flex items-center"
+          className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
         >
           <Plus className="w-4 h-4 mr-2" />
           Nueva Subcancha
@@ -203,13 +201,24 @@ export const FieldsById: React.FC = () => {
           {subcourts.map((subcourt) => (
             <div
               key={subcourt.subcourt_id}
-              className="p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-between border border-gray-200 dark:border-gray-600 shadow-sm"
+              className="p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-200 dark:border-gray-600 shadow-sm gap-4"
             >
-              <div className="flex-1">
-                <p className="font-bold text-gray-900 dark:text-white">
-                  {subcourt.subcourt_name}
-                </p>
-                <div className="flex items-center space-x-2 mt-1">
+              {/* Contenido principal: nombre y estado */}
+              <div className="flex flex-col flex-1">
+                {/* Nombre y botón de eliminar */}
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="font-bold text-gray-900 dark:text-white">
+                    {subcourt.subcourt_name}
+                  </p>
+                  <button
+                    onClick={() => handleDeleteSubcourt(subcourt)}
+                    className="p-1 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
+                  >
+                    <XCircle className="w-5 h-5" />
+                  </button>
+                </div>
+                {/* Estado */}
+                <div className="flex items-center space-x-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mr-2">
                     Estado:
                   </p>
@@ -224,29 +233,23 @@ export const FieldsById: React.FC = () => {
                   )}
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              {/* Botones de acción (Reservar, Modificar) */}
+              <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                 {subcourt.state && (
                   <button
                     onClick={() => handleReserveSubcourt(subcourt.subcourt_id)}
-                    className="px-3 py-1.5 bg-green-600 text-white rounded-md flex items-center hover:bg-green-700 transition-colors"
+                    className="w-full sm:w-auto px-3 py-1.5 bg-green-600 text-white rounded-md flex items-center justify-center hover:bg-green-700 transition-colors"
                   >
                     <CalendarCheck className="w-4 h-4 mr-2" />
                     Reservar
                   </button>
                 )}
-                {/* ✅ Nuevo botón de modificar */}
                 <button
                   onClick={() => handleModifySubcourt(subcourt.subcourt_id)}
-                  className="px-3 py-1.5 bg-yellow-500 text-white rounded-md flex items-center hover:bg-yellow-600 transition-colors"
+                  className="w-full sm:w-auto px-3 py-1.5 bg-yellow-500 text-white rounded-md flex items-center justify-center hover:bg-yellow-600 transition-colors"
                 >
                   <Pencil className="w-4 h-4 mr-2" />
                   Modificar
-                </button>
-                <button
-                  onClick={() => handleDeleteSubcourt(subcourt)}
-                  className="p-2 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
-                >
-                  <XCircle className="w-5 h-5" />
                 </button>
               </div>
             </div>
