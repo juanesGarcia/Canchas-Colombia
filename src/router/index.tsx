@@ -4,7 +4,8 @@ import { PrivateLayout } from "../components/Layout/private";
 import { lazy } from "../utils/depencies";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 import { AdminRoute } from "./AdminRoute";
-
+import { Proveedor } from "./Proveedor";
+import { UserRoute } from "./UserRoute";
 // Pages
 const Home = lazy(() =>
   import("../pages/Home/Home").then((module) => ({ default: module.Home }))
@@ -215,16 +216,16 @@ export const AppRouter: React.FC = () => {
               }
             />
             <Route path="/fieldsManage" element={<FieldsManage />} />
-            <Route
-              path="/bookings"
-              element={<FieldsById/>}
-              
-            />
+             <Route element={<UserRoute />}>
+              <Route path="/bookings"element={<FieldsById/>}/>
+            </Route>
               <Route element={<AdminRoute />}>
                 <Route path="/register" element={<Register />} />
             </Route>
+             <Route element={<Proveedor/>}>
+                <Route path="/RegisterService" element={<RegisterService />} />
+            </Route>
              <Route path="/ImageSelector" element={<ImageSelector />} />
-             <Route path="/RegisterService" element={<RegisterService />} />
              <Route path="/ReservationRegisterDashboard/:subcourtId" element={<ReservationRegister />} />
              <Route path="/SubcourtForm/:subcourtId" element={<CourtPriceForm />} />
              <Route path="/UserUpdate" element={<UserUpdateForm />} />

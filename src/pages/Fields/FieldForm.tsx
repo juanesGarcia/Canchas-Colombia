@@ -23,7 +23,7 @@ export const FieldForm: React.FC = () => {
 
     const fieldTypes = [
         { value: "", label: "Seleccione un tipo de cancha" },
-        { value: "futbol", label: "Fútbol" },
+        { value: "futbol", label: "Futbol" },
         { value: "basketball", label: "Básquet" },
         { value: "tennis", label: "Tenis" },
         { value: "volleyball", label: "Voleibol" },
@@ -55,7 +55,7 @@ export const FieldForm: React.FC = () => {
             return;
         }
 
-        const fieldId = id;
+        const fieldId = user.id;
         if (!fieldId) {
             setError('ID de cancha no proporcionado.');
             setLoading(false);

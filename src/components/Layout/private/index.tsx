@@ -9,7 +9,9 @@ import {
   Menu as MenuIcon,
   Moon as MoonIcon,
   Sun as SunIcon,
-  Volleyball
+  Volleyball,
+  Image as ImageIcon,
+  FilePenLine as FilePenLineIcon,
 } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useTheme } from "../../../contexts/ThemeContext";
@@ -19,7 +21,7 @@ import { PRIVATE_NAVIGATION_ITEMS } from "../../../constants";
 interface NavigationItem {
   name: string;
   path: string;
-  icon?: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 export const PrivateLayout = () => {
@@ -34,31 +36,56 @@ export const PrivateLayout = () => {
     navigate("/login");
   };
 
-  // ✅ Lógica corregida para filtrar los elementos de navegación
-  let privateNavItems: NavigationItem[] = PRIVATE_NAVIGATION_ITEMS.map((item) => ({
-    ...item,
-    icon:
-      item.name === "Mis Reservas"
-        ? CalendarIcon
-        : item.name === "Perfil"
-        ? UserIcon
-        : item.name === "Dashboard"
-        ? HomeIcon
-        : item.name === "Canchas"
-        ? Volleyball
-        : item.name === "Registro"
-        ? CalendarIcon
-        : item.name === "Imagenes"
-        ? CalendarIcon
-        : item.name === "RegisterServices"
-        ? CalendarIcon
-        : undefined,
-  }));
+  // ✅ Función para obtener elementos específicos por rol
+  const getRoleSpecificNavItems = () => {
+    if (!user?.role) return [];
 
-  // ✅ Filtra el elemento "Registro" si el usuario no es 'superadmin'
-  if (user?.role !== 'superadmin') {
-    privateNavItems = privateNavItems.filter(item => item.name !== "Registro");
-  }
+    let filteredItems = [];
+    switch (user.role) {
+      case 'admin':
+        filteredItems = PRIVATE_NAVIGATION_ITEMS.filter(
+          (item) =>
+            item.name === "Mis Reservas" ||
+            item.name === "Canchas" ||
+            item.name === "Imagenes"
+        );
+        break;
+      case 'proveedor':
+        filteredItems = PRIVATE_NAVIGATION_ITEMS.filter(
+          (item) => item.name === "RegistroServicios"
+        );
+        break;
+      case 'superadmin':
+        filteredItems = PRIVATE_NAVIGATION_ITEMS.filter(
+          (item) => item.name === "Registro"
+        );
+        break;
+      default:
+        // Los usuarios sin un rol específico solo ven el dashboard
+        return [];
+    }
+    return filteredItems;
+  };
+
+  // ✅ Elementos de navegación siempre visibles (estáticos)
+  const staticNavItems = [
+    { name: "Dashboard", path: "/dashboard", icon: HomeIcon },
+  ];
+
+  // ✅ Elementos de navegación específicos del rol
+  const roleSpecificItems = getRoleSpecificNavItems();
+
+  // ✅ Combina y asigna los íconos a los elementos de navegación
+  const privateNavItems: NavigationItem[] = [...staticNavItems, ...roleSpecificItems].map((item) => {
+    let icon = HomeIcon;
+    if (item.name === "Mis Reservas") icon = CalendarIcon;
+    if (item.name === "Perfil") icon = UserIcon;
+    if (item.name === "Canchas") icon = Volleyball;
+    if (item.name === "Registro") icon = FilePenLineIcon;
+    if (item.name === "Imagenes") icon = ImageIcon;
+    if (item.name === "RegistroServicios") icon = FilePenLineIcon;
+    return { ...item, icon };
+  });
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -78,7 +105,7 @@ export const PrivateLayout = () => {
           {/* Navigation */}
           <nav className="flex-1 px-4 py-4 overflow-y-auto">
             {privateNavItems.map((item) => {
-              const Icon = item.icon || HomeIcon;
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.path}
@@ -96,7 +123,7 @@ export const PrivateLayout = () => {
             })}
           </nav>
 
-          {/* User Section */}
+          {/* User Section (este siempre se muestra) */}
           <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center mb-4">
               {user?.avatar ? (
@@ -139,10 +166,9 @@ export const PrivateLayout = () => {
           </div>
         </div>
       </div>
-
       {/* Main Content */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Mobile Header */}
+        {/* ... (Mobile header y Outlet) ... */}
         <header className="md:hidden bg-white dark:bg-gray-800 shadow-sm">
           <div className="flex items-center justify-between px-4 py-3">
             <button
@@ -178,19 +204,17 @@ export const PrivateLayout = () => {
             </div>
           </div>
         </header>
-
-        {/* Content Area */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
           <Outlet />
         </main>
       </div>
 
-      {/* Mobile Menu */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         onLogout={handleLogout}
         user={user}
+        navigationItems={privateNavItems}
       />
     </div>
   );

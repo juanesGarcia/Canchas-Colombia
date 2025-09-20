@@ -1,4 +1,12 @@
 import { Field, Service, navigateElement } from "../types";
+import {
+  Calendar as CalendarIcon,
+  User as UserIcon,
+  Home as HomeIcon,
+  Volleyball,
+  Image as ImageIcon,
+  CheckSquare as CheckSquareIcon, // Ícono para "Registro" o "Registro de servicios"
+} from "lucide-react";
 
 export const FIELDS: Field[] = [
   {

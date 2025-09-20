@@ -6,7 +6,7 @@ import {
 export interface Field {
   id: string;
   name: string;
-  type: "football" | "basketball" | "tennis" | "volleyball";
+  type: "futbol" | "basketball" | "tennis" | "volleyball";
   price: number;
   capacity: number;
   available: boolean;
@@ -45,7 +45,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "user" | "superadmin";
+  role: "admin" | "superadmin"| "proveedor";
   avatar?: string;
   token?: string; 
 }

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'; // Importa SweetAlert2
+import Swal from 'sweetalert2';
 import ImageSelector from '../images/ImageSelector';
-import { 
-  Mail, 
-  Lock, 
-  User, 
-  Eye, 
-  EyeOff, 
-  Smartphone, 
-  Building, 
-  MapPin, 
+import {
+  Mail,
+  Lock,
+  User,
+  Eye,
+  EyeOff,
+  Smartphone,
+  Building,
+  MapPin,
   Tag,
   Info,
   CheckCircle,
@@ -18,9 +18,11 @@ import {
   ClipboardList,
   PlusCircle,
   MinusCircle,
+  UserCheck,
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { onRegisterProveedor } from "../../api/auth";
 
 export const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -28,16 +30,18 @@ export const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
+
+  const [role, setRole] = useState<'admin' | 'proveedor'>('admin');
+
   const [courtName, setCourtName] = useState('');
   const [courtAddress, setCourtAddress] = useState('');
   const [courtCity, setCourtCity] = useState('');
   const [courtPhone, setCourtPhone] = useState('');
-  const [courtType, setCourtType] = useState('');
+  const [courtType, setCourtType] = useState<"futbol" | "basketball" | "tennis" | "volleyball" | ''>('');
   const [price, setPrice] = useState<number | ''>('');
   const [isPublic, setIsPublic] = useState(true);
   const [description, setDescription] = useState('');
   const [state, setState] = useState(true);
-  
   const [subcourts, setSubcourts] = useState([{ subcourtName: '', state: true }]);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -60,7 +64,7 @@ export const Register: React.FC = () => {
     }
     setSubcourts(newSubcourts);
   };
-  
+
   const handleRemoveSubcourt = (index: number) => {
     const newSubcourts = subcourts.filter((_, i) => i !== index);
     setSubcourts(newSubcourts);
@@ -91,48 +95,70 @@ export const Register: React.FC = () => {
       return;
     }
 
-    const dataToSend = {
-      email,
-      password,
-      name,
-      role: "admin",
-      phone,
-      courtName,
-      courtAddress,
-      courtCity,
-      courtPhone,
-      court_type: courtType,
-      price: Number(price),
-      is_public: isPublic,
-      description,
-      state,
-      subcourts: subcourts.map(subcourt => ({
-        subcourtName: subcourt.subcourtName,
-        state: subcourt.state,
-      })),
-    };
+    let dataToSend;
+    let registerFunction;
+
+    if (role === 'admin') {
+      dataToSend = {
+        email,
+        password,
+        name,
+        role,
+        phone,
+        courtName,
+        courtAddress,
+        courtCity,
+        courtPhone,
+        court_type: courtType,
+        price: Number(price),
+        is_public: isPublic,
+        description,
+        state,
+        subcourts: subcourts.map(subcourt => ({
+          subcourtName: subcourt.subcourtName,
+          state: subcourt.state,
+        })),
+      };
+      registerFunction = register;
+    } else if (role === 'proveedor') {
+      dataToSend = {
+        email,
+        password,
+        name,
+        role,
+        phone,
+      };
+      registerFunction = onRegisterProveedor;
+    }
 
     try {
-      const success = await register(dataToSend);
-      
-      if (success) {
-        Swal.fire({
-          icon: 'success',
-          title: '¡Registro exitoso!',
-          text: 'Tu cuenta ha sido creada y tu cancha registrada. Serás redirigido para iniciar sesión.',
-          timer: 3000,
-          timerProgressBar: true,
-        }).then(() => {
-          navigate('/login');
-        });
+      await registerFunction(dataToSend);
+
+      Swal.fire({
+        icon: 'success',
+        title: '¡Registro exitoso!',
+        text: 'Tu cuenta ha sido creada. Serás redirigido para iniciar sesión.',
+        timer: 3000,
+        timerProgressBar: true,
+      }).then(() => {
+        navigate('/dashboard');
+      });
+
+    } catch (err: any) {
+      console.error("Registration failed:", err);
+      let errorMessage = 'Hubo un problema al crear tu cuenta. Por favor, intenta de nuevo.';
+
+      if (err.response && err.response.data && err.response.data.errors) {
+        const serverErrors = err.response.data.errors;
+        errorMessage = serverErrors.map((e: any) => e.msg).join(' - ');
       }
-    } catch (err) {
-      console.error(err);
+
       Swal.fire({
         icon: 'error',
         title: 'Error en el registro',
-        text: 'Hubo un problema al crear tu cuenta. Por favor, intenta de nuevo.',
+        text: errorMessage,
       });
+
     } finally {
       setLoading(false);
     }
@@ -166,7 +192,27 @@ export const Register: React.FC = () => {
               </div>
             )}
 
-            {/* Campos de usuario */}
+            {/* Selector de Rol */}
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Tipo de Rol
+              </label>
+              <div className="relative">
+                <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <select
+                  id="role"
+                  required
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as 'admin' | 'proveedor')}
+                >
+                  <option value="admin">Admin (Registra Canchas)</option>
+                  <option value="proveedor">Proveedor (Registra Servicios)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Campos de usuario (siempre visibles) */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre completo
@@ -264,214 +310,222 @@ export const Register: React.FC = () => {
               </div>
             </div>
 
-            {/* Campos de la cancha */}
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Información de la Cancha</h3>
-            </div>
+            {/* Renderizado condicional para los campos de cancha (solo para admin) */}
+            {role === 'admin' && (
+              <>
+                <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Información de la Cancha</h3>
+                </div>
 
-            <div>
-              <label htmlFor="courtName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nombre de la Cancha
-              </label>
-              <div className="relative">
-                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="courtName"
-                  type="text"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: Teddy Canchas"
-                  value={courtName}
-                  onChange={(e) => setCourtName(e.target.value)}
-                />
-              </div>
-            </div>
+                <div>
+                  <label htmlFor="courtName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Nombre de la Cancha
+                  </label>
+                  <div className="relative">
+                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      id="courtName"
+                      type="text"
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Ej: Teddy Canchas"
+                      value={courtName}
+                      onChange={(e) => setCourtName(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label htmlFor="courtAddress" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Dirección
-              </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="courtAddress"
-                  type="text"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: Avenida Siempre Viva 742"
-                  value={courtAddress}
-                  onChange={(e) => setCourtAddress(e.target.value)}
-                />
-              </div>
-            </div>
+                <div>
+                  <label htmlFor="courtAddress" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Dirección
+                  </label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      id="courtAddress"
+                      type="text"
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Ej: Avenida Siempre Viva 742"
+                      value={courtAddress}
+                      onChange={(e) => setCourtAddress(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label htmlFor="courtCity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Ciudad
-              </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="courtCity"
-                  type="text"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: Springfield"
-                  value={courtCity}
-                  onChange={(e) => setCourtCity(e.target.value)}
-                />
-              </div>
-            </div>
+                <div>
+                  <label htmlFor="courtCity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Ciudad
+                  </label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      id="courtCity"
+                      type="text"
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Ej: Springfield"
+                      value={courtCity}
+                      onChange={(e) => setCourtCity(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label htmlFor="courtPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Teléfono de la Cancha
-              </label>
-              <div className="relative">
-                <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="courtPhone"
-                  type="tel"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: 6015551234"
-                  value={courtPhone}
-                  onChange={(e) => setCourtPhone(e.target.value)}
-                />
-              </div>
-            </div>
+                <div>
+                  <label htmlFor="courtPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Teléfono de la Cancha
+                  </label>
+                  <div className="relative">
+                    <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      id="courtPhone"
+                      type="tel"
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Ej: 6015551234"
+                      value={courtPhone}
+                      onChange={(e) => setCourtPhone(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label htmlFor="courtType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Tipo de Cancha
-              </label>
-              <div className="relative">
-                <ClipboardList className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="courtType"
-                  type="text"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: Baloncesto"
-                  value={courtType}
-                  onChange={(e) => setCourtType(e.target.value)}
-                />
-              </div>
-            </div>
+                <div>
+                  <label htmlFor="courtType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Tipo de Cancha
+                  </label>
+                  <div className="relative">
+                    <ClipboardList className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <select
+                      id="courtType"
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
+                      value={courtType}
+                      onChange={(e) => setCourtType(e.target.value as "futbol" | "basketball" | "tennis" | "volleyball")}
+                    >
+                      <option value="" disabled hidden>Selecciona un tipo</option>
+                      <option value="futbol">Fútbol</option>
+                      <option value="basketball">Básquetbol</option>
+                      <option value="tennis">Tenis</option>
+                      <option value="volleyball">Voleibol</option>
+                    </select>
+                  </div>
+                </div>
 
-            <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Precio de alquiler
-              </label>
-              <div className="relative">
-                <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="price"
-                  type="number"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: 50000"
-                  value={price}
-                  onChange={(e) => setPrice(Number(e.target.value))}
-                />
-              </div>
-            </div>
+                <div>
+                  <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Precio de alquiler
+                  </label>
+                  <div className="relative">
+                    <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      id="price"
+                      type="number"
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Ej: 50000"
+                      value={price}
+                      onChange={(e) => setPrice(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Descripción
-              </label>
-              <div className="relative">
-                <Info className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <textarea
-                  id="description"
-                  required
-                  rows={3}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Una breve descripción de la cancha..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-            </div>
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Descripción
+                  </label>
+                  <div className="relative">
+                    <Info className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <textarea
+                      id="description"
+                      required
+                      rows={3}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Una breve descripción de la cancha..."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            <div className="flex items-center">
-              <input
-                id="is_public"
-                name="is_public"
-                type="checkbox"
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
-              />
-              <label htmlFor="is_public" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                Cancha pública
-              </label>
-              {isPublic ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
-            </div>
+                <div className="flex items-center">
+                  <input
+                    id="is_public"
+                    name="is_public"
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
+                  />
+                  <label htmlFor="is_public" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                    Cancha pública
+                  </label>
+                  {isPublic ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
+                </div>
 
-            <div className="flex items-center">
-              <input
-                id="state"
-                name="state"
-                type="checkbox"
-                checked={state}
-                onChange={(e) => setState(e.target.checked)}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
-              />
-              <label htmlFor="state" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                Cancha activa
-              </label>
-              {state ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
-            </div>
+                <div className="flex items-center">
+                  <input
+                    id="state"
+                    name="state"
+                    type="checkbox"
+                    checked={state}
+                    onChange={(e) => setState(e.target.checked)}
+                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
+                  />
+                  <label htmlFor="state" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                    Cancha activa
+                  </label>
+                  {state ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
+                </div>
 
-            {/* Campos de Subcanchas */}
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Subcanchas</h3>
-                {subcourts.map((subcourt, index) => (
+                {/* Campos de Subcanchas */}
+                <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Subcanchas</h3>
+                  {subcourts.map((subcourt, index) => (
                     <div key={index} className="space-y-4 mb-4 p-4 border rounded-md border-gray-200 dark:border-gray-700">
-                        <div className="flex justify-between items-center">
-                            <h4 className="font-medium text-gray-900 dark:text-white">Subcancha {index + 1}</h4>
-                            {subcourts.length > 1 && (
-                                <button type="button" onClick={() => handleRemoveSubcourt(index)} className="text-red-500 hover:text-red-700">
-                                    <MinusCircle className="w-5 h-5" />
-                                </button>
-                            )}
-                        </div>
-                        <div>
-                            <label htmlFor={`subcourtName-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Nombre de la Subcancha
-                            </label>
-                            <input
-                                id={`subcourtName-${index}`}
-                                type="text"
-                                required
-                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                placeholder="Ej: Cancha 1"
-                                value={subcourt.subcourtName}
-                                onChange={(e) => handleSubcourtChange(index, 'subcourtName', e.target.value)}
-                            />
-                        </div>
-                        <div className="flex items-center">
-                            <input
-                                id={`subcourtState-${index}`}
-                                type="checkbox"
-                                checked={subcourt.state}
-                                onChange={(e) => handleSubcourtChange(index, 'state', e.target.checked)}
-                                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
-                            />
-                            <label htmlFor={`subcourtState-${index}`} className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                                Subcancha activa
-                            </label>
-                            {subcourt.state ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
-                        </div>
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium text-gray-900 dark:text-white">Subcancha {index + 1}</h4>
+                        {subcourts.length > 1 && (
+                          <button type="button" onClick={() => handleRemoveSubcourt(index)} className="text-red-500 hover:text-red-700">
+                            <MinusCircle className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor={`subcourtName-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Nombre de la Subcancha
+                        </label>
+                        <input
+                          id={`subcourtName-${index}`}
+                          type="text"
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          placeholder="Ej: Cancha 1"
+                          value={subcourt.subcourtName}
+                          onChange={(e) => handleSubcourtChange(index, 'subcourtName', e.target.value)}
+                        />
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          id={`subcourtState-${index}`}
+                          type="checkbox"
+                          checked={subcourt.state}
+                          onChange={(e) => handleSubcourtChange(index, 'state', e.target.checked)}
+                          className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
+                        />
+                        <label htmlFor={`subcourtState-${index}`} className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                          Subcancha activa
+                        </label>
+                        {subcourt.state ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
+                      </div>
                     </div>
-                ))}
-                <Button type="button" variant="ghost" className="w-full flex items-center justify-center space-x-2" onClick={handleAddSubcourt}>
+                  ))}
+                  <Button type="button" variant="ghost" className="w-full flex items-center justify-center space-x-2" onClick={handleAddSubcourt}>
                     <PlusCircle className="w-5 h-5" />
                     <span>Agregar Subcancha</span>
-                </Button>
-            </div>
+                  </Button>
+                </div>
+              </>
+            )}
 
             <div className="flex items-center">
               <input

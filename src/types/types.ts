@@ -39,6 +39,14 @@ export interface RegistrationData {
   subcourts?: Subcourt[];
 }
 
+export interface RegistrationDataProveedor {
+  email: string;
+  password: string;
+  name: string;
+  role: string;
+  phone: string;
+}
+
 export interface ReservationData {
   user_id: string;
   user_name: string;

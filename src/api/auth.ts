@@ -11,6 +11,7 @@ import {
   Subcourt,
   Service,
   RegistrationSubCourt,
+  RegistrationDataProveedor,
   SubcourtAdd,
   SubCourtPrice,
   UserUpdate,
@@ -62,6 +63,10 @@ interface DeleteResponse {
 
 export async function onRegister(registrationData: RegistrationData) {
   return await axios.post(`${backendUrl}/register`, registrationData);
+}
+
+export async function onRegisterProveedor(registrationData: RegistrationDataProveedor) {
+  return await axios.post(`${backendUrl}/registerProveedor`, registrationData);
 }
 
 export async function onReservationRegister(registrationData: ReservationData, subcourtId: string) {
