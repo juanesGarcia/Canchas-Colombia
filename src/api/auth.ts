@@ -16,7 +16,8 @@ import {
   SubCourtPrice,
   UserUpdate,
   CourtUpdate,
-  Reservation
+  Reservation,
+  RegistrationDataPromotion
 
 } from '../types/types.ts';
 import { format } from 'date-fns';
@@ -74,13 +75,16 @@ export async function onReservationRegister(registrationData: ReservationData, s
     const response = await axios.post(`${backendUrl}/reservations/${subcourtId}`, registrationData);
     return response.status >= 200 && response.status < 300;
   } catch (error) {
- 
     console.error('Error al registrar la reserva:', error);
     throw error;
   }
 }
 export async function onRegisterServices(registrationData: RegistrationDataService , userId:string) {
   return await axios.post(`${backendUrl}/registerServices/${userId}`, registrationData);
+}
+
+export async function onRegisterPromotions(registrationData: RegistrationDataPromotion , userId:string) {
+  return await axios.post(`${backendUrl}/registerPromotions/${userId}`, registrationData);
 }
 // Inicio de sesión
 export async function onLogin(loginData: LoginData) {

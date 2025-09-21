@@ -6,6 +6,7 @@ import { ArrowRight, Shield, Clock, Star, Users } from "lucide-react";
 import { Button } from "../../components/UI/Button";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { ServiceCard } from "../../components/Cards/ServiceCard";
+import { ServiceCard } from "../../components/Cards";
 import { FC } from "../../utils/depencies";
 
 
@@ -194,6 +195,53 @@ export const Home: FC = () => {
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
               Completa tu experiencia deportiva con nuestros servicios
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {isLoading && (
+              <div className="col-span-full text-center text-gray-500">
+                Cargando servicios...
+              </div>
+            )}
+            {error && (
+              <div className="col-span-full text-center text-red-500">
+                Error: {error}
+              </div>
+            )}
+            {!isLoading && !error && featuredServices.length > 0 && featuredServices.map((service) => (
+              <ServiceCard key={service.court_id} service={service} />
+            ))}
+            {!isLoading && !error && featuredServices.length === 0 && (
+              <div className="col-span-full text-center text-gray-500">
+                No hay servicios adicionales destacados disponibles.
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link to="/services">
+              <Button
+                variant="outline-solid"
+                size="lg"
+                icon={ArrowRight}
+                iconPosition="right"
+              >
+                Ver Todos los Servicios
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+        {/* Featured Services */}
+      <section className=" py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Promociones 
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Mira todas las promociones 
             </p>
           </div>
 

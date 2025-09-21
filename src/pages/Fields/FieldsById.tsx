@@ -107,7 +107,7 @@ export const FieldsById: React.FC = () => {
   };
 
   const handleReserveSubcourt = (subcourtId: string) => {
-    navigate(`/ReservationRegisterDashboard/${subcourtId}`);
+    navigate(`/ReservationRegisterCalendarAdmin/${subcourtId}`);
   };
 
   const handleAddSubcourt = () => {

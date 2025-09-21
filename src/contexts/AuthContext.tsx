@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { AuthContextType, User } from "../types";
-import { onLogin, onRegister, onLogout, onRegisterServices,onRegisterProveedor } from "../api/auth";
-import { RegistrationData, RegistrationDataService,RegistrationDataProveedor } from "../types/types";
+import { onLogin, onRegister, onLogout, onRegisterServices,onRegisterProveedor, onRegisterPromotions } from "../api/auth";
+import { RegistrationData, RegistrationDataService,RegistrationDataProveedor , RegistrationDataPromotion} from "../types/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -72,17 +72,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-    const registerProveedor = async (userData: RegistrationDataProveedor): Promise<boolean> => {
-    try {
-      const response = await onRegisterProveedor(userData);
-      console.log(response);
-      return true;
-    } catch (error) {
-      console.error("Registration failed:", error);
-      return false;
-    }
-  };
-
   const registerServices = async (userData: RegistrationDataService, userId: string): Promise<boolean> => {
     try {
       // Pasa el userId a la función de la API
@@ -94,6 +83,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       return false;
     }
   };
+
+   const registerPromotion = async (userData: RegistrationDataPromotion, userId: string): Promise<boolean> => {
+    try {
+      // Pasa el userId a la función de la API
+      const response = await onRegisterPromotions(userData, userId);
+      console.log(response);
+      return true;
+    } catch (error) {
+      console.error("Registration failed:", error);
+      return false;
+    }
+  };
+
   const logout = () => {
     onLogout();
     setUser(null);
@@ -102,7 +104,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   };
 
-  const value = { user, login, logout, isAuthenticated, register, registerServices,registerProveedor };
+  const value = { user, login, logout, isAuthenticated, register, registerServices,registerPromotion };
 
   if (loading) {
     return <div>Cargando...</div>;

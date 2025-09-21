@@ -31,6 +31,12 @@ const Services = lazy(() =>
   }))
 );
 
+const Promotions = lazy(() =>
+  import("../pages/Promotions/Promotions").then((module) => ({
+    default: module.Promotions,
+  }))
+);
+
 const Contact = lazy(() =>
   import("../pages/Contact/Contact").then((module) => ({
     default: module.Contact,
@@ -63,6 +69,13 @@ const RegisterService = lazy(() =>
   }))
 );
 
+const RegisterPromotion = lazy(() =>
+  import("../pages/Promotions/RegisterPromotion").then((module) => ({
+    default: module.RegisterPromotion,
+  }))
+);
+
+
 const ReservationRegister = lazy(() =>
   import("../pages/Reservation/ReservationRegister").then((module) => ({
     default: module.ReservationRegister,
@@ -73,6 +86,12 @@ const ReservationRegister = lazy(() =>
 const ReservationCalendar = lazy(() =>
   import("../pages/Reservation/ReservationCalendar").then((module) => ({
     default: module.ReservationCalendar,
+  }))
+);
+
+const ReservationInfo = lazy(() =>
+  import("../pages/Reservation/ReservationInfo").then((module) => ({
+    default: module.ReservationInfo,
   }))
 );
 
@@ -88,6 +107,11 @@ const FieldsById = lazy(() =>
   }))
 );
 
+const Reservation = lazy(() =>
+  import("../pages/Reservation/Reservation").then((module) => ({
+    default: module.Reservation,
+  }))
+);
 const CourtPriceForm = lazy(() =>
   import("../pages/Fields/CourtPriceForm").then((module) => ({
     default: module.CourtPriceForm,
@@ -124,6 +148,7 @@ export const AppRouter: React.FC = () => {
           <Route index path="/" element={<Home />} />
           <Route path="/fields" element={<Fields />} />
           <Route path="/services" element={<Services />} />
+           <Route path="/Promotions" element={<Promotions />} />
           <Route path="/contact" element={<Contact />} />
 
           <Route path="/login" element={<Login />} />
@@ -218,6 +243,8 @@ export const AppRouter: React.FC = () => {
             <Route path="/fieldsManage" element={<FieldsManage />} />
              <Route element={<UserRoute />}>
               <Route path="/bookings"element={<FieldsById/>}/>
+              <Route path="/RegisterPromotion" element={<RegisterPromotion />} />
+              <Route path="/Reservation" element={<Reservation />} />
             </Route>
               <Route element={<AdminRoute />}>
                 <Route path="/register" element={<Register />} />
@@ -225,11 +252,13 @@ export const AppRouter: React.FC = () => {
              <Route element={<Proveedor/>}>
                 <Route path="/RegisterService" element={<RegisterService />} />
             </Route>
+
              <Route path="/ImageSelector" element={<ImageSelector />} />
-             <Route path="/ReservationRegisterDashboard/:subcourtId" element={<ReservationRegister />} />
              <Route path="/SubcourtForm/:subcourtId" element={<CourtPriceForm />} />
              <Route path="/UserUpdate" element={<UserUpdateForm />} />
              <Route path="/FieldForm" element={<FieldForm />} />
+             <Route path="/ReservationRegisterCalendarAdmin/:subcourtId" element={<ReservationCalendar />} />
+             <Route path="/ReservationInfo/:subcourtId" element={<ReservationInfo />} />
             {" "}
           
           </Route>

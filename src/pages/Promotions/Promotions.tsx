@@ -1,52 +1,60 @@
 import React, { useState, useEffect } from "react";
+import { ServiceCard } from "../../components/Cards/ServiceCard";
 import { getCourts } from "../../api/auth";
-import { Court } from "../../types/types";
-import { Search, Filter, MapPin } from "lucide-react";
-import { FieldCard } from "../../components/Cards/FieldCard";
-import { Button } from "../../components/UI/Button";
+import { Court, Service } from "../../types/types";
+import { MapPin, Search, Filter } from "lucide-react";
 import { AnimatePresence, motion } from "../../utils/depencies";
+import { Button } from "../../components/UI/Button";
 
-export const Fields: React.FC = () => {
-  const [courts, setCourts] = useState<Court[]>([]);
+export const Promotions: React.FC = () => {
+  const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCity, setSelectedCity] = useState("all");
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedService, setSelectedService] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-    const fetchCourts = async () => {
+    const fetchServices = async () => {
       try {
-        const fetchedCourts = await getCourts();
-        console.log(fetchedCourts);
-        setCourts(fetchedCourts);
+        const fetchedItems: Court[] = await getCourts();
+        const fetchedServices = fetchedItems
+          .filter(item => item.type === 'promotion')
+          .map(item => ({
+            court_id: item.court_id,
+            court_name: item.court_name,
+            city: item.city,
+            address: item.address,
+            description: item.description,
+            phone: item.phone,
+            photos: item.photos,
+            court_prices: item.court_prices,
+            state: item.state,
+            price: item.price,
+            services: item.court_type // Asegúrate de que esta propiedad existe en tu tipo Court
+          }));
+        setServices(fetchedServices);
       } catch (err) {
-        setError("No se pudieron cargar las canchas.");
-        console.error("Error fetching courts:", err);
+        setError("No se pudieron cargar los servicios.");
+        console.error("Error fetching services:", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCourts();
+    fetchServices();
   }, []);
 
-  const fieldTypes = [
-    { value: "all", label: "Todos" },
-    { value: "futbol", label: "futbol" },
-    { value: "basketball", label: "Básquet" },
-    { value: "tennis", label: "Tenis" },
-    { value: "volleyball", label: "Voleibol" },
+  const serviceTypes = [
+    { value: "all", label: "Todos los servicios" },
+    { value: "equipacion", label: "Equipación" },
+    { value: "entrenamiento", label: "Entrenamiento" },
+    { value: "iluminacion", label: "Iluminación" },
+    { value: "camerinos", label: "Camerinos" },
+    { value: "arbitraje", label: "Arbitraje" },
   ];
-  const cities = [
-    { value: "all", label: "Todos" },
-    { value: "Bogota", label: "Bogotá" },
-    { value: "Medellín", label: "Medellín" },
-    { value: "Cali", label: "Cali" },
-    { value: "Barranquilla", label: "Barranquilla" },
-    { value: "Cartagena", label: "Cartagena" },
-  ];
+
   const priceRanges = [
     { value: "all", label: "Todos los precios" },
     { value: "low", label: "Hasta $30,000" },
@@ -54,32 +62,25 @@ export const Fields: React.FC = () => {
     { value: "high", label: "Más de $50,000" },
   ];
 
-const filteredFields = courts.filter((court) => {
-  const matchesSearch =
-    court.court_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    court.city?.toLowerCase().includes(searchTerm.toLowerCase())
-  const matchesType =
-      selectedType === "all" || court.court_type?.toLowerCase().includes(selectedType);
-  const matchesPrice =
-    priceRange === "all" ||
-    (priceRange === "low" && court.price <= 30000) ||
-    (priceRange === "medium" && court.price > 30000 && court.price <= 50000) ||
-    (priceRange === "high" && court.price > 50000);
-    
-    const matchesCity =
-      selectedCity === "all" || court.city?.toLowerCase() === selectedCity.toLowerCase();
-  const isCourt = court.type === "court";
+  const filteredServices = services.filter((service) => {
+    const matchesSearch =
+      service.court_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.city?.toLowerCase().includes(searchTerm.toLowerCase());
 
-  return (
-    matchesSearch &&
-    matchesType &&
-    matchesPrice &&
-    matchesCity &&
-    isCourt 
-  );
-});
-  const handleBookField = (court: Court) => {
-    console.log("Reservar cancha:", court);
+    const matchesServiceType =
+      selectedService === "all" || service.court_type?.toLowerCase().includes(selectedService);
+
+    const matchesPrice =
+      priceRange === "all" ||
+      (priceRange === "low" && service.price <= 30000) ||
+      (priceRange === "medium" && service.price > 30000 && service.price <= 50000) ||
+      (priceRange === "high" && service.price > 50000);
+
+    return matchesSearch && matchesServiceType && matchesPrice;
+  });
+
+  const handleSelectService = (service: Service) => {
+    console.log("Contratar servicio:", service);
   };
 
   return (
@@ -88,10 +89,10 @@ const filteredFields = courts.filter((court) => {
       <div className="bg-white dark:bg-gray-800 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Nuestras Canchas
+            Servicios Adicionales
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            Encuentra la cancha perfecta para tu práctica deportiva
+            Completa tu experiencia deportiva con nuestros servicios profesionales
           </p>
         </div>
       </div>
@@ -122,22 +123,25 @@ const filteredFields = courts.filter((court) => {
           {showFilters && (
             <AnimatePresence>
               <motion.div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Service Type Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Tipo de Cancha
+                    Tipo de Servicio
                   </label>
                   <select
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value)}
+                    value={selectedService}
+                    onChange={(e) => setSelectedService(e.target.value)}
                   >
-                    {fieldTypes.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
+                    {serviceTypes.map((service) => (
+                      <option key={service.value} value={service.value}>
+                        {service.label}
                       </option>
                     ))}
                   </select>
                 </div>
+
+                {/* Price Range Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Rango de Precio
@@ -154,31 +158,14 @@ const filteredFields = courts.filter((court) => {
                     ))}
                   </select>
                 </div>
-                            <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Ciudad
-                    </label>
-                    <select
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      value={selectedCity}
-                      onChange={(e) => setSelectedCity(e.target.value)}
-                    >
-                      {cities.map((city) => (
-                        <option key={city.value} value={city.value}>
-                          {city.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
 
                 <div className="flex items-end">
                   <Button
                     variant="ghost"
                     onClick={() => {
                       setSearchTerm("");
-                      setSelectedType("all");
+                      setSelectedService("all");
                       setPriceRange("all");
-                      setSelectedCity("all");
                     }}
                   >
                     Limpiar Filtros
@@ -192,24 +179,23 @@ const filteredFields = courts.filter((court) => {
         {/* Results */}
         <div className="mb-6">
           <p className="text-gray-600 dark:text-gray-300">
-            {filteredFields.length} cancha{filteredFields.length !== 1 ? "s" : ""} encontrada{filteredFields.length !== 1 ? "s" : ""}
+            {filteredServices.length} servicio{filteredServices.length !== 1 ? "s" : ""} encontrado{filteredServices.length !== 1 ? "s" : ""}
           </p>
         </div>
 
-        {/* Fields Grid */}
         {isLoading ? (
-          <div className="text-center py-12 text-gray-500">Cargando canchas...</div>
+          <div className="text-center py-12 text-gray-500">Cargando servicios...</div>
         ) : error ? (
           <div className="text-center py-12 text-red-500">
             Error: {error}
           </div>
-        ) : filteredFields.length > 0 ? (
+        ) : filteredServices.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredFields.map((field) => (
-              <FieldCard
-                key={field.court_id}
-                field={field}
-                onBook={handleBookField}
+            {filteredServices.map((service) => (
+              <ServiceCard
+                key={service.court_id}
+                service={service}
+                onSelect={handleSelectService}
               />
             ))}
           </div>
@@ -217,10 +203,10 @@ const filteredFields = courts.filter((court) => {
           <div className="text-center py-12">
             <MapPin className="w-16 h-16 text-green-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No se encontraron canchas
+              No se encontraron servicios
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Intenta ajustar los filtros o buscar con otros términos
+              Lo sentimos, no hay servicios adicionales disponibles en este momento.
             </p>
           </div>
         )}

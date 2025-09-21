@@ -21,7 +21,7 @@ export const Services: React.FC = () => {
       try {
         const fetchedItems: Court[] = await getCourts();
         const fetchedServices = fetchedItems
-          .filter(item => item.is_court === false)
+          .filter(item => item.type === 'services')
           .map(item => ({
             court_id: item.court_id,
             court_name: item.court_name,

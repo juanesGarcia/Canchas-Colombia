@@ -13,7 +13,7 @@ import { Button } from '../../components/UI/Button';
 import Swal from 'sweetalert2';
 import { onReservationRegister, getReservationsBySubcourtAndDate } from '../../api/auth';
 import { format, addHours, parse , addMinutes} from 'date-fns';
-import 'react-calendar/dist/Calendar.css';
+import '../../css/App.css';
 
 // Interfaz para los datos que se envían al backend
 interface ReservationData {
@@ -181,7 +181,7 @@ const getHourlyRange = (startTime: string, endTime: string): string[] => {
                     showConfirmButton: false,
                     timer: 2000
                 });
-                navigate('/');
+                navigate('/Dashboard');
             }
         } catch (err: any) {
             const errorMessage = err.response?.data?.error || err.message || 'Error desconocido al crear la reserva.';
@@ -313,23 +313,26 @@ const getHourlyRange = (startTime: string, endTime: string): string[] => {
                                 </div>
                             </div>
                         </div>
-                        
                         <div>
-                            <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Duración (en minutos)
-                            </label>
-                            <div className="relative">
-                                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    id="duration"
-                                    type="number"
-                                    required
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="Ej: 60"
-                                    value={duration}
-                                    onChange={(e) => setDuration(Number(e.target.value))}
-                                />
-                            </div>
+                        <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Duración (en horas)
+                        </label>
+                        <div className="relative">
+                            <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <select
+                            id="duration"
+                            required
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            value={duration}
+                            onChange={(e) => setDuration(Number(e.target.value))}
+                            >
+                            <option value="">Selecciona una duración</option>
+                            <option value={60}>1 hora (60 min)</option>
+                            <option value={120}>2 horas (120 min)</option>
+                            <option value={180}>3 horas (180 min)</option>
+                            <option value={240}>4 horas (240 min)</option> {/* Opción agregada */}
+                            </select>
+                        </div>
                         </div>
 
                         <div>

@@ -97,6 +97,16 @@ export interface RegistrationDataService {
   is_court: boolean; // Clave para identificar que es un servicio
 }
 
+export interface RegistrationDataPromotion {
+  name: string;
+  phone: string;
+  price: number;
+  description: string;
+  state: boolean;
+  is_public:boolean;
+  type: string; // Clave para identificar que es un servicio
+}
+
 export interface Court {
   court_id: string;
   court_name: string;
@@ -111,6 +121,7 @@ export interface Court {
   description: string;
   price: number;
   state: boolean;
+  type: string;
   subcourts: Subcourt[];
   court_prices: CourtPrice[]; // Define esta interfaz según tu tabla
   court_socials: CourtSocial[]; // Define esta interfaz según tu tabla
@@ -135,6 +146,7 @@ export interface Service {
   state: boolean;
   price: number;
   court_type: string;
+  type: string;
   // Agrega cualquier otra propiedad que un servicio pueda tener
 }
 

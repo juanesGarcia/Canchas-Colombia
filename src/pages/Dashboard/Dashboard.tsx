@@ -220,22 +220,6 @@ export const Dashboard: React.FC = () => {
                 </Button>
               </div>
             </div>
-
-            <div className="bg-linear-to-r from-green-500 to-green-600 rounded-xl shadow-md p-6 text-white">
-              <h3 className="text-lg font-bold mb-2">
-                ¡Programa de Fidelidad!
-              </h3>
-              <p className="text-sm text-green-100 mb-4">
-                Acumula puntos con cada reserva y obtén descuentos exclusivos.
-              </p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold">1,250</p>
-                  <p className="text-xs text-green-100">Puntos acumulados</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-green-200" />
-              </div>
-            </div>
           </div>
         </div>
       </div>

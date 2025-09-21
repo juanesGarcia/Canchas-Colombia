@@ -12,6 +12,7 @@ import {
   Volleyball,
   Image as ImageIcon,
   FilePenLine as FilePenLineIcon,
+   HeartHandshake  as PercentIcon
 } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useTheme } from "../../../contexts/ThemeContext";
@@ -47,7 +48,9 @@ export const PrivateLayout = () => {
           (item) =>
             item.name === "Mis Reservas" ||
             item.name === "Canchas" ||
-            item.name === "Imagenes"
+            item.name === "Imagenes"||
+            item.name === "Registro Promociones"||
+            item.name === "Reservas"
         );
         break;
       case 'proveedor':
@@ -84,6 +87,8 @@ export const PrivateLayout = () => {
     if (item.name === "Registro") icon = FilePenLineIcon;
     if (item.name === "Imagenes") icon = ImageIcon;
     if (item.name === "RegistroServicios") icon = FilePenLineIcon;
+    if (item.name === "Registro Promociones") icon = PercentIcon;
+    if (item.name === "Reservas") icon = PercentIcon;
     return { ...item, icon };
   });
 

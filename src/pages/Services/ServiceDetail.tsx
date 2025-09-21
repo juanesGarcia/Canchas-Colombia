@@ -163,7 +163,8 @@ export const ServiceDetail: React.FC = () => {
               onClick={handleWhatsAppClick}
               className="px-8 py-3 rounded-full text-white font-bold bg-green-600 hover:bg-green-700 transition-colors duration-200 shadow-lg"
             >
-              Obtener servicio
+                {service.type === 'services' ? 'Obtener servicio' : 'Aprovechar Oferta'}
+
             </button>
           </div>
         </div>

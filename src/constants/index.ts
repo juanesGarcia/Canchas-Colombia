@@ -191,14 +191,17 @@ export const NAVIGATION_ITEMS: navigateElement[] = [
   { name: "Canchas", path: "/fields", public: true },
   { name: "Servicios", path: "/services", public: true },
   { name: "Contacto", path: "/contact", public: true },
+  { name: "Promociones", path: "/Promotions", public: true }
 ];
 
 export const PRIVATE_NAVIGATION_ITEMS: navigateElement[] = [
   { name: "Dashboard", path: "/dashboard", public: false },
   { name: "Mis Reservas", path: "/bookings", public: false },
+  { name: "Reservas", path: "/Reservation", public: false },
   { name: "Perfil", path: "/UserUpdate", public: false },
   { name: "Canchas", path: "/FieldForm", public: false },
   { name: "Registro", path: "/register", public: false },
   { name: "Imagenes", path: "/ImageSelector", public: false },
-   { name: "RegistroServicios", path: "/RegisterService", public: false }
+  { name: "Registro Servicios", path: "/RegisterService", public: false },
+  { name: "Registro Promociones", path: "/RegisterPromotion", public: false }
 ];
