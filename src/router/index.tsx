@@ -20,6 +20,11 @@ const ImageSelector = lazy(() =>
  default: module.ImageSelector,
  }))
 );
+const ImageSelectorUser = lazy(() =>
+  import("../pages/images/ImageSelectorUser").then((module) => ({
+  default: module.ImageSelectorUser,
+  }))
+ );
 const Fields = lazy(() =>
   import("../pages/Fields/Fields").then((module) => ({
     default: module.Fields,
@@ -34,6 +39,12 @@ const Services = lazy(() =>
 const Promotions = lazy(() =>
   import("../pages/Promotions/Promotions").then((module) => ({
     default: module.Promotions,
+  }))
+);
+
+const PromotionsByUser = lazy(() =>
+  import("../pages/Promotions/PromotionsByUser").then((module) => ({
+    default: module.PromotionsByUser,
   }))
 );
 
@@ -237,27 +248,34 @@ export const AppRouter: React.FC = () => {
             <Route
               path="/profile"
               element={
-<UserUpdateForm/>
+              <UserUpdateForm/>
               }
             />
             <Route path="/fieldsManage" element={<FieldsManage />} />
+            <Route path="/GetPromotions" element={<PromotionsByUser />} />
+            <Route path="/ServicesDetailDashboard/:id" element={<ServicesDetail/>} />
              <Route element={<UserRoute />}>
               <Route path="/bookings"element={<FieldsById/>}/>
               <Route path="/RegisterPromotion" element={<RegisterPromotion />} />
               <Route path="/Reservation" element={<Reservation />} />
+              
             </Route>
               <Route element={<AdminRoute />}>
                 <Route path="/register" element={<Register />} />
             </Route>
              <Route element={<Proveedor/>}>
-                <Route path="/RegisterService" element={<RegisterService />} />
+       
+              <Route path="/RegisterService" element={<RegisterService />} />
+                
             </Route>
              <Route path="/ImageSelector" element={<ImageSelector />} />
+             <Route path="/ImageSelectorUser" element={<ImageSelectorUser />} />
              <Route path="/SubcourtForm/:subcourtId" element={<CourtPriceForm />} />
              <Route path="/UserUpdate" element={<UserUpdateForm />} />
              <Route path="/FieldForm" element={<FieldForm />} />
              <Route path="/ReservationRegisterCalendarAdmin/:subcourtId" element={<ReservationCalendar />} />
              <Route path="/ReservationInfo/:subcourtId" element={<ReservationInfo />} />
+             <Route path="/GetPromotions" element={<PromotionsByUser />} />
             {" "}
           
           </Route>

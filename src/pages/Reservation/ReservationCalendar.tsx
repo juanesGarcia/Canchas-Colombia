@@ -172,7 +172,7 @@ const getHourlyRange = (startTime: string, endTime: string): string[] => {
 
         try {
             const success = await onReservationRegister(dataToSend, subcourtId);
-
+            console.log(success)
             if (success) {
                 Swal.fire({
                     icon: 'success',

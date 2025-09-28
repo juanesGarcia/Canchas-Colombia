@@ -1,21 +1,23 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Swal from 'sweetalert2';
-import { onUploadImages } from '../../api/auth';
+import { onUploadImages, onUploadImagesServices } from '../../api/auth'; // asegúrate que existan
 import { useNavigate } from 'react-router-dom';
 
 interface ImageSelectorProps {
   userId: string;
+  type?: 'service' | 'promotion'; // 👉 opcional
 }
 
 interface ImagePreview extends File {
   preview: string;
 }
 
-export const ImageSelector: React.FC<ImageSelectorProps> = ({userId}) => {
+export const ImageSelector: React.FC<ImageSelectorProps> = ({ userId, type }) => {
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newImages = acceptedFiles.map((file) =>
       Object.assign(file, {
@@ -33,8 +35,6 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({userId}) => {
   });
 
   const handleSubmit = async () => {
-
-
     if (acceptedFiles.length === 0) {
       Swal.fire({
         icon: 'warning',
@@ -49,10 +49,19 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({userId}) => {
     setLoading(true);
 
     try {
-      await onUploadImages({
-        id: userId,
-        files: [...acceptedFiles] 
-      });
+      if (type) {
+        // 👇 Si se pasa type (service o promotion), usar la API especializada
+        await onUploadImagesServices({
+          id: userId,
+          files: [...acceptedFiles] 
+        });
+      } else {
+        // 👇 Si no se pasa type, usar la API genérica
+        await onUploadImages({
+          id: userId,
+          files: [...acceptedFiles] ,
+        });
+      }
 
       Swal.fire({
         icon: 'success',
@@ -61,8 +70,9 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({userId}) => {
         showConfirmButton: false,
         timer: 1500,
       });
+
       setImages([]);
-      navigate('/Dashboard')
+      navigate('/Dashboard');
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -89,6 +99,10 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({userId}) => {
 
   return (
     <div className="container mt-6">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+        Sube imágenes para tu {type === 'service' ? 'servicio' : type === 'promotion' ? 'promoción' : 'elemento'}
+      </h3>
+
       <div {...getRootProps()} className="border-2 border-dashed border-gray-300 p-6 rounded-md text-center cursor-pointer bg-gray-50 dark:bg-gray-800">
         <input {...getInputProps()} />
         {isDragActive ? (

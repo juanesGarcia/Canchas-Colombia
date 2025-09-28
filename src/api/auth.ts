@@ -173,6 +173,14 @@ export async function getCourts(): Promise<Court[]> {
   console.log(response.data.courts);
   return response.data.courts;
 }
+
+export async function getPromotionsByUserId(id: string): Promise<Court[]> {
+  console.log(id)
+  const response = await axios.get<GetCourtsResponse>(`${backendUrl}/getPromotions/${id}`);
+  console.log(response)
+  return response.data.courts
+}
+
 export async function getSubCourtPrice(id: string): Promise<SubCourtPrice[]> {
     try {
         const response = await axios.get<SubCourtPrice[]>(`${backendUrl}/subcourtPrice/${id}`);
@@ -233,6 +241,15 @@ export async function onUploadImages(uploadData: { id:string; files: File[]}) {
   return await axios.post(`${backendUrl}/upload/${uploadData.id}`, formData);
 }
 
+export async function onUploadImagesServices(uploadData: { id:string; files: File[]}) {
+  const formData = new FormData();
+  uploadData.files.forEach(file => {
+    formData.append('photo', file);
+  });
+
+  return await axios.post(`${backendUrl}/uploadServices/${uploadData.id}`, formData);
+}
+
 // Obtener las imágenes de un usuario específico
 export async function getImages(id: string) {
   return await axios.get(`${backendUrl}/getImages/${id}`);
@@ -241,6 +258,14 @@ export async function getImages(id: string) {
 // Eliminar una imagen de una cancha
 export async function onDeleteImage(data: { courtId: string; photoId: string; token: string }) {
   return await axios.delete(`${backendUrl}/deleteImages/${data.courtId}/${data.photoId}`, {
+    headers: {
+      'Authorization': `Bearer ${data.token}`
+    }
+  });
+}
+
+export async function deletePromotionById(data: { courtId: string; token: string }) {
+  return await axios.delete(`${backendUrl}/courts/${data.courtId}`, {
     headers: {
       'Authorization': `Bearer ${data.token}`
     }

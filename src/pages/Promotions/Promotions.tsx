@@ -179,7 +179,7 @@ export const Promotions: React.FC = () => {
         {/* Results */}
         <div className="mb-6">
           <p className="text-gray-600 dark:text-gray-300">
-            {filteredServices.length} servicio{filteredServices.length !== 1 ? "s" : ""} encontrado{filteredServices.length !== 1 ? "s" : ""}
+            {filteredServices.length} promocion{filteredServices.length !== 1 ? "es" : ""} encontrada{filteredServices.length !== 1 ? "s" : ""}
           </p>
         </div>
 

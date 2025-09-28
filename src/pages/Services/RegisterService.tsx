@@ -75,7 +75,7 @@ export const RegisterService: React.FC = () => {
             console.log(response)
             // Asumiendo que onRegisterServices devuelve un objeto con la propiedad 'serviceId'
             if (response && response.success === true && response.user) { 
-                setNewServiceId(response.user); // Guardamos el ID del servicio
+                setNewServiceId(response.promotionId); // Guardamos el ID del servicio
                 setIsRegistered(true); // Marcamos como registrado para mostrar el ImageSelector
 
                 Swal.fire({
@@ -282,7 +282,9 @@ export const RegisterService: React.FC = () => {
                                 Sube imágenes de tu servicio
                             </h3>
                             {/* Pasamos el ID del servicio como userId. Asumo que ImageSelector maneja esto. */}
-                            <ImageSelector userId={newServiceId} /> 
+                    
+                            <ImageSelector userId={newServiceId} type="service" />
+
                             <p className='mt-4 text-sm text-gray-600 dark:text-gray-400'>
                                 **Nota:** El ID de referencia para las imágenes es: `{newServiceId}`
                             </p>

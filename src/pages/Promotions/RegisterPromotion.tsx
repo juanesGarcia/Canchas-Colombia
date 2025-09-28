@@ -76,7 +76,8 @@ export const RegisterPromotion: React.FC = () => {
             // Adapto la lógica de respuesta basándome en el componente Register:
             // Debe haber un indicador de éxito y el ID del elemento creado.
             if (response.success === true && response.user) {
-                setNewPromotionId(response.user);
+                console.log(response.promotionId)
+                setNewPromotionId(response.promotionId);
                 setIsRegistered(true);
 
                 Swal.fire({
@@ -249,12 +250,10 @@ export const RegisterPromotion: React.FC = () => {
                     // Mostrar ImageSelector cuando la promoción está registrada
                     newPromotionId && (
                         <div className="mt-12">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                                Sube imágenes para tu promoción
-                            </h3>
+                 
                             {/* Nota: Necesitas asegurarte de que ImageSelector puede manejar un ID de promoción. 
                             Asumo que 'userId' en ImageSelector es un nombre de prop genérico para un ID. */}
-                            <ImageSelector userId={newPromotionId} />
+                            <ImageSelector userId={newPromotionId} type="promotion" />
                             
                             <Button
                                 type="button"

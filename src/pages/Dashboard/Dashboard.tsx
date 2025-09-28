@@ -3,55 +3,58 @@ import { Calendar, Clock, MapPin} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../../components/UI/Button";
 import { useNavigate } from 'react-router-dom';
-import { getUserReservation } from '../../api/auth'; // Asegúrate que esta ruta sea correcta
+import { getUserReservation } from '../../api/auth';
 import { Reservation } from "../../types/types";
 
 
 interface BookingUI {
     id: string;
     field: string;
-    date: string;
-    time: string;
+    formattedDate: string;
+    formattedTime: string;
     status: string;
     price: number;
+    // Guardamos la fecha y hora originales para la ordenación
+    sortDate: string; 
+    sortTime: string;
+    endTime: string;
 }
-
-// =======================================================================
-// 2. COMPONENTE DASHBOARD
-// =======================================================================
 
 export const Dashboard: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // Estados para la data
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Carga de datos al montar el componente
+    const formatDate = (isoDateString: string): string => {
+        const date = new Date(isoDateString);
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // ¡Recuerda que los meses van de 0-11!
+        const year = date.getUTCFullYear();
+        return `${day}/${month}/${year}`;
+    };
+    
+
     useEffect(() => {
         const fetchReservations = async () => {
-            // Verifica que el usuario y su ID existan
             if (!user || !user.id) {
                 setLoading(false);
                 return;
             }
 
             try {
-                // Llama a la función de la API con el ID del usuario
                 const data = await getUserReservation(user.id);
-                
-                // 🚀 CORRECCIÓN DEL FILTRO: 
-    const activeReservations = data.filter((r: Reservation) => r.state);
+                console.log(data)
+                // Filtra solo las reservas activas (state = true)
+                const activeReservations = data.filter((r: Reservation) => r.state);
                 
                 setReservations(activeReservations);
                 setError(null);
             } catch (err) {
                 console.error("Error fetching reservations:", err);
-                // 🚀 CORRECCIÓN DE AXIOS: Usamos la type guard importada
-          
-
+                setError("No se pudieron cargar las reservas. Intenta nuevamente.");
                 setReservations([]);
             } finally {
                 setLoading(false);
@@ -64,28 +67,33 @@ export const Dashboard: React.FC = () => {
     // Cálculo y transformación de datos (Optimizados con useMemo)
     const processedData = useMemo(() => {
         const sortedBookings: BookingUI[] = reservations
-            // Mapeo al formato de la UI
-            .map(r => ({
-                id: r.reservation_id,
-                field: r.subcourt_name,
-                date: r.reservation_date,
-                time: r.reservation_time,
-                status: r.state,
-                price: r.price_reservation,
-            }))
+            // Mapeo y formateo al formato de la UI
+            .map(r => {
+                return {
+                    id: r.reservation_id,
+                    field: r.subcourt_name,
+                    formattedDate: formatDate(r.reservation_date),
+                    formattedTime: r.reservation_time,
+                    status: r.state,
+                    price: r.price_reservation,
+                    sortDate: r.reservation_date,
+                    sortTime: r.reservation_time,
+                    endTime: r.end_time
+                };
+            })
             // Ordenar por fecha y hora (más reciente primero)
             .sort((a, b) => {
-                const dateA = new Date(`${a.date}T${a.time}`);
-                const dateB = new Date(`${b.date}T${b.time}`);
+                const dateA = new Date(`${a.sortDate}T${a.sortTime}`);
+                const dateB = new Date(`${b.sortDate}T${b.sortTime}`);
                 return dateB.getTime() - dateA.getTime();
             });
             
-        // Últimas 3 reservas para la vista del dashboard
-        const recentBookingsUI = sortedBookings.slice(0, 3);
+        // Últimas 5 reservas para la vista del dashboard
+        const recentBookingsUI = sortedBookings.slice(0, 5);
         
         // Calcular estadísticas
         const activeCount = reservations.length;
-       const totalDurationMinutes = reservations.reduce((sum, r) => sum + r.duration, 0);
+        const totalDurationMinutes = reservations.reduce((sum, r) => sum + r.duration, 0);
         const totalHours = (totalDurationMinutes / 60).toFixed(1);
 
         return {
@@ -96,15 +104,13 @@ export const Dashboard: React.FC = () => {
     }, [reservations]);
 
 
-    // Funciones de utilidad y handlers (mantienen la lógica original)
+    // Funciones de utilidad y handlers
     const handleNewReservationClick = () => {
         navigate('/bookings');
     };
     
-    // Asumiendo que quieres navegar a rutas específicas para cada acción
-    const handleMyReservationsClick = () => { navigate(`/ReservationInfo/${reservations[0].subcourt_id}`);};
-    const handleHistoryClick = () => { navigate('/history'); };
-    const handleSettingsClick = () => { navigate('/settings'); };
+    const handleMyReservationsClick = () => { navigate(`/Reservation`);};
+    const handleSettingsClick = () => { navigate('/UserUpdate'); };
 
 
     const stats = [
@@ -121,13 +127,6 @@ export const Dashboard: React.FC = () => {
             icon: Clock,
             color: "text-green-600",
             bgColor: "bg-green-100 dark:bg-green-900/20",
-        },
-        {
-            title: "Canchas Favoritas",
-            value: "2", // Dato estático, actualiza si tienes la lógica real
-            icon: MapPin,
-            color: "text-purple-600",
-            bgColor: "bg-purple-100 dark:bg-purple-900/20",
         }
     ];
 
@@ -169,7 +168,7 @@ export const Dashboard: React.FC = () => {
     if (loading) {
         return (
             <div className="text-center py-10 text-gray-600 dark:text-gray-400">
-                Cargando dashboard... ⏱️
+                Cargando dashboard... 
             </div>
         );
     }
@@ -189,7 +188,7 @@ export const Dashboard: React.FC = () => {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                        Bienvenido, {user?.name} 👋
+                        Bienvenido, {user?.name} 
                     </h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">
                         Gestiona tus reservas y actividad deportiva
@@ -250,9 +249,11 @@ export const Dashboard: React.FC = () => {
                                                 </h3>
                                                 <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
                                                     <Calendar className="w-4 h-4 mr-1" />
-                                                    {booking.date}
+                                                    {booking.formattedDate}
                                                     <Clock className="w-4 h-4 ml-3 mr-1" />
-                                                    {booking.time}
+                                                    {booking.formattedTime}
+                                                    <Clock className="w-4 h-4 ml-3 mr-1" />
+                                                    {booking.endTime}
                                                 </div>
                                             </div>
                                             <div className="flex items-center space-x-4">
@@ -290,9 +291,6 @@ export const Dashboard: React.FC = () => {
                                 </Button>
                                 <Button size="sm" className="w-full" onClick={handleMyReservationsClick}>
                                     Mis Reservas
-                                </Button>
-                                <Button size="sm" className="w-full" onClick={handleHistoryClick}>
-                                    Historial
                                 </Button>
                                 <Button size="sm" className="w-full" onClick={handleSettingsClick}>
                                     Configuración

@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock } from 'lucide-react';
+import { User, Lock, Mail } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import Swal from 'sweetalert2';
-import {
-    onUpdateUser // Usamos el nombre de tu función de API
-} from '../../api/auth';
-
+import { onUpdateUser } from '../../api/auth';
 import { useAuth } from "../../contexts/AuthContext";
+
 
 export const UserUpdateForm: React.FC = () => {
     const navigate = useNavigate();
-  const { user } = useAuth();
+    const { user , logout} = useAuth();
+    
+
     const [formData, setFormData] = useState({
         name: '',
+        email: '',
         password: '',
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -33,30 +33,27 @@ export const UserUpdateForm: React.FC = () => {
         setLoading(true);
         setError('');
 
-              if (!user || !user.id || !user.token) {
+        if (!user || !user.id || !user.token) {
             setError('Faltan datos de usuario. Por favor, vuelve a iniciar sesión.');
             setLoading(false);
             return;
         }
 
-        if (!formData.name || !formData.password) {
+        if (!formData.name || !formData.email || !formData.password) {
             setError('Todos los campos son obligatorios.');
             setLoading(false);
             return;
         }
 
-        // Obtener el token del almacenamiento local o de donde lo tengas guardado
-
-
-        // Creamos el objeto con el formato que la función onUpdateUser espera
-       const dataToSend = {
-    id: user.id,
-    userData: {
-        name: formData.name,
-        password: formData.password
-    },
-    token: user.token
-};
+        const dataToSend = {
+            id: user.id,
+            userData: {
+                name: formData.name,
+                email: formData.email,
+                password: formData.password
+            },
+            token: user.token
+        };
 
         try {
             await onUpdateUser(dataToSend);
@@ -67,7 +64,13 @@ export const UserUpdateForm: React.FC = () => {
                 showConfirmButton: false,
                 timer: 2000
             });
-            navigate('/dashboard'); 
+            try {
+                await logout();
+          } catch (err) {
+            setError('Error al iniciar sesión. Verifica tus credenciales.'+err);
+          } finally {
+            setLoading(false);
+          }
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || err.message || 'Error desconocido al actualizar el perfil.';
             setError('Error: ' + errorMessage);
@@ -108,6 +111,22 @@ export const UserUpdateForm: React.FC = () => {
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                     placeholder="Nombre de usuario"
                                     value={formData.name}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="email" className="sr-only">Correo Electrónico</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    required
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Correo electrónico"
+                                    value={formData.email}
                                     onChange={handleChange}
                                 />
                             </div>

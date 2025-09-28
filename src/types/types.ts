@@ -12,6 +12,7 @@ export interface User {
 export interface UserUpdate {
   name: string;
   password?: string;
+  email?:string;
 }
 
 export interface CourtUpdate {
@@ -189,6 +190,7 @@ export interface RegisterResponse {
   success: boolean;
   message: string;
   user: string;
+  promotionId: string;
 }
 
 

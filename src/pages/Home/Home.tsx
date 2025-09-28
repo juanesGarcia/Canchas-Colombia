@@ -19,7 +19,7 @@ export const Home: FC = () => {
     const fetchCourtsAndServices = async () => {
       try {
         const fetchedItems = await getCourts();
-
+        console.log(fetchedItems);
         // Filtra la data para separar canchas y servicios
         const courtsData = fetchedItems.filter(item => item.is_court);
         const servicesData = fetchedItems

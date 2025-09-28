@@ -14,7 +14,8 @@ import {
   FilePenLine as FilePenLineIcon,
    HeartHandshake  as PercentIcon,
    FileUp ,
-   BadgePercent
+   BadgePercent,
+   Eye
 } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useTheme } from "../../../contexts/ThemeContext";
@@ -52,12 +53,14 @@ export const PrivateLayout = () => {
             item.name === "Canchas" ||
             item.name === "Imagenes"||
             item.name === "Registro Promociones"||
-            item.name === "Reservas"
+            item.name === "Reservas"||
+            item.name === "Promociones o Servicios"
         );
         break;
       case 'proveedor':
         filteredItems = PRIVATE_NAVIGATION_ITEMS.filter(
-          (item) => item.name === "Registro Servicios"
+          (item) => item.name === "Registro Servicios"||
+           item.name === "Promociones o Servicios"
         );
         break;
       case 'superadmin':
@@ -75,6 +78,7 @@ export const PrivateLayout = () => {
   // ✅ Elementos de navegación siempre visibles (estáticos)
   const staticNavItems = [
     { name: "Dashboard", path: "/dashboard", icon: HomeIcon },
+    { name: "Perfil", path: "/UserUpdate" },
   ];
 
   // ✅ Elementos de navegación específicos del rol
@@ -90,6 +94,7 @@ export const PrivateLayout = () => {
     if (item.name === "Imagenes") icon = ImageIcon;
     if (item.name === "Registro Servicios") icon = FileUp;
     if (item.name === "Registro Promociones") icon = BadgePercent;
+    if (item.name === "Promociones o Servicios") icon = Eye;
     if (item.name === "Reservas") icon = PercentIcon;
     return { ...item, icon };
   });

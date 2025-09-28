@@ -1,27 +1,115 @@
-import React from "react";
-import { MapPin, Star, Clock, DollarSign,Phone } from "lucide-react";
-import { Service } from "../../types/types"; // Importa la interfaz Service
+import React, { useCallback } from "react";
+import { MapPin, Star, DollarSign, Phone, ChevronLeft, ChevronRight } from "lucide-react";
+import { Service } from "../../types/types";
 import { Button } from "../UI/Button";
 import { useNavigate } from "react-router-dom";
+import useEmblaCarousel from 'embla-carousel-react';
+
+// 🎯 Botón de flecha para el carrusel
+interface ArrowButtonProps {
+  onClick: () => void;
+  direction: 'prev' | 'next';
+  disabled: boolean;
+}
+
+const ArrowButton: React.FC<ArrowButtonProps> = ({ onClick, direction, disabled }) => {
+  const Icon = direction === 'prev' ? ChevronLeft : ChevronRight;
+  const positionClass = direction === 'prev' ? 'left-2' : 'right-2';
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      disabled={disabled}
+      className={`
+        absolute top-1/2 -translate-y-1/2 p-2 rounded-full 
+        bg-white/80 text-gray-800 backdrop-blur-sm shadow-md 
+        hover:bg-white transition-opacity duration-300 z-10
+        ${positionClass}
+        opacity-0 group-hover:opacity-100
+        ${disabled ? 'opacity-30 cursor-not-allowed' : ''}
+      `}
+    >
+      <Icon className="w-5 h-5" />
+    </button>
+  );
+};
 
 interface ServiceCardProps {
-  service: Service; // <-- Cambiado a Service
-  onSelect?: (service: Service) => void; // <-- Cambiado a Service
+  service: Service;
+  onSelect?: (service: Service) => void;
 }
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) => {
   const navigate = useNavigate();
+  const hasPhotos = service.photos && service.photos.length > 0;
+  const defaultImageUrl = "https://via.placeholder.com/600x400?text=Servicio+No+Disponible";
 
-  const imageUrl = service.photos && service.photos.length > 0 ? service.photos[0].url : "ruta-a-imagen-por-defecto.jpg";
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    dragFree: true,
+  });
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
-      <div className="relative">
-        <img
-          src={imageUrl}
-          alt={service.court_name}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+      
+      {/* 📸 Carrusel */}
+      <div className="relative h-48" onClick={handleImageClick}>
+        <div className="overflow-hidden h-full" ref={emblaRef}>
+          <div className="flex h-full">
+            {hasPhotos ? (
+              service.photos.map((photo, index) => (
+                <div key={index} className="flex-shrink-0 flex-grow-0 w-full relative">
+                  <img
+                    src={photo.url}
+                    alt={`${service.court_name} - Imagen ${index + 1}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="flex-shrink-0 flex-grow-0 w-full relative">
+                <img
+                  src={defaultImageUrl}
+                  alt="Servicio por defecto"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 🔁 Flechas de navegación (solo si hay más de una imagen) */}
+        {hasPhotos && service.photos.length > 1 && (
+          <>
+            <ArrowButton
+              direction="prev"
+              onClick={scrollPrev}
+              disabled={!emblaApi || emblaApi.scrollSnapList().length <= 1}
+            />
+            <ArrowButton
+              direction="next"
+              onClick={scrollNext}
+              disabled={!emblaApi || emblaApi.scrollSnapList().length <= 1}
+            />
+          </>
+        )}
+
+        {/* Etiqueta */}
         <div className="absolute top-4 left-4">
           <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
             Servicio
@@ -29,6 +117,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
         </div>
       </div>
 
+      {/* 📄 Contenido */}
       <div className="p-6">
         <div className="flex items-start justify-between mb-3">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -49,19 +138,14 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
             <MapPin className="w-4 h-4 mr-2" />
             {service.city}, {service.address}
           </div>
-          {/* Removido el icono de Usuarios porque los servicios no tienen "capacidad" */}
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <Phone className="w-4 h-4 mr-2" />
             {service.phone}
           </div>
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <DollarSign  className="w-4 h-4 mr-2" />
-            Precio: {service.price} {/* Adaptado para mostrar el precio del servicio */}
+            <DollarSign className="w-4 h-4 mr-2" />
+            Precio: {service.price}
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mb-6">
-          {/* Se remueve el bloque de features si no aplica a servicios */}
         </div>
 
         <div className="flex items-center justify-end space-x-2">
