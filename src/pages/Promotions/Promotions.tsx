@@ -30,10 +30,10 @@ export const Promotions: React.FC = () => {
             description: item.description,
             phone: item.phone,
             photos: item.photos,
-            court_prices: item.court_prices,
             state: item.state,
             price: item.price,
-            services: item.court_type // Asegúrate de que esta propiedad existe en tu tipo Court
+            court_type: item.court_type ,// Asegúrate de que esta propiedad existe en tu tipo Court
+            type: item.type
           }));
         setServices(fetchedServices);
       } catch (err) {
@@ -89,10 +89,10 @@ export const Promotions: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Servicios Adicionales
+            Promociones
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            Completa tu experiencia deportiva con nuestros servicios profesionales
+            Mira todas las promociones disponibles
           </p>
         </div>
       </div>

@@ -6,7 +6,6 @@ import { ArrowRight, Shield, Clock, Star, Users } from "lucide-react";
 import { Button } from "../../components/UI/Button";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { ServiceCard } from "../../components/Cards/ServiceCard";
-import { ServiceCard } from "../../components/Cards";
 import { FC } from "../../utils/depencies";
 
 
@@ -34,7 +33,7 @@ export const Home: FC = () => {
             description: item.description,
             phone: item.phone,
             photos: item.photos,
-            court_prices: item.court_prices,
+            price: item.price,
             state: item.state,
           }));
 
@@ -185,7 +184,6 @@ export const Home: FC = () => {
           </Link>
         </div>
       </section>
-
       {/* Featured Services */}
       <section className=" py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -233,7 +231,7 @@ export const Home: FC = () => {
           </div>
         </div>
       </section>
-        {/* Featured Services */}
+        {/* Featured Promociones */}
       <section className=" py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">

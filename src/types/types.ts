@@ -93,7 +93,6 @@ export interface RegistrationDataService {
   description: string;
   state: boolean;
   court_type: string;
-  is_public:boolean;
   is_court: boolean; // Clave para identificar que es un servicio
 }
 
@@ -134,6 +133,7 @@ export interface Photo {
   url: string;
 }
 
+
 export interface Service {
   court_id: string; // O service_id si tienes uno
   court_name: string;
@@ -141,7 +141,6 @@ export interface Service {
   address: string;
   description: string;
   phone: string;
-  court_prices: Array<{ price: number }>;
   photos: Photo[];
   state: boolean;
   price: number;
@@ -186,6 +185,12 @@ export interface RegistrationSubCourt {
   name:string;
   state:boolean;
 }
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  user: string;
+}
+
 
 export interface Reservation {
   reservation_id: string;

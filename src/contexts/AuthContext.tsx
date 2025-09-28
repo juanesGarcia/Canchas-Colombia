@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { AuthContextType, User } from "../types";
-import { onLogin, onRegister, onLogout, onRegisterServices,onRegisterProveedor, onRegisterPromotions } from "../api/auth";
-import { RegistrationData, RegistrationDataService,RegistrationDataProveedor , RegistrationDataPromotion} from "../types/types";
+import { onLogin, onRegister, onLogout, onRegisterServices,onRegisterPromotions } from "../api/auth";
+import { RegistrationData, RegistrationDataService,RegisterResponse , RegistrationDataPromotion} from "../types/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -61,16 +61,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const register = async (userData: RegistrationData): Promise<boolean> => {
-    try {
-      const response = await onRegister(userData);
-      console.log(response);
-      return true;
-    } catch (error) {
-      console.error("Registration failed:", error);
-      return false;
-    }
-  };
+const register = async (userData: RegistrationData): Promise<RegisterResponse> => {
+  try {
+    const response = await onRegister(userData);
+    return response.data as RegisterResponse;
+  } catch (error: any) {
+    console.error("Registration failed:", error);
+
+    throw new Error(
+      error.response?.data?.message || 'Error en el registro del usuario.'
+    );
+  }
+};
+
 
   const registerServices = async (userData: RegistrationDataService, userId: string): Promise<boolean> => {
     try {
@@ -84,17 +87,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-   const registerPromotion = async (userData: RegistrationDataPromotion, userId: string): Promise<boolean> => {
-    try {
-      // Pasa el userId a la función de la API
-      const response = await onRegisterPromotions(userData, userId);
-      console.log(response);
-      return true;
-    } catch (error) {
-      console.error("Registration failed:", error);
-      return false;
-    }
-  };
+  const registerPromotion = async (userData: RegistrationDataPromotion, userId: string): Promise<RegisterResponse> => {
+  try {
+    const response = await onRegisterPromotions(userData,userId);
+    return response.data as RegisterResponse;
+  } catch (error: any) {
+    console.error("Registration failed:", error);
+
+    throw new Error(
+      error.response?.data?.message || 'Error en el registro del usuario.'
+    );
+  }
+};
 
   const logout = () => {
     onLogout();

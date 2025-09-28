@@ -17,7 +17,8 @@ import {
   UserUpdate,
   CourtUpdate,
   Reservation,
-  RegistrationDataPromotion
+  RegistrationDataPromotion,
+  RegisterResponse
 
 } from '../types/types.ts';
 import { format } from 'date-fns';
@@ -28,6 +29,12 @@ const backendUrl = 'http://localhost:3000';
 interface GetCourtsResponse {
   success: boolean;
   courts: Court[];
+}
+
+interface UserReservationsResponse {
+    success: boolean;
+    message: string;
+    reservations: Reservation[]; // La clave correcta del backend es 'reservations'
 }
 
 interface GetServicesDetailResponse {
@@ -67,7 +74,13 @@ export async function onRegister(registrationData: RegistrationData) {
 }
 
 export async function onRegisterProveedor(registrationData: RegistrationDataProveedor) {
-  return await axios.post(`${backendUrl}/registerProveedor`, registrationData);
+    const response = await axios.post<RegisterResponse>(`${backendUrl}/registerProveedor`, registrationData);
+   return response.data;
+}
+
+export async function onRegisterPromotions(registrationData: RegistrationDataPromotion , userId:string) {
+  const response = await axios.post<RegisterResponse>(`${backendUrl}/registerPromotions/${userId}`, registrationData);
+   return response.data;
 }
 
 export async function onReservationRegister(registrationData: ReservationData, subcourtId: string) {
@@ -79,13 +92,14 @@ export async function onReservationRegister(registrationData: ReservationData, s
     throw error;
   }
 }
-export async function onRegisterServices(registrationData: RegistrationDataService , userId:string) {
-  return await axios.post(`${backendUrl}/registerServices/${userId}`, registrationData);
+
+export async function onRegisterServices(registrationData: RegistrationDataService, userId:string) {
+    const response = await axios.post<RegisterResponse>(`${backendUrl}/registerServices/${userId}`, registrationData);
+   return response.data;
 }
 
-export async function onRegisterPromotions(registrationData: RegistrationDataPromotion , userId:string) {
-  return await axios.post(`${backendUrl}/registerPromotions/${userId}`, registrationData);
-}
+
+
 // Inicio de sesión
 export async function onLogin(loginData: LoginData) {
   // Aquí solo especificas el tipo de la respuesta (LoginResponse)
@@ -210,18 +224,13 @@ export async function onUpdateCourt(updateData: { id: string; fieldData : CourtU
 }
 
 // Subir imágenes y actualizar la descripción de una cancha
-export async function onUploadImages(uploadData: { id: string; files: File[]; description: string; token: string }) {
+export async function onUploadImages(uploadData: { id:string; files: File[]}) {
   const formData = new FormData();
   uploadData.files.forEach(file => {
     formData.append('photo', file);
   });
 
-  return await axios.post(`${backendUrl}/upload/${uploadData.id}`, formData, {
-    headers: {
-      'Authorization': `Bearer ${uploadData.token}`,
-      'Content-Type': 'multipart/form-data'
-    }
-  });
+  return await axios.post(`${backendUrl}/upload/${uploadData.id}`, formData);
 }
 
 // Obtener las imágenes de un usuario específico
@@ -334,3 +343,8 @@ export async function deleteSubcourt(subcourtId: string, token : string): Promis
     }
 }
 
+export async function getUserReservation(id: string): Promise<Reservation[]>{
+  const response = await axios.get<UserReservationsResponse>(`${backendUrl}/userCourts/${id}`);
+  console.log(response.data);
+  return response.data.reservations;
+}

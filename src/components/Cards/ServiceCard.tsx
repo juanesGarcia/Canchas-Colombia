@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, Star, Clock } from "lucide-react";
+import { MapPin, Star, Clock, DollarSign,Phone } from "lucide-react";
 import { Service } from "../../types/types"; // Importa la interfaz Service
 import { Button } from "../UI/Button";
 import { useNavigate } from "react-router-dom";
@@ -51,11 +51,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
           </div>
           {/* Removido el icono de Usuarios porque los servicios no tienen "capacidad" */}
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <Clock className="w-4 h-4 mr-2" />
+            <Phone className="w-4 h-4 mr-2" />
             {service.phone}
           </div>
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <Clock className="w-4 h-4 mr-2" />
+            <DollarSign  className="w-4 h-4 mr-2" />
             Precio: {service.price} {/* Adaptado para mostrar el precio del servicio */}
           </div>
         </div>

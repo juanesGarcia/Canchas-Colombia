@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { useAuth } from '../../contexts/AuthContext';
-import { onRegisterProveedor } from "../../api/auth";
+import { onRegisterProveedor } from '../../api/auth';
 
 export const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -37,12 +37,14 @@ export const Register: React.FC = () => {
   const [courtAddress, setCourtAddress] = useState('');
   const [courtCity, setCourtCity] = useState('');
   const [courtPhone, setCourtPhone] = useState('');
-  const [courtType, setCourtType] = useState<"futbol" | "basketball" | "tennis" | "volleyball" | ''>('');
+  const [courtType, setCourtType] = useState<'futbol' | 'basketball' | 'tennis' | 'volleyball' | ''>('');
   const [price, setPrice] = useState<number | ''>('');
   const [isPublic, setIsPublic] = useState(true);
   const [description, setDescription] = useState('');
   const [state, setState] = useState(true);
-  const [subcourts, setSubcourts] = useState([{ subcourtName: '', state: true }]);
+  const [subcourts, setSubcourts] = useState<{ subcourtName: string; state: boolean }[]>([
+    { subcourtName: '', state: true },
+  ]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -51,11 +53,15 @@ export const Register: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  // Estado para guardar el usuario creado y controlar la vista
+  const [newUser, setNewUser] = useState<{ id: string } | null>(null);
+  const [isRegistered, setIsRegistered] = useState(false);
+
   const handleAddSubcourt = () => {
     setSubcourts([...subcourts, { subcourtName: '', state: true }]);
   };
 
-  const handleSubcourtChange = (index: number, field: string, value: string | boolean) => {
+  const handleSubcourtChange = (index: number, field: 'subcourtName' | 'state', value: string | boolean) => {
     const newSubcourts = [...subcourts];
     if (field === 'subcourtName') {
       newSubcourts[index].subcourtName = value as string;
@@ -75,6 +81,7 @@ export const Register: React.FC = () => {
     setLoading(true);
     setError('');
 
+    // Validaciones
     if (password !== confirmPassword) {
       setLoading(false);
       Swal.fire({
@@ -84,7 +91,6 @@ export const Register: React.FC = () => {
       });
       return;
     }
-
     if (password.length < 6) {
       setLoading(false);
       Swal.fire({
@@ -95,8 +101,8 @@ export const Register: React.FC = () => {
       return;
     }
 
-    let dataToSend;
-    let registerFunction;
+    let dataToSend: any;
+    let registerFunction: (data: any) => Promise<any>;
 
     if (role === 'admin') {
       dataToSend = {
@@ -110,17 +116,18 @@ export const Register: React.FC = () => {
         courtCity,
         courtPhone,
         court_type: courtType,
-        price: Number(price),
+        price: price === '' ? 0 : Number(price),
         is_public: isPublic,
         description,
         state,
-        subcourts: subcourts.map(subcourt => ({
-          subcourtName: subcourt.subcourtName,
-          state: subcourt.state,
+        subcourts: subcourts.map((sc) => ({
+          subcourtName: sc.subcourtName,
+          state: sc.state,
         })),
       };
       registerFunction = register;
-    } else if (role === 'proveedor') {
+    } else {
+      // proveedor
       dataToSend = {
         email,
         password,
@@ -132,20 +139,39 @@ export const Register: React.FC = () => {
     }
 
     try {
-      await registerFunction(dataToSend);
+      const response = await registerFunction(dataToSend);
+      console.log(response)
+      if(response.success === true){
+      const createdUser = response?.user;
 
-      Swal.fire({
-        icon: 'success',
-        title: '¡Registro exitoso!',
-        text: 'Tu cuenta ha sido creada. Serás redirigido para iniciar sesión.',
-        timer: 3000,
-        timerProgressBar: true,
-      }).then(() => {
-        navigate('/dashboard');
-      });
+      if (createdUser) {
+        setNewUser({ id: createdUser });
+        setIsRegistered(true);
 
+        Swal.fire({
+          icon: 'success',
+          title: '¡Registro exitoso!',
+          text: 'Serás redirigido a tu panel',
+          timer: 2500,
+          timerProgressBar: true,
+        });
+
+             if (role === 'proveedor') {
+            // Redirigir inmediatamente al dashboard del proveedor
+            // Asume que la ruta es /proveedor/dashboard o similar
+            navigate('/dashboard'); 
+        } else {
+            // Lógica existente para el Admin (continúa con la subida de imágenes)
+            setNewUser({ id: createdUser });
+            setIsRegistered(true);
+        }
+
+      } else {
+        throw new Error('No se pudo obtener información de usuario registrado');
+      }
+      }
     } catch (err: any) {
-      console.error("Registration failed:", err);
+      console.error('Registration failed:', err);
       let errorMessage = 'Hubo un problema al crear tu cuenta. Por favor, intenta de nuevo.';
 
       if (err.response && err.response.data && err.response.data.errors) {
@@ -158,7 +184,6 @@ export const Register: React.FC = () => {
         title: 'Error en el registro',
         text: errorMessage,
       });
-
     } finally {
       setLoading(false);
     }
@@ -174,389 +199,419 @@ export const Register: React.FC = () => {
             </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
-            Crear Cuenta
+            {isRegistered ? 'Subir imágenes de la Cancha' : 'Crear Cuenta'}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            ¿Ya tienes cuenta?{' '}
-            <Link to="/login" className="font-medium text-green-600 hover:text-green-500">
-              Inicia sesión aquí
-            </Link>
-          </p>
+          {!isRegistered && (
+            <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+              ¿Ya tienes cuenta?{' '}
+              <Link to="/login" className="font-medium text-green-600 hover:text-green-500">
+                Inicia sesión aquí
+              </Link>
+            </p>
+          )}
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md">
-                {error}
-              </div>
-            )}
+        {/* Mostrar formulario solo si NO está registrado */}
+        {!isRegistered ? (
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md">
+                  {error}
+                </div>
+              )}
 
-            {/* Selector de Rol */}
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Tipo de Rol
-              </label>
-              <div className="relative">
-                <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
-                  id="role"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as 'admin' | 'proveedor')}
+              {/* Selector de rol */}
+              <div>
+                <label
+                  htmlFor="role"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  <option value="admin">Admin (Registra Canchas)</option>
-                  <option value="proveedor">Proveedor (Registra Servicios)</option>
-                </select>
+                  Tipo de Rol
+                </label>
+                <div className="relative">
+                  <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <select
+                    id="role"
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value as 'admin' | 'proveedor')}
+                  >
+                    <option value="admin">Admin (Registra Canchas)</option>
+                    <option value="proveedor">Proveedor (Registra Servicios)</option>
+                  </select>
+                </div>
               </div>
-            </div>
 
-            {/* Campos de usuario (siempre visibles) */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nombre completo
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="name"
-                  type="text"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Tu nombre completo"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="tu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Número de teléfono
-              </label>
-              <div className="relative">
-                <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="phone"
-                  type="tel"
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: 3101234567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Mínimo 6 caracteres"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
+              {/* Campos básicos */}
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+                  Nombre completo
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    id="name"
+                    type="text"
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="Tu nombre"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Confirmar contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  id="confirmPassword"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Confirma tu contraseña"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Correo electrónico
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="ejemplo@correo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Renderizado condicional para los campos de cancha (solo para admin) */}
-            {role === 'admin' && (
-              <>
-                <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Información de la Cancha</h3>
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Teléfono
+                </label>
+                <div className="relative">
+                  <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    id="phone"
+                    type="tel"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="+123456789"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
                 </div>
+              </div>
 
-                <div>
-                  <label htmlFor="courtName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Nombre de la Cancha
-                  </label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      id="courtName"
-                      type="text"
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="Ej: Teddy Canchas"
-                      value={courtName}
-                      onChange={(e) => setCourtName(e.target.value)}
-                    />
-                  </div>
+              {/* Contraseña */}
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Contraseña
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
                 </div>
+              </div>
 
-                <div>
-                  <label htmlFor="courtAddress" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Dirección
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      id="courtAddress"
-                      type="text"
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="Ej: Avenida Siempre Viva 742"
-                      value={courtAddress}
-                      onChange={(e) => setCourtAddress(e.target.value)}
-                    />
-                  </div>
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Confirmar Contraseña
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    id="confirmPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
                 </div>
+              </div>
 
-                <div>
-                  <label htmlFor="courtCity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Ciudad
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      id="courtCity"
-                      type="text"
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="Ej: Springfield"
-                      value={courtCity}
-                      onChange={(e) => setCourtCity(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="courtPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Teléfono de la Cancha
-                  </label>
-                  <div className="relative">
-                    <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      id="courtPhone"
-                      type="tel"
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="Ej: 6015551234"
-                      value={courtPhone}
-                      onChange={(e) => setCourtPhone(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="courtType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Tipo de Cancha
-                  </label>
-                  <div className="relative">
-                    <ClipboardList className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <select
-                      id="courtType"
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
-                      value={courtType}
-                      onChange={(e) => setCourtType(e.target.value as "futbol" | "basketball" | "tennis" | "volleyball")}
+              {/* Campos específicos para Admin */}
+              {role === 'admin' && (
+                <>
+                  <div>
+                    <label
+                      htmlFor="courtName"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      <option value="" disabled hidden>Selecciona un tipo</option>
-                      <option value="futbol">Fútbol</option>
-                      <option value="basketball">Básquetbol</option>
-                      <option value="tennis">Tenis</option>
-                      <option value="volleyball">Voleibol</option>
-                    </select>
+                      Nombre de la cancha
+                    </label>
+                    <div className="relative">
+                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        id="courtName"
+                        type="text"
+                        required
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Nombre de tu cancha"
+                        value={courtName}
+                        onChange={(e) => setCourtName(e.target.value)}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Precio de alquiler
-                  </label>
-                  <div className="relative">
-                    <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <div>
+                    <label
+                      htmlFor="courtAddress"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Dirección
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        id="courtAddress"
+                        type="text"
+                        required
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Dirección completa"
+                        value={courtAddress}
+                        onChange={(e) => setCourtAddress(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="courtCity"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Ciudad
+                    </label>
+                    <div className="relative">
+                      <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        id="courtCity"
+                        type="text"
+                        required
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Ciudad"
+                        value={courtCity}
+                        onChange={(e) => setCourtCity(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="courtPhone"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Teléfono de la cancha
+                    </label>
+                    <div className="relative">
+                      <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        id="courtPhone"
+                        type="tel"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Teléfono de contacto"
+                        value={courtPhone}
+                        onChange={(e) => setCourtPhone(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="courtType"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Tipo de cancha
+                    </label>
+                    <div className="relative">
+                      <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <select
+                        id="courtType"
+                        required
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
+                        value={courtType}
+                        onChange={(e) =>
+                          setCourtType(
+                            e.target.value as
+                              | 'futbol'
+                              | 'basketball'
+                              | 'tennis'
+                              | 'volleyball'
+                              | ''
+                          )
+                        }
+                      >
+                        <option value="">Selecciona un tipo</option>
+                        <option value="futbol">Fútbol</option>
+                        <option value="basketball">Basketball</option>
+                        <option value="tennis">Tennis</option>
+                        <option value="volleyball">Volleyball</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="price"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Precio por hora
+                    </label>
+                    <div className="relative">
+                      <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        id="price"
+                        type="number"
+                        min={0}
+                        step={0.01}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Precio en moneda local"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
                     <input
-                      id="price"
-                      type="number"
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="Ej: 50000"
-                      value={price}
-                      onChange={(e) => setPrice(Number(e.target.value))}
+                      id="isPublic"
+                      type="checkbox"
+                      checked={isPublic}
+                      onChange={(e) => setIsPublic(e.target.checked)}
+                      className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                     />
+                    <label htmlFor="isPublic" className="text-sm text-gray-700 dark:text-gray-300">
+                      Cancha pública
+                    </label>
                   </div>
-                </div>
 
-                <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Descripción
-                  </label>
-                  <div className="relative">
-                    <Info className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <div>
+                    <label
+                      htmlFor="description"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
+                      Descripción
+                    </label>
                     <textarea
                       id="description"
-                      required
                       rows={3}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="Una breve descripción de la cancha..."
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Describe tu cancha"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                     />
                   </div>
-                </div>
 
-                <div className="flex items-center">
-                  <input
-                    id="is_public"
-                    name="is_public"
-                    type="checkbox"
-                    checked={isPublic}
-                    onChange={(e) => setIsPublic(e.target.checked)}
-                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
-                  />
-                  <label htmlFor="is_public" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                    Cancha pública
-                  </label>
-                  {isPublic ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
-                </div>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <input
+                      id="state"
+                      type="checkbox"
+                      checked={state}
+                      onChange={(e) => setState(e.target.checked)}
+                      className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="state" className="text-sm text-gray-700 dark:text-gray-300">
+                      Activa la cancha
+                    </label>
+                  </div>
 
-                <div className="flex items-center">
-                  <input
-                    id="state"
-                    name="state"
-                    type="checkbox"
-                    checked={state}
-                    onChange={(e) => setState(e.target.checked)}
-                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
-                  />
-                  <label htmlFor="state" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                    Cancha activa
-                  </label>
-                  {state ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
-                </div>
-
-                {/* Campos de Subcanchas */}
-                <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Subcanchas</h3>
-                  {subcourts.map((subcourt, index) => (
-                    <div key={index} className="space-y-4 mb-4 p-4 border rounded-md border-gray-200 dark:border-gray-700">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-medium text-gray-900 dark:text-white">Subcancha {index + 1}</h4>
-                        {subcourts.length > 1 && (
-                          <button type="button" onClick={() => handleRemoveSubcourt(index)} className="text-red-500 hover:text-red-700">
-                            <MinusCircle className="w-5 h-5" />
-                          </button>
-                        )}
-                      </div>
-                      <div>
-                        <label htmlFor={`subcourtName-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Nombre de la Subcancha
-                        </label>
+                  {/* Subcancha */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Subcanchas
+                    </label>
+                    {subcourts.map((subcourt, index) => (
+                      <div key={index} className="flex items-center space-x-2 mb-2">
                         <input
-                          id={`subcourtName-${index}`}
                           type="text"
-                          required
-                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                          placeholder="Ej: Cancha 1"
+                          placeholder="Nombre subcancha"
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                           value={subcourt.subcourtName}
                           onChange={(e) => handleSubcourtChange(index, 'subcourtName', e.target.value)}
                         />
-                      </div>
-                      <div className="flex items-center">
                         <input
-                          id={`subcourtState-${index}`}
                           type="checkbox"
                           checked={subcourt.state}
                           onChange={(e) => handleSubcourtChange(index, 'state', e.target.checked)}
-                          className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
+                          className="h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                          title="Activa/Desactiva subcancha"
                         />
-                        <label htmlFor={`subcourtState-${index}`} className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                          Subcancha activa
-                        </label>
-                        {subcourt.state ? <CheckCircle className="ml-2 w-4 h-4 text-green-500" /> : <CircleOff className="ml-2 w-4 h-4 text-gray-500" />}
+                        {subcourts.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSubcourt(index)}
+                            className="text-red-600 hover:text-red-800"
+                            title="Eliminar subcancha"
+                          >
+                            <MinusCircle size={20} />
+                          </button>
+                        )}
                       </div>
-                    </div>
-                  ))}
-                  <Button type="button" variant="ghost" className="w-full flex items-center justify-center space-x-2" onClick={handleAddSubcourt}>
-                    <PlusCircle className="w-5 h-5" />
-                    <span>Agregar Subcancha</span>
-                  </Button>
-                </div>
-              </>
-            )}
-
-            <div className="flex items-center">
-              <input
-                id="terms"
-                name="terms"
-                type="checkbox"
-                required
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
-              />
-              <label htmlFor="terms" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                Acepto los{' '}
-                <Link to="/terms" className="font-medium text-green-600 hover:text-green-500">
-                  términos y condiciones
-                </Link>
-              </label>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={handleAddSubcourt}
+                      className="inline-flex items-center px-3 py-1 rounded-md text-green-600 hover:text-green-800"
+                    >
+                      <PlusCircle size={18} />
+                      <span className="ml-1 text-sm">Agregar subcancha</span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
-          </div>
-          <ImageSelector />
 
-          <div>
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              loading={loading}
-              className="w-full"
-            >
-              Crear Cuenta
-            </Button>
-          </div>
-        </form>
+            <div>
+              <Button
+                type="submit"
+                className="w-full py-3 mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md"
+                disabled={loading}
+              >
+                {loading ? 'Registrando...' : 'Crear Cuenta'}
+              </Button>
+            </div>
+          </form>
+        ) : (
+          // Solo muestra ImageSelector cuando el usuario está registrado
+          newUser && (
+            <div className="mt-12">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                Sube imágenes de tu cancha
+              </h3>
+              <div>{newUser.id} </div>
+              <ImageSelector userId={newUser.id} />
+            </div>
+          )
+        )}
       </div>
     </div>
   );

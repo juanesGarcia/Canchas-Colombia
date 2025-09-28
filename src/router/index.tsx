@@ -252,7 +252,6 @@ export const AppRouter: React.FC = () => {
              <Route element={<Proveedor/>}>
                 <Route path="/RegisterService" element={<RegisterService />} />
             </Route>
-
              <Route path="/ImageSelector" element={<ImageSelector />} />
              <Route path="/SubcourtForm/:subcourtId" element={<CourtPriceForm />} />
              <Route path="/UserUpdate" element={<UserUpdateForm />} />

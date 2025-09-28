@@ -30,10 +30,10 @@ export const Services: React.FC = () => {
             description: item.description,
             phone: item.phone,
             photos: item.photos,
-            court_prices: item.court_prices,
             state: item.state,
             price: item.price,
-            services: item.court_type // Asegúrate de que esta propiedad existe en tu tipo Court
+            court_type: item.court_type,
+            type: item.type // Asegúrate de que esta propiedad existe en tu tipo Court
           }));
         setServices(fetchedServices);
       } catch (err) {

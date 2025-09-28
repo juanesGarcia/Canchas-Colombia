@@ -3,6 +3,7 @@ import { Phone, Mail, MapPin, Send, Clock } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { COMPANY_INFO } from '../../constants';
 import Swal from 'sweetalert2';
+import {Map} from "../Map/Map";
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -149,14 +150,12 @@ export const Contact: React.FC = () => {
             </div>
 
             {/* Map placeholder */}
-            <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-64 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">Mapa de ubicación</p>
-              </div>
+          <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-64">
+            <div className="h-full w-full">
+              <Map address="Calle 48csur #25-94" />
             </div>
           </div>
-
+        </div>
           {/* Contact Form */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">

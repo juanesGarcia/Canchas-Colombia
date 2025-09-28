@@ -2,17 +2,20 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Swal from 'sweetalert2';
 import { onUploadImages } from '../../api/auth';
-import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
+interface ImageSelectorProps {
+  userId: string;
+}
 
 interface ImagePreview extends File {
   preview: string;
 }
 
-export const ImageSelector: React.FC = () => {
+export const ImageSelector: React.FC<ImageSelectorProps> = ({userId}) => {
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const { user } = useAuth();
-
+  const navigate = useNavigate();
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newImages = acceptedFiles.map((file) =>
       Object.assign(file, {
@@ -30,17 +33,7 @@ export const ImageSelector: React.FC = () => {
   });
 
   const handleSubmit = async () => {
-    if (!user || !user.token) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error de autenticación',
-        text: 'No se pudo obtener el token de usuario. Por favor, inicia sesión de nuevo.',
-        showConfirmButton: false,
-        timer: 2000,
-      });
-      setLoading(false);
-      return;
-    }
+
 
     if (acceptedFiles.length === 0) {
       Swal.fire({
@@ -55,14 +48,10 @@ export const ImageSelector: React.FC = () => {
 
     setLoading(true);
 
-    const mutableFiles = [...acceptedFiles];
-
     try {
       await onUploadImages({
-        id: user.id,
-        files: mutableFiles,
-        description: '',
-        token: user.token,
+        id: userId,
+        files: [...acceptedFiles] 
       });
 
       Swal.fire({
@@ -72,14 +61,13 @@ export const ImageSelector: React.FC = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-      
       setImages([]);
-
+      navigate('/Dashboard')
     } catch (error) {
       Swal.fire({
         icon: 'error',
         title: 'Error al subir',
-        text: 'Hubo un problema al subir las imágenes. Por favor, inténtalo de nuevo.' + error,
+        text: 'Hubo un problema al subir las imágenes. Por favor, inténtalo de nuevo.',
         showConfirmButton: false,
         timer: 2000,
       });
@@ -89,36 +77,37 @@ export const ImageSelector: React.FC = () => {
   };
 
   const thumbs = images.map((file) => (
-    <div key={file.name}>
+    <div key={file.name} className="mr-2 mb-2">
       <img
         src={file.preview}
-        style={{ width: '100px', height: '100px', objectFit: 'cover' }}
         alt={file.name}
-        onLoad={() => {
-          URL.revokeObjectURL(file.preview);
-        }}
+        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+        onLoad={() => URL.revokeObjectURL(file.preview)}
       />
     </div>
   ));
 
   return (
-    <div className="container">
-      <div {...getRootProps()} className="dropzone-area">
+    <div className="container mt-6">
+      <div {...getRootProps()} className="border-2 border-dashed border-gray-300 p-6 rounded-md text-center cursor-pointer bg-gray-50 dark:bg-gray-800">
         <input {...getInputProps()} />
         {isDragActive ? (
-          <p>Suelta las imágenes aquí...</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Suelta las imágenes aquí...</p>
         ) : (
-          <p>Arrastra y suelta algunas imágenes aquí, o haz clic para seleccionarlas</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Arrastra y suelta imágenes aquí, o haz clic para seleccionarlas</p>
         )}
       </div>
+      <div>{userId}</div>
 
-      <aside style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: 16 }}>
-        {thumbs}
-      </aside>
+      <aside className="flex flex-wrap mt-4">{thumbs}</aside>
 
       {images.length > 0 && (
-        <div style={{ marginTop: 20 }}>
-          <button onClick={handleSubmit} disabled={loading}>
+        <div className="mt-4">
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition duration-150"
+          >
             {loading ? 'Subiendo...' : 'Subir Imágenes'}
           </button>
         </div>

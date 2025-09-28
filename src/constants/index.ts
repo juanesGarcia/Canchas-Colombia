@@ -1,12 +1,4 @@
 import { Field, Service, navigateElement } from "../types";
-import {
-  Calendar as CalendarIcon,
-  User as UserIcon,
-  Home as HomeIcon,
-  Volleyball,
-  Image as ImageIcon,
-  CheckSquare as CheckSquareIcon, // Ícono para "Registro" o "Registro de servicios"
-} from "lucide-react";
 
 export const FIELDS: Field[] = [
   {
@@ -190,8 +182,8 @@ export const NAVIGATION_ITEMS: navigateElement[] = [
   { name: "Inicio", path: "/", public: true },
   { name: "Canchas", path: "/fields", public: true },
   { name: "Servicios", path: "/services", public: true },
-  { name: "Contacto", path: "/contact", public: true },
-  { name: "Promociones", path: "/Promotions", public: true }
+  { name: "Promociones", path: "/Promotions", public: true },
+    { name: "Contacto", path: "/contact", public: true }
 ];
 
 export const PRIVATE_NAVIGATION_ITEMS: navigateElement[] = [

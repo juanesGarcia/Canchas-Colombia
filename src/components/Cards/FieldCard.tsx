@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, Users, Star, Clock } from "lucide-react";
+import { MapPin, Users, Star, Clock , DollarSign,Phone } from "lucide-react";
 import { Court } from "../../types/types"; // Importa la interfaz Court
 import { Button } from "../UI/Button";
 import { useNavigate } from "react-router-dom";
@@ -61,11 +61,11 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
             Hasta X personas
           </div>
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <Clock className="w-4 h-4 mr-2" />
+            <Phone className="w-4 h-4 mr-2" />
             {field.phone}
           </div>
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <Clock className="w-4 h-4 mr-2" />
+            <DollarSign  className="w-4 h-4 mr-2" />
             {field.price}
           </div>
         </div>
