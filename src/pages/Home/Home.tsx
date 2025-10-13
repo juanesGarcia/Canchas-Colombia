@@ -7,6 +7,13 @@ import { Button } from "../../components/UI/Button";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { ServiceCard } from "../../components/Cards/ServiceCard";
 import { FC } from "../../utils/depencies";
+import PruebaChart from "../Reports/PruebaChart";
+import  ReservasPorDiaChart from "../Reports/ReservasPorDiaChart";
+import RecaudosPorPagoChart from "../Reports/RecaudosPorPagoChart";
+import ClientesFrecuentesTable from "../Reports/ClientesFrecuentesTable"
+import ReservasPorHoraChart from "../Reports/ReservasPorHoraChart"
+import HotColdHoursCard from "../Reports/HotColdHoursCard"
+import ReservasPeriodicasCard from "../Reports/ReservasPeriodicasCard"
 
 
 export const Home: FC = () => {
@@ -279,6 +286,13 @@ export const Home: FC = () => {
         </div>
       </section>
 
+      <PruebaChart></PruebaChart>
+      <ReservasPorDiaChart></ReservasPorDiaChart>
+      <RecaudosPorPagoChart></RecaudosPorPagoChart>
+      <ClientesFrecuentesTable></ClientesFrecuentesTable>
+      <ReservasPorHoraChart></ReservasPorHoraChart>
+      <HotColdHoursCard></HotColdHoursCard>
+      <ReservasPeriodicasCard></ReservasPeriodicasCard>
       {/* CTA Section */}
       <section className="bg-green-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -295,6 +309,7 @@ export const Home: FC = () => {
           </Link>
         </div>
       </section>
+
     </div>
   );
 };
