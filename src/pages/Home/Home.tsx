@@ -287,12 +287,7 @@ export const Home: FC = () => {
       </section>
 
       <PruebaChart></PruebaChart>
-      <ReservasPorDiaChart></ReservasPorDiaChart>
-      <RecaudosPorPagoChart></RecaudosPorPagoChart>
-      <ClientesFrecuentesTable></ClientesFrecuentesTable>
-      <ReservasPorHoraChart></ReservasPorHoraChart>
-      <HotColdHoursCard></HotColdHoursCard>
-      <ReservasPeriodicasCard></ReservasPeriodicasCard>
+
       {/* CTA Section */}
       <section className="bg-green-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

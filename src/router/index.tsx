@@ -148,6 +148,13 @@ const CourtDetail = lazy(() =>
 );
 
 
+const PruebaChart = lazy(() =>
+  import("../pages/Reports/PruebaChart").then((module) => ({
+    default: module.default,
+  }))
+);
+
+
 import NotFound from "../pages/NotFound";
 
 export const AppRouter: React.FC = () => {
@@ -272,6 +279,7 @@ export const AppRouter: React.FC = () => {
              <Route path="/ImageSelectorUser" element={<ImageSelectorUser />} />
              <Route path="/SubcourtForm/:subcourtId" element={<CourtPriceForm />} />
              <Route path="/UserUpdate" element={<UserUpdateForm />} />
+             <Route path="/Reports/:subcourtId" element={<PruebaChart />} />
              <Route path="/FieldForm" element={<FieldForm />} />
              <Route path="/ReservationRegisterCalendarAdmin/:subcourtId" element={<ReservationCalendar />} />
              <Route path="/ReservationInfo/:subcourtId" element={<ReservationInfo />} />

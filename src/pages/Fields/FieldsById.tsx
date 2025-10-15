@@ -8,8 +8,10 @@ import {
   MapPin,
   Loader,
   Pencil,
+  BarChart2, // Ícono para Estadísticas
 } from "lucide-react";
 import Swal from "sweetalert2";
+// Asegúrate de que estas rutas de importación sean correctas en tu proyecto
 import { Subcourt, RegistrationSubCourt } from "../../types/types";
 import { useAuth } from "../../contexts/AuthContext";
 import { getSubcourtsByUserId, onSubCourt, deleteSubcourt } from "../../api/auth";
@@ -118,6 +120,11 @@ export const FieldsById: React.FC = () => {
     navigate(`/SubcourtForm/${subcourtId}`);
   };
 
+  const handleViewStats = (subcourtId: string) => {
+    navigate(`/Reports/${subcourtId}`); 
+  };
+  // -----------------------------------------------------------
+
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newSubcourtName.trim() === "") {
@@ -176,6 +183,8 @@ export const FieldsById: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Mis Subcanchas
         </h2>
+        
+        {/* Solo el botón de agregar subcancha permanece en el encabezado */}
         <button
           onClick={handleAddSubcourt}
           className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
@@ -233,8 +242,19 @@ export const FieldsById: React.FC = () => {
                   )}
                 </div>
               </div>
-              {/* Botones de acción (Reservar, Modificar) */}
+              
+              {/* Botones de acción (Reservar, Modificar, Estadísticas) */}
               <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                
+                {/* Botón de Estadísticas (Nuevo) */}
+                <button
+                    onClick={() => handleViewStats(subcourt.subcourt_id)}
+                    className="w-full sm:w-auto px-3 py-1.5 bg-pink-600 text-white rounded-md flex items-center justify-center hover:bg-pink-700 transition-colors"
+                >
+                    <BarChart2 className="w-4 h-4 mr-2" />
+                    Estadísticas
+                </button>
+                
                 {subcourt.state && (
                   <button
                     onClick={() => handleReserveSubcourt(subcourt.subcourt_id)}

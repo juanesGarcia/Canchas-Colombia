@@ -52,13 +52,14 @@ export interface ReservationData {
   user_id: string;
   user_name: string;
   phone: string;
-  subcourt_id: string; // Este campo es crucial
+  subcourt_id: string; 
   reservation_date: string;
   reservation_time: string;
-  duration: number; // Debe ser 'number'
-  price_reservation: number;    // Debe ser 'number'
+  duration: number; 
+  price_reservation: number;   
   transfer: number;
   state:boolean;
+  payment_method: 'transferencia' | 'tarjeta' | 'efectivo' | '';
 }
 
 

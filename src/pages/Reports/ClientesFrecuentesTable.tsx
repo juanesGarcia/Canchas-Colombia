@@ -1,30 +1,95 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Users } from 'lucide-react';
 
-// --- TIPOS Y MOCK DATA (Consulta 5) ---
+// Importamos la función y la interfaz del archivo de la API
+import { getFrequentClients } from '../../api/auth';
 
-interface ClienteFrecuente {
-  nombre_cliente: string;
-  documento: string;
-  total_reservas: number;
+
+interface FrequentClient {
+    user_id: string;
+    user_name: string;
+    total_reservas: number;
+}
+// --- COMPONENTE ---
+interface ReservasChartProps {
+    subcourtId: string; 
 }
 
-const mockClientes: ClienteFrecuente[] = [
-    { nombre_cliente: 'Juan Pérez', documento: '1000162871', total_reservas: 18 },
-    { nombre_cliente: 'María López', documento: '9876543210', total_reservas: 15 },
-    { nombre_cliente: 'Carlos Gómez', documento: '1234567890', total_reservas: 12 },
-    { nombre_cliente: 'Ana Torres', documento: '5551112223', total_reservas: 11 },
-    { nombre_cliente: 'Pedro Sánchez', documento: '4443332211', total_reservas: 9 },
-];
+const ClientesFrecuentesTable: React.FC<ReservasChartProps>= ({ subcourtId }) => {
+    // **ID FIJO** (Ajusta este ID según sea necesario, similar al ejemplo anterior)
 
-// --- COMPONENTE ---
 
-const ClientesFrecuentesTable: React.FC = () => {
+    const [clientes, setClientes] = useState<FrequentClient[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // 1. Efecto para cargar los datos
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                // Llamada a la API usando el ID
+                const data = await getFrequentClients(subcourtId );
+                
+                // Ordenar los clientes por total_reservas (descendente) y tomar solo el Top 5
+                const top5Clientes = data
+                    .sort((a, b) => b.total_reservas - a.total_reservas)
+                    .slice(0, 5);
+                
+                setClientes(top5Clientes);
+            } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : "Error desconocido al cargar los datos.";
+                console.error("Fallo al cargar clientes frecuentes:", err);
+                setError(`No se pudieron cargar los clientes frecuentes: ${errorMessage}`);
+                setClientes([]); // Asegura que la lista esté vacía en caso de error
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [subcourtId]); // Se ejecutará cuando el targetId cambie (aunque aquí es fijo)
+
+
+    // --- Renderizado Condicional ---
+
+    if (loading) {
+        return (
+            <div className="p-6 bg-white rounded-xl shadow-lg h-full flex items-center justify-center min-h-[250px]">
+                <div className="flex items-center space-x-2">
+                    <svg className="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p className="text-gray-500">Cargando clientes frecuentes...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-6 bg-red-100 border border-red-400 text-red-700 rounded-xl shadow-lg h-full flex items-center justify-center min-h-[250px]">
+                <p>Error: {error}</p>
+            </div>
+        );
+    }
+    
+    if (clientes.length === 0) {
+        return (
+            <div className="p-6 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-xl shadow-lg h-full flex items-center justify-center min-h-[250px]">
+                <p>No se encontraron clientes frecuentes para el ID {targetId}.</p>
+            </div>
+        );
+    }
+
+    // --- Renderizado de Tabla ---
     return (
         <div className="p-6 bg-white rounded-xl shadow-lg">
             <div className="flex items-center mb-4">
                 <Users className="w-6 h-6 text-indigo-600 mr-3" />
-                <h2 className="text-xl font-semibold text-gray-800">Clientes Frecuentes (Top 5 - Consulta 5)</h2>
+                <h2 className="text-xl font-semibold text-gray-800">Clientes Frecuentes (Top {clientes.length} - Consulta 5)</h2>
             </div>
             
             <div className="overflow-x-auto">
@@ -46,16 +111,18 @@ const ClientesFrecuentesTable: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {mockClientes.map((cliente, index) => (
-                            <tr key={cliente.documento} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        {clientes.map((cliente, index) => (
+                            <tr key={cliente.user_id} className={index % 2 === 0 ? 'bg-white hover:bg-indigo-50' : 'bg-gray-50 hover:bg-indigo-50 transition duration-150'}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #{index + 1}
+                                    <span className="inline-flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold text-white bg-indigo-500">
+                                        {index + 1}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                    {cliente.nombre_cliente}
+                                    {cliente.user_name}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {cliente.documento}
+                                    {cliente.user_id}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-indigo-600">
                                     {cliente.total_reservas}

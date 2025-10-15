@@ -69,6 +69,54 @@ interface DeleteResponse {
   message?: string;
 }
 
+/** 1. Reserva por Día de la Semana */
+interface ReservationDay {
+    dia_semana: string;
+    total_reservas: number;
+}
+
+/** 2. Total de Reservas por Hora */
+interface ReservationHour {
+    hora_inicio: string;
+    total_reservas: number;
+}
+
+/** 3. Horarios Pico y Valle */
+interface PeakOffPeakHour {
+    tipo: 'hot' | 'cold'; // 'hot' (pico) o 'cold' (valle)
+    hora: string; // Hora en formato HH24 (ej. "18")
+    total_reservas: number;
+}
+
+/** 4. Reservas Periódicas (Semana, Mes, Año) */
+export interface PeriodicReservation {
+    ano: string;
+    mes_nombre: string;
+    mes_numero: string;
+    total_reservas: string; // La API devuelve '3' (string), así que lo mantenemos como string por seguridad.
+}
+/** 5. Clientes Frecuentes */
+interface FrequentClient {
+    user_id: string;
+    user_name: string;
+    total_reservas: number;
+}
+
+/** 6. Recaudo por Método de Pago (Filtrado por Subcancha) */
+interface RevenueByPaymentMethod {
+    payment_method: string; // Puede ser un método o 'Total General'
+    total_reservas: number;
+    recaudo_total: string; // O number, dependiendo de cómo manejes la moneda
+}
+
+/** 7. Recaudo Detallado por Subcancha y Método de Pago (NUEVO) */
+interface DetailedRevenue {
+    metodo_pago: string; // Método de pago o 'TOTAL GENERAL'
+    total_reservas: number;
+    recaudo_total: string; // O number, dependiendo de cómo manejes la moneda
+}
+
+
 export async function onRegister(registrationData: RegistrationData) {
   return await axios.post(`${backendUrl}/register`, registrationData);
 }
@@ -372,4 +420,116 @@ export async function getUserReservation(id: string): Promise<Reservation[]>{
   const response = await axios.get<UserReservationsResponse>(`${backendUrl}/userCourts/${id}`);
   console.log(response.data);
   return response.data.reservations;
+}
+
+/**
+ * 1. Obtiene el total de reservas agrupadas por día de la semana.
+ * @param id El ID de la subcancha para filtrar.
+ */
+export async function getReservationsByDay(id: string): Promise<ReservationDay[]> {
+    try {
+        const response = await axios.get<ReservationDay[]>(`${backendUrl}/analytics/reservationsDays/${id}`);
+        console.log("Reservas por Día:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener reservas por día:", error);
+        throw error;
+    }
+}
+
+/**
+ * 2. Obtiene el total de reservas agrupadas por hora de inicio.
+ * @param id El ID de la subcancha para filtrar.
+ */
+export async function getReservationsByHour(id: string): Promise<ReservationHour[]> {
+    try {
+      console.log(id);
+        const response = await axios.get<ReservationHour[]>(`${backendUrl}/analytics/reservationsHours/${id}`);
+        console.log("Reservas por Hora:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener reservas por hora:", error);
+        throw error;
+    }
+}
+
+/**
+ * 3. Identifica la hora pico ('hot') y la hora valle ('cold') de reservas.
+ * @param id El ID de la subcancha para filtrar.
+ */
+export async function getPeakOffPeakHours(id: string): Promise<PeakOffPeakHour[]> {
+    try {
+        const response = await axios.get<PeakOffPeakHour[]>(`${backendUrl}/analytics/HotCold/${id}`);
+        console.log("Horarios Pico/Valle:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener horarios pico y valle:", error);
+        throw error;
+    }
+}
+
+/**
+ * 4. Obtiene el histórico de reservas agrupadas por semana, mes y año.
+ * @param id El ID de la subcancha para filtrar.
+ */
+export async function getPeriodicReservations(id: string): Promise<PeriodicReservation[]> {
+    try {
+        const response = await axios.get<PeriodicReservation[]>(`${backendUrl}/analytics/periodicReservations/${id}`);
+        console.log("Reservas Periódicas:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener reservas periódicas:", error);
+        throw error;
+    }
+}
+
+/**
+ * 5. Obtiene la lista de los 10 clientes con más reservas.
+ * @param id El ID de la subcancha para filtrar.
+ */
+export async function getFrequentClients(id: string): Promise<FrequentClient[]> {
+    try {
+        const response = await axios.get<FrequentClient[]>(`${backendUrl}/analytics/frequentClients/${id}`);
+        console.log("Clientes Frecuentes:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener clientes frecuentes:", error);
+        throw error;
+    }
+}
+
+/**
+ * 6. Obtiene el recaudo y total de reservas agrupado por método de pago para una subcancha específica.
+ * @param id El ID de la subcancha para filtrar.
+ */
+export async function getRevenueByPaymentMethod(id: string): Promise<RevenueByPaymentMethod[]> {
+    try {
+        // Asumiendo que el endpoint es: /analytics/revenuePayment/:id
+        const response = await axios.get<RevenueByPaymentMethod[]>(`${backendUrl}/analytics/revenuePayment/${id}`);
+        console.log("Recaudo por Método de Pago:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener recaudo por método de pago:", error);
+        throw error;
+    }
+}
+
+// ====================================================================
+// FUNCIÓN ADICIONAL (Para el endpoint detallado que creamos previamente)
+// ====================================================================
+
+/**
+ * 7. Obtiene el recaudo detallado por subcancha y método de pago (si tu router lo implementa).
+ * @param id El ID de la subcancha para filtrar.
+ */
+export async function getDetailedRevenue(id: string): Promise<DetailedRevenue[]> {
+    try {
+        // Utilizando un nombre de endpoint sugerido basado en la solicitud anterior
+        const response = await axios.get<DetailedRevenue[]>(`${backendUrl}/analytics/revenueBySubcourtPayment/${id}`);
+        console.log("Recaudo Detallado por Subcancha/Método:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener recaudo detallado:", error);
+        throw error;
+    }
 }
