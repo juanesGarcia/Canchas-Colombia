@@ -286,8 +286,6 @@ export const Home: FC = () => {
         </div>
       </section>
 
-      <PruebaChart></PruebaChart>
-
       {/* CTA Section */}
       <section className="bg-green-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
