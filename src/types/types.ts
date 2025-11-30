@@ -59,7 +59,8 @@ export interface ReservationData {
   price_reservation: number;   
   transfer: number;
   state:boolean;
-  payment_method: 'transferencia' | 'tarjeta' | 'efectivo' | '';
+  payment_method: 'transferencia' | 'tarjeta' | 'efectivo' | 'pending' | string;
+
 }
 
 

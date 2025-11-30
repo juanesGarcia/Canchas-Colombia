@@ -37,7 +37,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
     ...PRIVATE_NAVIGATION_ITEMS.map((item) => ({
       ...item,
       icon:
-        item.name === "Mis Reservas"
+        item.name === "Mis Canchas"
           ? CalendarIcon
           : item.name === "Perfil"
           ? UserIcon

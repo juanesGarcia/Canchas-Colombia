@@ -188,10 +188,10 @@ export const NAVIGATION_ITEMS: navigateElement[] = [
 
 export const PRIVATE_NAVIGATION_ITEMS: navigateElement[] = [
   { name: "Dashboard", path: "/dashboard", public: false },
-  { name: "Mis Reservas", path: "/bookings", public: false },
+  { name: "Mis Canchas", path: "/bookings", public: false },
   { name: "Reservas", path: "/Reservation", public: false },
   { name: "Perfil", path: "/UserUpdate", public: false },
-  { name: "Canchas", path: "/FieldForm", public: false },
+  { name: "Info Canchas", path: "/FieldForm", public: false },
   { name: "Registro", path: "/register", public: false },
   { name: "Imagenes", path: "/ImageSelectorUser", public: false },
   { name: "Registro Servicios", path: "/RegisterService", public: false },

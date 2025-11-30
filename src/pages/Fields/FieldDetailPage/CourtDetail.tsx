@@ -5,6 +5,7 @@ import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
 
 import { getCourtById } from "../../../api/auth";
 import { Service as Court} from "../../../types/types"; 
+import {Map} from "../../Map/Map";
 
 // -----------------------------------------------------------
 // 1. COMPONENTE AUXILIAR: Botón de flecha para el carrusel
@@ -236,6 +237,10 @@ export const CourtDetail: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <div className="mt-8 h-50 w-150">
+  <Map address={court?.address} />
+</div>
+
         </div>
     );
 };

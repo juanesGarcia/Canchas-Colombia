@@ -8,54 +8,56 @@ import {
     ArcElement,
 } from 'chart.js';
 
-// Importación real de la API
 import { getRevenueByPaymentMethod } from '../../api/auth';
 
-// Registrar componentes necesarios de Chart.js
-ChartJS.register(
-    Title,
-    Tooltip,
-    Legend,
-    ArcElement
-);
+ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-// --- TIPOS CORREGIDOS ---
-// La interfaz se ajusta a la data recibida: 'payment_method' en lugar de 'metodo_pago'
-// y los valores numéricos se definen como 'string' ya que así llegan de la API.
 interface DetailedRevenue {
     payment_method: string;
-    total_reservas: string;
+    total_reservas: number;
     recaudo_total: string;
+    medio_pago: string;
 }
 
 const PALETA_COLORES = [
-    'rgb(245, 158, 11)',  // Amber (Pending)
-    'rgb(59, 130, 246)',  // Blue (Tarjeta)
-    'rgb(16, 185, 129)',  // Emerald (Transferencia)
-    'rgb(168, 85, 247)',  // Violet (Otros)
+    'rgb(245, 158, 11)',  // Amber
+    'rgb(59, 130, 246)',  // Blue
+    'rgb(16, 185, 129)',  // Emerald
+    'rgb(168, 85, 247)',  // Violet
 ];
 
-
-// --- COMPONENTE PRINCIPAL ---
-interface ReservasChartProps {
-    subcourtId: string; // ¡Esta es la clave!
+interface RecaudosPorPagoChartProps {
+    subcourtId: string;
+    year?: string;
+    month?: string;
 }
-const RecaudosPorPagoChart: React.FC <ReservasChartProps>  = ({ subcourtId }) => {
-    // Definimos el estado usando la interfaz corregida.
+
+const RecaudosPorPagoChart: React.FC<RecaudosPorPagoChartProps> = ({ subcourtId, year, month }) => {
     const [recaudosData, setRecaudosData] = useState<DetailedRevenue[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // 1. Efecto para llamar a la API
+    // Función para convertir mes texto a número
+    const getMonthNumber = (monthName: string): number => {
+        const date = new Date(`${monthName} 1, 2024`);
+        return date.getMonth() + 1;
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             setError(null);
+
             try {
-                const data = await getRevenueByPaymentMethod(subcourtId); 
-                // Filtramos elementos nulos y aseguramos que el array está limpio
+                // Preparar filtros año/mes
+                const filters: any = {};
+                if (year) filters.year = year;
+                if (month) filters.month = getMonthNumber(month);
+
+                const data = await getRevenueByPaymentMethod(subcourtId, {year, month });
+                // Filtrar nulos y limpiar array
                 const cleanedData = Array.isArray(data) ? data.filter(d => d != null) : [];
-                setRecaudosData(cleanedData as DetailedRevenue[]);
+                setRecaudosData(cleanedData);
             } catch (err) {
                 console.error("Error al obtener recaudo:", err);
                 setError("Ocurrió un error al cargar los datos de recaudo.");
@@ -66,32 +68,23 @@ const RecaudosPorPagoChart: React.FC <ReservasChartProps>  = ({ subcourtId }) =>
         };
 
         fetchData();
-    }, [subcourtId]); 
+    }, [subcourtId, year, month]);
 
-    // 2. Lógica para preparar los datos, **parsear strings a números** y filtrar el 'Total General'.
     const { chartData, totalRecaudo, options } = useMemo(() => {
-        
-        // CORRECCIÓN CLAVE: Usamos 'payment_method' y verificamos la existencia de la propiedad.
-        const filteredData = recaudosData.filter(d => 
-            d && d.payment_method && d.payment_method.toLowerCase() !== 'total general'
+        const filteredData = recaudosData.filter(
+            d => d && d.medio_pago && d.medio_pago.toLowerCase() !== 'total general'
         );
-        
-        // CALCULAR el total sumando los valores convertidos a Number.
+
         const total = filteredData.reduce((sum, d) => sum + Number(d.recaudo_total), 0);
 
-        // Opciones del gráfico
         const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '80%', 
+            cutout: '80%',
             plugins: {
-                legend: { 
-                    position: 'bottom' as const, 
-                    labels: { 
-                        usePointStyle: true, 
-                        padding: 20,
-                        font: { size: 12 }
-                    } 
+                legend: {
+                    position: 'bottom' as const,
+                    labels: { usePointStyle: true, padding: 20, font: { size: 12 } }
                 },
                 title: {
                     display: true,
@@ -103,7 +96,6 @@ const RecaudosPorPagoChart: React.FC <ReservasChartProps>  = ({ subcourtId }) =>
                         label: (context: any) => {
                             const currentValue = context.raw;
                             const percentage = total > 0 ? ((currentValue / total) * 100).toFixed(1) : '0.0';
-                            // Formato de moneda (asumiendo CLP por el formato anterior)
                             const formattedValue = currentValue.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 });
                             return `${context.label}: ${formattedValue} (${percentage}%)`;
                         }
@@ -111,25 +103,22 @@ const RecaudosPorPagoChart: React.FC <ReservasChartProps>  = ({ subcourtId }) =>
                 }
             }
         };
-        
-        // Datos para Chart.js - Convertimos recaudo_total a Number aquí también
+
         const dataForChart = {
             labels: filteredData.map(d => d.payment_method),
             datasets: [
                 {
                     label: 'Recaudo Total',
-                    data: filteredData.map(d => Number(d.recaudo_total)), // Conversión
+                    data: filteredData.map(d => Number(d.recaudo_total)),
                     backgroundColor: PALETA_COLORES.slice(0, filteredData.length).map(c => c.replace('rgb', 'rgba').replace(')', ', 0.8)')),
                     borderColor: PALETA_COLORES.slice(0, filteredData.length),
                     borderWidth: 2,
-                },
-            ],
+                }
+            ]
         };
 
         return { chartData: dataForChart, totalRecaudo: total, options: chartOptions };
     }, [recaudosData]);
-
-    // 3. Renderizado Condicional
 
     const BaseCard = ({ children }: { children: React.ReactNode }) => (
         <div className="p-6 bg-white rounded-xl shadow-2xl border border-gray-100 h-[450px] w-full flex flex-col items-center justify-center font-sans">
@@ -158,33 +147,22 @@ const RecaudosPorPagoChart: React.FC <ReservasChartProps>  = ({ subcourtId }) =>
             </BaseCard>
         );
     }
-    
-    // Verificamos si hay elementos válidos para el gráfico
-    const hasDataForChart = recaudosData.some(d => d && d.payment_method && d.payment_method.toLowerCase() !== 'total general');
 
-    if (!hasDataForChart) {
+    if (recaudosData.length === 0) {
         return (
-            <BaseCard>
-                <div className="p-4 bg-yellow-50 border border-yellow-300 text-yellow-700 rounded-lg text-center">
-                    <p className="font-bold mb-1">Sin Desglose de Recaudo</p>
-                    <p className="text-sm">No se encontraron transacciones detalladas para mostrar.</p>
-                </div>
-            </BaseCard>
+            <div className="p-6 bg-yellow-100 text-yellow-800 border border-yellow-400 rounded-xl text-center">
+                <p>No se encontraron reservas para esta fecha.</p>
+            </div>
         );
     }
 
-    // 4. Renderizado del Gráfico
     return (
         <BaseCard>
             <div className="w-full max-w-md h-full max-h-[400px] relative">
-                {/* Contenedor del Gráfico */}
                 <Doughnut options={options as any} data={chartData} />
-
-                {/* Texto Centrado para el Total General */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <p className="text-sm text-gray-500 mb-1">Total General</p>
                     <p className="text-3xl font-extrabold text-emerald-600 tracking-tight">
-                        {/* Muestra el total calculado */}
                         {totalRecaudo.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 })}
                     </p>
                 </div>

@@ -131,7 +131,7 @@ export const CourtPriceForm: React.FC = () => {
         Sunday: 'Domingo',
         Thursday: 'Jueves',
         Wednesday: 'Miércoles',
-        martes: 'Martes',
+        Tuesday: 'Martes',
     };
 
     if (loading && !courtData) {

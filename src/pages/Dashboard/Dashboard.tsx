@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Calendar, Clock, MapPin} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Button } from "../../components/UI/Button";
 import { useNavigate } from 'react-router-dom';
 import { getUserReservation } from '../../api/auth';
 import { Reservation } from "../../types/types";
+import { Clock, Calendar, ArrowRight, User, DollarSign, Bell } from 'lucide-react';
+
 
 
 interface BookingUI {
@@ -225,59 +226,78 @@ export const Dashboard: React.FC = () => {
                     ))}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Reservas Recientes (Data dinámica) */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                    Reservas Recientes
-                                </h2>
-                                <Button size="sm" onClick={handleMyReservationsClick}>Ver Todas</Button>
-                            </div>
+{/* Reservas Recientes (Data dinámica) */}
+<div className="lg:col-span-2">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6">
+        <div className="flex items-center justify-between mb-6">
+            {/* Título de la sección */}
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Reservas Recientes
+            </h2>
+            {/* Botón de acción (Asegúrate de tener un componente Button definido) */}
+            <Button size="sm" onClick={handleMyReservationsClick}>Ver Todas</Button>
+        </div>
 
-                            <div className="space-y-4">
-                                {processedData.recentBookingsUI.length > 0 ? (
-                                    processedData.recentBookingsUI.map((booking) => (
-                                        <div
-                                            key={booking.id}
-                                            className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                                        >
-                                            <div className="flex-1">
-                                                <h3 className="font-semibold text-gray-900 dark:text-white">
-                                                    {booking.field}
-                                                </h3>
-                                                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                    <Calendar className="w-4 h-4 mr-1" />
-                                                    {booking.formattedDate}
-                                                    <Clock className="w-4 h-4 ml-3 mr-1" />
-                                                    {booking.formattedTime}
-                                                    <Clock className="w-4 h-4 ml-3 mr-1" />
-                                                    {booking.endTime}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center space-x-4">
-                                                <span className="font-semibold text-gray-900 dark:text-white">
-                                                    {formatPrice(booking.price)}
-                                                </span>
-                                                <span
-                                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                                        booking.status
-                                                    )}`}
-                                                >
-                                                    {getStatusLabel(booking.status)}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-                                        ¡No tienes reservas recientes!
-                                    </p>
-                                )}
+        <div className="space-y-4">
+            {/* Iteración sobre la lista de reservas */}
+            {processedData.recentBookingsUI.length > 0 ? (
+                processedData.recentBookingsUI.map((booking) => (
+                    <div
+                        key={booking.id}
+                        // CLAVES DE RESPONSIVIDAD: 
+                        // flex-col en móvil, sm:flex-row en tablet/desktop.
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between 
+                                   p-4 border border-gray-200 dark:border-gray-700 rounded-lg 
+                                   hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                    >
+                        {/* Bloque de Información Principal (Nombre y Horario) */}
+                        <div className="flex-1 mb-3 sm:mb-0">
+                            <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                                {booking.field}
+                            </h3>
+                            <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                {/* Icono de Calendario (Asegúrate de que 'Calendar' esté definido) */}
+                                <Calendar className="w-4 h-4 mr-1 text-indigo-500" />
+                                <span className="mr-4">{booking.formattedDate}</span>
+                                
+                                {/* Icono de Reloj (Hora de inicio) */}
+                                <Clock className="w-4 h-4 mr-1 text-indigo-500" />
+                                <span className="mr-1">{booking.formattedTime}</span>
+                                
+                                {/* Separador visual de tiempo (Asegúrate de que 'ArrowRight' esté definido) */}
+                                <ArrowRight className="w-3 h-3 mx-1 text-gray-400" />
+                                <span className="mr-4">{booking.endTime}</span>
                             </div>
                         </div>
+                        
+                        {/* Bloque de Precio y Estado */}
+                        {/* Separador vertical/horizontal responsivo para móvil/desktop */}
+                        <div className="flex items-center space-x-4 pt-3 sm:pt-0 
+                                        border-t border-gray-200 dark:border-gray-700 
+                                        sm:border-t-0 sm:border-l sm:pl-4 sm:ml-4">
+                            <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
+                                {/* Asegúrate de que 'formatPrice' esté definido */}
+                                {formatPrice(booking.price)}
+                            </span>
+                            <span
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
+                                    // Asegúrate de que 'getStatusColor' y 'getStatusLabel' estén definidos
+                                    getStatusColor(booking.status)
+                                }`}
+                            >
+                                {getStatusLabel(booking.status)}
+                            </span>
+                        </div>
                     </div>
+                ))
+            ) : (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+                    ¡No tienes reservas recientes!
+                </p>
+            )}
+        </div>
+    </div>
+
 
                     {/* Quick Actions */}
                     <div className="space-y-6">

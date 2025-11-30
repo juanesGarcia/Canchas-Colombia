@@ -59,6 +59,19 @@ interface GetSubcourtsResponsePrice {
   subcourts: SubCourtPrice[]; // El backend ahora devuelve directamente este campo
 }
 
+
+export interface ReservaMensual {
+    anio: number;
+    mes: string;
+    total_reservas: number;
+}
+
+// 📌 Tipo de parámetros del filtro
+export interface PeriodicFilters {
+    year?: number | null;
+    month?: number | null;
+}
+
 interface GetSubcourtResponse {
   success: boolean;
   subcourt: Subcourt; // El backend ahora devuelve directamente este campo
@@ -107,6 +120,7 @@ interface RevenueByPaymentMethod {
     payment_method: string; // Puede ser un método o 'Total General'
     total_reservas: number;
     recaudo_total: string; // O number, dependiendo de cómo manejes la moneda
+    medio_pago : string;
 }
 
 /** 7. Recaudo Detallado por Subcancha y Método de Pago (NUEVO) */
@@ -141,6 +155,16 @@ export async function onReservationRegister(registrationData: ReservationData, s
   }
 }
 
+export async function onReservationDelete(subcourtId: string) {
+  try {
+    const response = await axios.post(`${backendUrl}/deleteReservations/${subcourtId}`);
+    console.log(response)
+    return response.status >= 200 && response.status < 300;
+  } catch (error) {
+    console.error('Error al eliminar la reserva:', error);
+    throw error;
+  }
+}
 export async function onRegisterServices(registrationData: RegistrationDataService, userId:string) {
     const response = await axios.post<RegisterResponse>(`${backendUrl}/registerServices/${userId}`, registrationData);
    return response.data;
@@ -173,9 +197,20 @@ export async function getReservationsBySubcourtAndDate(subcourtId: string, date:
   const response = await axios.get<{ reservations: Reservation[] }>(
     `${backendUrl}/ReservationDate/${subcourtId}?reservationDate=${formattedDate}`
   );
-  
+  console.log(response.data.reservations)
   return response.data.reservations;
 }
+
+export const getSubcourtPriceByDate = async (subcourtId: string, reservationDate: Date) => {
+    const formattedDate = reservationDate.toISOString().split('T')[0]; // yyyy-MM-dd
+    const response = await fetch(`${backendUrl}/${subcourtId}/price?reservationDate=${formattedDate}`);
+    const data = await response.json();
+    console.log(data)
+
+    if (!data.success) throw new Error(data.error || 'Error al obtener precio');
+    return data;
+};
+
 
 // Obtener un usuario por su ID
 export async function getUser(id: string): Promise<User> {
@@ -426,10 +461,26 @@ export async function getUserReservation(id: string): Promise<Reservation[]>{
  * 1. Obtiene el total de reservas agrupadas por día de la semana.
  * @param id El ID de la subcancha para filtrar.
  */
-export async function getReservationsByDay(id: string): Promise<ReservationDay[]> {
+export async function getReservationsByDay(
+    id: string,
+    filters: { year?: string; month?: string }
+): Promise<ReservationDay[]> {
     try {
-        const response = await axios.get<ReservationDay[]>(`${backendUrl}/analytics/reservationsDays/${id}`);
-        console.log("Reservas por Día:", response.data);
+        const paramsToSend: any = {};
+
+        if (filters.year) {
+            paramsToSend.year = filters.year;
+        }
+
+        if (filters.month) {
+            paramsToSend.month = new Date(`${filters.month} 1, 2024`).getMonth() + 1;
+        }
+
+        const response = await axios.get<ReservationDay[]>(
+            `${backendUrl}/analytics/reservationsDays/${id}`,
+            { params: paramsToSend }
+        );
+
         return response.data;
     } catch (error) {
         console.error("Error al obtener reservas por día:", error);
@@ -441,11 +492,17 @@ export async function getReservationsByDay(id: string): Promise<ReservationDay[]
  * 2. Obtiene el total de reservas agrupadas por hora de inicio.
  * @param id El ID de la subcancha para filtrar.
  */
-export async function getReservationsByHour(id: string): Promise<ReservationHour[]> {
+export async function getReservationsByHour(
+    id: string,
+    filters: { year?: string; month?: string } = {}
+): Promise<ReservationHour[]> {
     try {
-      console.log(id);
-        const response = await axios.get<ReservationHour[]>(`${backendUrl}/analytics/reservationsHours/${id}`);
-        console.log("Reservas por Hora:", response.data);
+        const paramsToSend: any = {};
+        if (filters.year) paramsToSend.year = filters.year;
+        if (filters.month) {
+            paramsToSend.month = new Date(`${filters.month} 1, 2024`).getMonth() + 1;
+        }
+        const response = await axios.get<ReservationHour[]>(`${backendUrl}/analytics/reservationsHours/${id}`, { params: paramsToSend });
         return response.data;
     } catch (error) {
         console.error("Error al obtener reservas por hora:", error);
@@ -453,14 +510,23 @@ export async function getReservationsByHour(id: string): Promise<ReservationHour
     }
 }
 
+
 /**
  * 3. Identifica la hora pico ('hot') y la hora valle ('cold') de reservas.
  * @param id El ID de la subcancha para filtrar.
  */
-export async function getPeakOffPeakHours(id: string): Promise<PeakOffPeakHour[]> {
+export async function getPeakOffPeakHours(
+    id: string,
+    filters: { year?: string; month?: string } = {}
+): Promise<PeakOffPeakHour[]> {
     try {
-        const response = await axios.get<PeakOffPeakHour[]>(`${backendUrl}/analytics/HotCold/${id}`);
-        console.log("Horarios Pico/Valle:", response.data);
+        const paramsToSend: any = {};
+        if (filters.year) paramsToSend.year = filters.year;
+        if (filters.month) {
+            paramsToSend.month = new Date(`${filters.month} 1, 2024`).getMonth() + 1;
+        }
+
+        const response = await axios.get<PeakOffPeakHour[]>(`${backendUrl}/analytics/HotCold/${id}`, { params: paramsToSend });
         return response.data;
     } catch (error) {
         console.error("Error al obtener horarios pico y valle:", error);
@@ -468,28 +534,61 @@ export async function getPeakOffPeakHours(id: string): Promise<PeakOffPeakHour[]
     }
 }
 
+
 /**
  * 4. Obtiene el histórico de reservas agrupadas por semana, mes y año.
  * @param id El ID de la subcancha para filtrar.
  */
-export async function getPeriodicReservations(id: string): Promise<PeriodicReservation[]> {
-    try {
-        const response = await axios.get<PeriodicReservation[]>(`${backendUrl}/analytics/periodicReservations/${id}`);
-        console.log("Reservas Periódicas:", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Error al obtener reservas periódicas:", error);
-        throw error;
+export const getPeriodicReservations = async (
+    id: string,
+    filters: { year?: string; month?: string }
+): Promise<ReservaMensual[]> => {
+
+    const paramsToSend: any = {};
+
+    // Si envían año → pásalo tal cual
+    if (filters.year) {
+        paramsToSend.year = filters.year;
     }
-}
+
+    // Si envían mes → convertir texto → número DINÁMICAMENTE
+    if (filters.month) {
+        const monthNumber =
+            new Date(`${filters.month} 1, 2024`).getMonth() + 1;
+
+        paramsToSend.month = monthNumber; // <-- número dinámico
+    }
+
+    console.log("PARAMS ENVIADOS ===>", paramsToSend);
+
+    const response = await axios.get<ReservaMensual[]>(
+        `${backendUrl}/analytics/periodicReservations/${id}`,
+        { params: paramsToSend }
+    );
+
+    console.log("RESP API ===>", response.data);
+
+    return response.data;
+};
+
 
 /**
  * 5. Obtiene la lista de los 10 clientes con más reservas.
  * @param id El ID de la subcancha para filtrar.
  */
-export async function getFrequentClients(id: string): Promise<FrequentClient[]> {
+export async function getFrequentClients(
+    id: string,
+    filters: { year?: string; month?: string } = {}
+): Promise<FrequentClient[]> {
     try {
-        const response = await axios.get<FrequentClient[]>(`${backendUrl}/analytics/frequentClients/${id}`);
+        const paramsToSend: any = {};
+
+        if (filters.year) paramsToSend.year = filters.year;
+        if (filters.month) {
+            paramsToSend.month = new Date(`${filters.month} 1, 2024`).getMonth() + 1;
+        }
+
+        const response = await axios.get<FrequentClient[]>(`${backendUrl}/analytics/frequentClients/${id}`, { params: paramsToSend });
         console.log("Clientes Frecuentes:", response.data);
         return response.data;
     } catch (error) {
@@ -498,14 +597,35 @@ export async function getFrequentClients(id: string): Promise<FrequentClient[]> 
     }
 }
 
+
 /**
  * 6. Obtiene el recaudo y total de reservas agrupado por método de pago para una subcancha específica.
  * @param id El ID de la subcancha para filtrar.
  */
-export async function getRevenueByPaymentMethod(id: string): Promise<RevenueByPaymentMethod[]> {
+
+export async function getRevenueByPaymentMethod(
+    id: string,
+    filters: { year?: string; month?: string } = {}
+): Promise<RevenueByPaymentMethod[]> {
     try {
-        // Asumiendo que el endpoint es: /analytics/revenuePayment/:id
-        const response = await axios.get<RevenueByPaymentMethod[]>(`${backendUrl}/analytics/revenuePayment/${id}`);
+        const paramsToSend: any = {};
+
+        if (filters.year) {
+            paramsToSend.year = filters.year;
+        }
+
+        if (filters.month) {
+            // Convierte mes texto a número dinámicamente
+            paramsToSend.month = new Date(`${filters.month} 1, 2024`).getMonth() + 1;
+        }
+
+        const response = await axios.get<RevenueByPaymentMethod[]>(
+            `${backendUrl}/analytics/revenuePayment/${id}`,
+            { params: paramsToSend }
+        );
+
+        console.log('este'+paramsToSend)
+
         console.log("Recaudo por Método de Pago:", response.data);
         return response.data;
     } catch (error) {

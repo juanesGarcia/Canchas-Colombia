@@ -1,160 +1,135 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
-
-// NOTA: Asegúrate de que esta ruta y el nombre de la función sean correctos
-import { getPeriodicReservations } from '../../api/auth'; 
-
+import { getPeriodicReservations } from '../../api/auth';
 
 export interface ReservaMensual {
-    ano: string;
-    mes_nombre: string;
-    mes_numero: string; // Útil para ordenamiento interno
-    total_reservas: string; // Viene como string "3"
+    anio: number;
+    mes: string;
+    total_reservas: number;
 }
 
-interface ReservasChartProps {
-    subcourtId: string; // ¡Esta es la clave!
+interface Props {
+    subcourtId: string;
+    year?: string;
+    month?: string;
 }
-const ReservasPeriodicasCard: React.FC <ReservasChartProps>= ({ subcourtId }) => {
 
-
+const ReservasPeriodicasCard: React.FC<Props> = ({ subcourtId, year, month }) => {
     const [reservas, setReservas] = useState<ReservaMensual[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Efecto para cargar los datos
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
-            setError(null);
             try {
-                // Lógica de fetch que asume que la función existe y usa la nueva interfaz
-                const data = await getPeriodicReservations(subcourtId);
-                setReservas(data);
+                setLoading(true);
+
+                const response = await getPeriodicReservations(subcourtId, { year, month });
+
+                if (!Array.isArray(response)) {
+                    setError("La API devolvió un formato inesperado");
+                    return;
+                }
+
+                setReservas(response);
+
             } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : "Error desconocido al cargar los datos.";
-                console.error("Fallo al cargar reservas mensuales:", err);
-                setError(`No se pudieron cargar las reservas mensuales: ${errorMessage}`);
-                setReservas([]);
+                setError("Error al cargar datos");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchData();
-    }, [subcourtId]);
+    }, [subcourtId, year, month]);
 
-
-    // --- Renderizado Condicional de Estado ---
 
     if (loading) {
         return (
-            <div className="bg-white p-6 rounded-xl shadow-lg h-full flex items-center justify-center min-h-[180px]">
-                <div className="flex items-center space-x-2">
-                    <svg className="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p className="text-gray-500">Cargando reporte de reservas mensuales...</p>
-                </div>
+            <div className="bg-gray-900 text-white p-6 rounded-xl shadow-lg text-center">
+                <p>Cargando reservas...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="bg-red-100 p-6 border border-red-400 text-red-700 rounded-xl shadow-lg h-full flex items-center justify-center min-h-[180px]">
-                <p>Error de Carga: {error}</p>
+            <div className="bg-red-900 text-red-200 p-6 border border-red-600 rounded-xl">
+                <p>{error}</p>
             </div>
         );
     }
-    
+
     if (reservas.length === 0) {
         return (
-            <div className="bg-yellow-100 p-6 border border-yellow-400 text-yellow-700 rounded-xl shadow-lg h-full flex items-center justify-center min-h-[180px]">
-                <p>No se encontraron datos de reservas mensuales para el ID {targetId}.</p>
+            <div className="p-6 bg-yellow-100 text-yellow-800 border border-yellow-400 rounded-xl text-center">
+                <p>No se encontraron reservas para esta fecha.</p>
             </div>
         );
     }
 
 
-    // Agrupar los datos por año para mostrar encabezados de sección
-    const groupedByYear = reservas.reduce((acc, reserva) => {
-        const year = reserva.ano;
-        if (!acc[year]) {
-            acc[year] = [];
-        }
-        acc[year].push(reserva);
+    const groupedByYear = reservas.reduce((acc, r) => {
+        if (!acc[r.anio]) acc[r.anio] = [];
+        acc[r.anio].push(r);
         return acc;
-    }, {} as Record<string, ReservaMensual[]>);
+    }, {} as Record<number, ReservaMensual[]>);
 
-    // Ordenar los años de forma descendente para que el más reciente aparezca primero
-    const sortedYears = Object.keys(groupedByYear).sort((a, b) => parseInt(b) - parseInt(a));
+    const sortedYears = Object.keys(groupedByYear)
+        .map(Number)
+        .sort((a, b) => b - a);
 
-
-    // --- Renderizado Principal ---
     return (
-        <div className="bg-white p-6 rounded-xl shadow-lg">
-            <h2 className="text-xl font-semibold text-gray-800 mb-5 flex items-center">
-                <Calendar className="w-5 h-5 text-indigo-600 mr-2" />
-                Reporte de Reservas Mensuales Detalladas
+        <div className="bg-gray-900 text-gray-100 p-6 rounded-xl shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+                <Calendar className="w-5 h-5 text-indigo-400 mr-2" />
+                Reservas por Mes y Año
             </h2>
-            
-            <div className="overflow-x-auto max-h-[500px]"> {/* Altura máxima para hacerlo desplazable */}
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+
+            <div className="overflow-x-auto max-h-[450px]">
+                <table className="min-w-full divide-y divide-gray-700">
+                    <thead className="bg-gray-800">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                                Período
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                                Mes
-                            </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2">
-                                Total de Reservas
-                            </th>
+                            <th className="px-4 py-2 text-left">Año-Mes</th>
+                            <th className="px-4 py-2 text-left">Mes</th>
+                            <th className="px-4 py-2 text-right">Total</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {sortedYears.map(year => (
+
+                    <tbody>
+                        {sortedYears.map((year) => (
                             <React.Fragment key={year}>
-                                {/* Encabezado de Año */}
                                 <tr>
-                                    <td colSpan={3} className="px-6 py-2 text-lg font-extrabold text-indigo-700 bg-indigo-50 border-t-2 border-indigo-200 sticky top-0 z-10">
+                                    <td
+                                        colSpan={3}
+                                        className="bg-indigo-900 text-indigo-200 font-bold px-4 py-2"
+                                    >
                                         Año {year}
                                     </td>
                                 </tr>
-                                {/* Filas de Meses */}
-                                {
-                                    // Ordenar los meses para el renderizado (por mes_numero)
-                                    groupedByYear[year].sort((a, b) => parseInt(a.mes_numero) - parseInt(b.mes_numero))
-                                    .map((reserva, index) => (
-                                    <tr 
-                                        key={`${reserva.ano}-${reserva.mes_numero}`} 
-                                        className={index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-100 hover:bg-gray-50 transition duration-150'}
-                                    >
-                                        <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {reserva.ano}-{reserva.mes_numero}
-                                        </td>
-                                        <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700">
-                                            {reserva.mes_nombre}
-                                        </td>
-                                        <td className="px-6 py-3 whitespace-nowrap text-sm text-right font-bold text-indigo-600">
-                                            {
-                                                // Convertimos a número antes de formatear
-                                                parseInt(reserva.total_reservas).toLocaleString()
-                                            }
-                                        </td>
-                                    </tr>
-                                ))}
+
+                                {groupedByYear[year]
+                                    .sort((a, b) =>
+                                        new Date(`2024-${a.mes}-01`).getMonth() -
+                                        new Date(`2024-${b.mes}-01`).getMonth()
+                                    )
+                                    .map((r, i) => (
+                                        <tr
+                                            key={`${year}-${r.mes}`}
+                                            className={i % 2 ? "bg-gray-800" : "bg-gray-900"}
+                                        >
+                                            <td className="px-4 py-2">{year}-{r.mes}</td>
+                                            <td className="px-4 py-2">{r.mes}</td>
+                                            <td className="px-4 py-2 text-right font-semibold">
+                                                {r.total_reservas}
+                                            </td>
+                                        </tr>
+                                    ))}
                             </React.Fragment>
                         ))}
                     </tbody>
                 </table>
             </div>
-            <p className="text-xs text-gray-500 mt-4 text-center">
-                Datos agrupados por año y mes de todas las reservas de la subcancha {subcourtId}.
-            </p>
         </div>
     );
 };

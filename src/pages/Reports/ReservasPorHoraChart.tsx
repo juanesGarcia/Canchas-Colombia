@@ -38,26 +38,24 @@ interface ChartDataPoint {
     hora: number; 
     total_reservas: number;
 }
+
 interface ReservasChartProps {
-    subcourtId: string; // ¡Esta es la clave!
+    subcourtId: string;
+    year?: string;
+    month?: string;
 }
 
-
-// Se elimina la interfaz de Props y el componente ya no recibe props
-const ReservasPorHoraChart: React.FC <ReservasChartProps>= ({ subcourtId }) => {
-
+const ReservasPorHoraChart: React.FC<ReservasChartProps> = ({ subcourtId, year, month }) => {
     const [reservationsData, setReservationsData] = useState<ReservationHour[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    // 1. Efecto para cargar los datos al montar el componente
     useEffect(() => {
         const fetchReservations = async () => {
             setLoading(true);
             setError(null);
             try {
-                // Llamada a la función de API con el ID fijo
-                const data = await getReservationsByHour(subcourtId);
+                const data = await getReservationsByHour(subcourtId, { year, month });
                 setReservationsData(data);
             } catch (err) {
                 console.error("Fallo al cargar reservas por hora:", err);
@@ -68,36 +66,20 @@ const ReservasPorHoraChart: React.FC <ReservasChartProps>= ({ subcourtId }) => {
             }
         };
 
-        // El fetch se ejecuta una vez al montar, ya que el ID es constante.
         fetchReservations();
-        
-        // La dependencia `subCourtId` se elimina o se ignora ya que es una constante interna.
-        // Añadimos solo `[]` como dependencia para que se ejecute una única vez.
-    }, []); 
+    }, [subcourtId, year, month]);
 
-
-    // 2. Lógica para transformar los datos para Chart.js
     const chartData = useMemo(() => {
-        // Rango de horas a mostrar (00 a 23)
-        const allHours: ChartDataPoint[] = Array.from({ length: 24 }, (_, i) => ({ 
-            hora: i, 
-            total_reservas: 0 
-        }));
+        const allHours: ChartDataPoint[] = Array.from({ length: 24 }, (_, i) => ({ hora: i, total_reservas: 0 }));
 
-        // Mapear los datos de la API a la estructura del gráfico
         reservationsData.forEach(item => {
-            // hora_inicio es un string "HH24"
-            const hourNumber = parseInt(item.hora_inicio, 10); 
+            const hourNumber = parseInt(item.hora_inicio, 10);
             const existingHour = allHours.find(d => d.hora === hourNumber);
-            
-            if (existingHour) {
-                existingHour.total_reservas = item.total_reservas;
-            }
+            if (existingHour) existingHour.total_reservas = item.total_reservas;
         });
 
-        // Filtramos para visualizar solo el rango operativo (8:00 a 20:00)
-        const operationalHours = allHours.filter(d => d.hora >= 8 && d.hora <= 20); 
-        
+        const operationalHours = allHours.filter(d => d.hora >= 8 && d.hora <= 20);
+
         return {
             labels: operationalHours.map(d => `${d.hora}:00`),
             datasets: [
@@ -105,8 +87,8 @@ const ReservasPorHoraChart: React.FC <ReservasChartProps>= ({ subcourtId }) => {
                     label: 'Reservas',
                     data: operationalHours.map(d => d.total_reservas),
                     fill: true,
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)', // Red light area
-                    borderColor: 'rgb(239, 68, 68)', // Red line
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderColor: 'rgb(239, 68, 68)',
                     tension: 0.4,
                     pointBackgroundColor: 'rgb(239, 68, 68)',
                     pointRadius: 5,
@@ -116,7 +98,6 @@ const ReservasPorHoraChart: React.FC <ReservasChartProps>= ({ subcourtId }) => {
         };
     }, [reservationsData]);
 
-    // Opciones del gráfico de líneas (se actualiza el título para reflejar el ID quemado)
     const options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -125,20 +106,20 @@ const ReservasPorHoraChart: React.FC <ReservasChartProps>= ({ subcourtId }) => {
             title: {
                 display: true,
                 text: `Cantidad de Reservas por Hora (Subcancha ID: ${subcourtId})`,
-                font: { size: 16 }
+                font: { size: 16 },
             },
             tooltip: {
                 callbacks: {
                     label: (context: any) => `${context.parsed.y.toLocaleString()} reservas a las ${context.label}`,
-                }
-            }
+                },
+            },
         },
         scales: {
             y: {
                 beginAtZero: true,
-                title: { display: true, text: 'Cantidad de Reservas' }
-            }
-        }
+                title: { display: true, text: 'Cantidad de Reservas' },
+            },
+        },
     };
 
     if (loading) {
@@ -156,16 +137,14 @@ const ReservasPorHoraChart: React.FC <ReservasChartProps>= ({ subcourtId }) => {
             </div>
         );
     }
-    
-    // Si no hay datos después de cargar
+
     if (reservationsData.length === 0 && !loading) {
         return (
             <div className="p-6 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-xl shadow-lg h-[400px] flex items-center justify-center">
-                <p>No se encontraron datos de reservas por hora para esta subcancha (ID: {subCourtId}).</p>
+                <p>No se encontraron datos de reservas por hora para esta subcancha en la fecha seleccionada.</p>
             </div>
         );
     }
-
 
     return (
         <div className="p-4 bg-white rounded-xl shadow-lg h-[400px]">
@@ -175,3 +154,4 @@ const ReservasPorHoraChart: React.FC <ReservasChartProps>= ({ subcourtId }) => {
 };
 
 export default ReservasPorHoraChart;
+
