@@ -43,7 +43,7 @@ export const ReservationCalendar: React.FC = () => {
     const [bookedTimes, setBookedTimes] = useState<string[]>([]);
     const [duration, setDuration] = useState<number | ''>('');
     const [price, setPrice] = useState<number | ''>('');
-    const [transferCode, setTransferCode] = useState<number | ''>('');
+    const [transferCode, setTransferCode] = useState<string>("");
     const [paymentMethod, setPaymentMethod] = useState<'transferencia' | 'tarjeta' | 'efectivo' | 'pending' | string>('pending');
     const [loading, setLoading] = useState(false);
     const [isFetchingTimes, setIsFetchingTimes] = useState(false);
@@ -107,6 +107,7 @@ export const ReservationCalendar: React.FC = () => {
                 if (selectedTime && uniqueBookedTimes.includes(selectedTime)) {
                     setSelectedTime(null);
                 }
+
             } catch (err) {
                 console.error("Error al obtener las reservas:", err);
                 setBookedTimes([]);
@@ -173,7 +174,6 @@ export const ReservationCalendar: React.FC = () => {
             setSelectedTime(time);
         }
     };
-
     // 🔹 Envío de reserva
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -198,7 +198,7 @@ export const ReservationCalendar: React.FC = () => {
             return;
         }
 
-        if (!subcourtId || !cedula || !userName || !phone || !selectedTime || !duration || !price || paymentMethod === 'pending') {
+        if (!subcourtId || !cedula || !userName || !phone || !selectedTime || !duration || paymentMethod === 'pending') {
             Swal.fire({
                 icon: 'error',
                 title: 'Datos incompletos',
@@ -245,7 +245,6 @@ export const ReservationCalendar: React.FC = () => {
         }
     };
 
-    const isTransferCodeRequired = paymentMethod === 'transferencia';
     const availableHours = getAvailableHours();
 
     return (
@@ -412,12 +411,15 @@ export const ReservationCalendar: React.FC = () => {
                             <div className="relative">
                                 <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                                 <input
-                                    type="number"
+                                    type="text"
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                                    placeholder="Digite la cantidad a transferir"
-                                    value={transferCode}
-                                    onChange={(e) => setTransferCode(Number(e.target.value))}
-                                    disabled={!isTransferCodeRequired}
+                                    placeholder="Cantidad pagada"
+                                      value={transferCode}
+                                    onChange={(e) => {
+                                        // Solo deja números
+                                        const value = e.target.value.replace(/\D/g, "");
+                                        setTransferCode(value);
+                                    }}
                                 />
                             </div>
                         </div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
 import { Users, ArrowLeft } from 'lucide-react';
 
 import ClientesFrecuentesTable from './ClientesFrecuentesTable';
@@ -14,6 +13,22 @@ const meses = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
+
+// 🔥 MAPEO CORRECTO MES → NÚMERO
+const monthMap: Record<string, number> = {
+    Enero: 1,
+    Febrero: 2,
+    Marzo: 3,
+    Abril: 4,
+    Mayo: 5,
+    Junio: 6,
+    Julio: 7,
+    Agosto: 8,
+    Septiembre: 9,
+    Octubre: 10,
+    Noviembre: 11,
+    Diciembre: 12
+};
 
 const PruebaChart: React.FC = () => {
     const { subcourtId } = useParams<{ subcourtId: string }>();
@@ -40,6 +55,9 @@ const PruebaChart: React.FC = () => {
     };
 
     const currentSubcourtId = subcourtId || "ID no disponible";
+
+    // 🔥 Convertimos mes de texto → número
+    const monthNumber = month ? String(monthMap[month]) : "";
 
     if (loading) {
         return (
@@ -120,74 +138,78 @@ const PruebaChart: React.FC = () => {
                     Buscar
                 </button>
             </div>
-<section className="mb-10">
-    {search ? (
-        <>
-            {/* CHARTS SUPERIORES */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
 
-                <div className="lg:col-span-2">
-                    <ReservasPorDiaChart 
-                        subcourtId={currentSubcourtId}
-                        year={year}
-                        month={month}
-                    />
-                </div>
+            <section className="mb-10">
+                {search ? (
+                    <>
+                        {/* CHARTS SUPERIORES */}
+                        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
 
-                <div>
-                    <RecaudosPorPagoChart  subcourtId={currentSubcourtId}
-                       year={year}
-                       month={month} 
-                    />
-                </div>
+                            <div className="lg:col-span-2">
+                                <ReservasPorDiaChart
+                                    subcourtId={currentSubcourtId}
+                                    year={year}
+                                    month={monthNumber}
+                                />
+                            </div>
 
+                            <div>
+                                <RecaudosPorPagoChart
+                                    subcourtId={currentSubcourtId}
+                                    year={year}
+                                    month={monthNumber}
+                                />
+                            </div>
+
+                        </section>
+
+                        {/* SEGUNDA FILA */}
+                        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+
+                            <div className="p-6 bg-white rounded-xl shadow-lg">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                                    <Users className="w-5 h-5 mr-2 text-blue-600" /> Clientes Más Frecuentes
+                                </h2>
+                                <ClientesFrecuentesTable
+                                    subcourtId={currentSubcourtId}
+                                    year={year}
+                                    month={monthNumber}
+                                />
+                            </div>
+
+                            <div>
+                                <ReservasPorHoraChart
+                                    subcourtId={currentSubcourtId}
+                                    year={year}
+                                    month={monthNumber}
+                                />
+                            </div>
+                        </section>
+
+                        {/* RESERVAS PERIÓDICAS */}
+                        <section className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+                            <ReservasPeriodicasCard
+                                subcourtId={currentSubcourtId}
+                                year={year}
+                                month={monthNumber}
+                            />
+                        </section>
+
+                        {/* HOT / COLD HOURS */}
+                        <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <HotColdHoursCard
+                                subcourtId={currentSubcourtId}
+                                year={year}
+                                month={monthNumber}
+                            />
+                        </section>
+                    </>
+                ) : (
+                    <p className="text-center text-gray-600 mb-10 text-lg">
+                        Selecciona <strong>año</strong> y <strong>mes</strong>, luego presiona <strong>Buscar</strong>.
+                    </p>
+                )}
             </section>
-
-            {/* SEGUNDA FILA */}
-            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-
-                <div className="p-6 bg-white rounded-xl shadow-lg">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                        <Users className="w-5 h-5 mr-2 text-blue-600" /> Clientes Más Frecuentes
-                    </h2>
-                    <ClientesFrecuentesTable subcourtId={currentSubcourtId}
-                       year={year}
-                       month={month} 
-                     />
-                </div>
-
-                <div>
-                    <ReservasPorHoraChart subcourtId={currentSubcourtId} 
-                       year={year}
-                       month={month} 
-                       />
-                </div>
-            </section>
-
-            {/* RESERVAS PERIÓDICAS */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-                <ReservasPeriodicasCard
-                    subcourtId={currentSubcourtId}
-                    year={year}
-                    month={month}
-                />
-            </section>
-
-            {/* HOT / COLD HOURS */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <HotColdHoursCard subcourtId={currentSubcourtId} 
-                  year={year}
-                    month={month}
-                    />
-            </section>
-        </>
-    ) : (
-        <p className="text-center text-gray-600 mb-10 text-lg">
-            Selecciona <strong>año</strong> y <strong>mes</strong>, luego presiona <strong>Buscar</strong>.
-        </p>
-    )}
-</section>
-
 
         </div>
     );

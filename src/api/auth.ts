@@ -155,6 +155,8 @@ export async function onReservationRegister(registrationData: ReservationData, s
   }
 }
 
+
+
 export async function onReservationDelete(subcourtId: string) {
   try {
     const response = await axios.post(`${backendUrl}/deleteReservations/${subcourtId}`);
@@ -165,6 +167,39 @@ export async function onReservationDelete(subcourtId: string) {
     throw error;
   }
 }
+
+export async function onReservationUpdate(updateData: {
+  reservationId: string;
+  reservationData: ReservationData;
+  token: string;
+}) {
+  return await axios.put(
+    `${backendUrl}/reservations/${updateData.reservationId}`,
+    updateData.reservationData,
+    {
+      headers: {
+        Authorization: `Bearer ${updateData.token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+}
+export async function onReservationReminder(updateData: {
+  reservationId: string;
+  token: string;
+}) {
+  return await axios.post(
+    `${backendUrl}/reservations/${updateData.reservationId}/reminder`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${updateData.token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+}
+
 export async function onRegisterServices(registrationData: RegistrationDataService, userId:string) {
     const response = await axios.post<RegisterResponse>(`${backendUrl}/registerServices/${userId}`, registrationData);
    return response.data;
@@ -521,18 +556,22 @@ export async function getPeakOffPeakHours(
 ): Promise<PeakOffPeakHour[]> {
     try {
         const paramsToSend: any = {};
-        if (filters.year) paramsToSend.year = filters.year;
-        if (filters.month) {
-            paramsToSend.month = new Date(`${filters.month} 1, 2024`).getMonth() + 1;
-        }
 
-        const response = await axios.get<PeakOffPeakHour[]>(`${backendUrl}/analytics/HotCold/${id}`, { params: paramsToSend });
+        if (filters.year) paramsToSend.year = filters.year;
+        if (filters.month) paramsToSend.month = filters.month; // <-- enviar "Enero", "Febrero", etc
+
+        const response = await axios.get<PeakOffPeakHour[]>(
+            `${backendUrl}/analytics/HotCold/${id}`,
+            { params: paramsToSend }
+        );
+
         return response.data;
     } catch (error) {
         console.error("Error al obtener horarios pico y valle:", error);
         throw error;
     }
 }
+
 
 
 /**
