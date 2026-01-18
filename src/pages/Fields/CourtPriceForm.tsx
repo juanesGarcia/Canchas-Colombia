@@ -96,6 +96,8 @@ export const CourtPriceForm: React.FC = () => {
             state: courtData.state
         };
 
+        console.log(courtData);
+
         try {
             // ✅ CALL THE API TO UPDATE THE DATA
             await updateSubCourt(subcourtId, dataToSend);
@@ -125,13 +127,13 @@ export const CourtPriceForm: React.FC = () => {
     };
 
     const dayLabels: { [key: string]: string } = {
-        Friday: 'Viernes',
-        Monday: 'Lunes',
-        Saturday: 'Sábado',
-        Sunday: 'Domingo',
-        Thursday: 'Jueves',
-        Wednesday: 'Miércoles',
-        Tuesday: 'Martes',
+        viernes: 'viernes',
+        lunes: 'lunes',
+        sábado: 'sábado',
+        domingo: 'domingo',
+        jueves: 'jueves',
+        miercoles: 'miércoles',
+        martes: 'martes',
     };
 
     if (loading && !courtData) {

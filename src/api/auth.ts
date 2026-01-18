@@ -339,6 +339,28 @@ export async function getSubcourtsByUserId(userId: string): Promise<Subcourt[]> 
     throw error;
   }
 }
+
+
+export async function getSubcourtName(subcourtId: string): Promise<Subcourt[]> {
+  try {
+    const response = await axios.get<GetSubcourtsResponse>(`${backendUrl}/subCourtName/${subcourtId}`);
+
+    console.log('Respuesta de la API para subcanchas:', response.data);
+
+    // FIX: Extrae el array de subcanchas del objeto 'court'
+    
+    const fetchedSubcourts = response.data.subcourts || [];
+    if (response.data.success && Array.isArray(fetchedSubcourts)) {
+      return fetchedSubcourts;
+    } else {
+      console.error("La respuesta de la API no contiene un array de subcanchas válido.");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error al obtener subcanchas por ID de usuario:", error);
+    throw error;
+  }
+}
 // Actualizar una cancha
 export async function onUpdateCourt(updateData: { id: string; fieldData : CourtUpdate; token: string }) {
   return await axios.put(`${backendUrl}/courts/${updateData.id}`, updateData.fieldData, {

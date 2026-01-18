@@ -132,10 +132,6 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                         {field.court_name}
                     </h3>
-                    <div className="flex items-center text-yellow-500">
-                        <Star className="w-4 h-4 fill-current" />
-                        <span className="ml-1 text-sm font-medium">4.8</span>
-                    </div>
                 </div>
 
                 <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
@@ -146,10 +142,6 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <MapPin className="w-4 h-4 mr-2" />
                         {field.city}, {field.address}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Users className="w-4 h-4 mr-2" />
-                        Hasta X personas
                     </div>
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <Phone className="w-4 h-4 mr-2" />

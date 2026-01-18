@@ -111,8 +111,6 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({ userId, type }) =>
           <p className="text-sm text-gray-600 dark:text-gray-300">Arrastra y suelta imágenes aquí, o haz clic para seleccionarlas</p>
         )}
       </div>
-      <div>{userId}</div>
-
       <aside className="flex flex-wrap mt-4">{thumbs}</aside>
 
       {images.length > 0 && (

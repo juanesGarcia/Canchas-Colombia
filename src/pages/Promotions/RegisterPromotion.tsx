@@ -75,21 +75,20 @@ export const RegisterPromotion: React.FC = () => {
 
             // Adapto la lógica de respuesta basándome en el componente Register:
             // Debe haber un indicador de éxito y el ID del elemento creado.
-            if (response.success === true && response.user) {
-                console.log(response.promotionId)
-                setNewPromotionId(response.promotionId);
-                setIsRegistered(true);
+           if (response.success === true && response.promotionId) {
+        setNewPromotionId(response.promotionId);
+        setIsRegistered(true);
 
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Registro exitoso!',
-                    text: 'Ahora puedes subir imágenes para tu promoción.',
-                    timer: 2500,
-                    timerProgressBar: true,
-                });
-            } else {
-                throw new Error('No se pudo obtener el ID de la promoción registrada.');
-            }
+        Swal.fire({
+            icon: 'success',
+            title: '¡Registro exitoso!',
+            text: 'Ahora puedes subir imágenes para tu promoción.',
+            timer: 2500,
+            timerProgressBar: true,
+        });
+    } else {
+        throw new Error('No se pudo obtener el ID de la promoción registrada.');
+    }
         } catch (err: any) {
             console.error('Registration failed:', err);
             let errorMessage = 'Hubo un problema al crear tu promoción. Por favor, intenta de nuevo.';

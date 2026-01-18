@@ -278,9 +278,7 @@ export const RegisterService: React.FC = () => {
                     // Muestra ImageSelector si el servicio está registrado
                     newServiceId && (
                         <div className="mt-12">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                                Sube imágenes de tu servicio
-                            </h3>
+
                             {/* Pasamos el ID del servicio como userId. Asumo que ImageSelector maneja esto. */}
                     
                             <ImageSelector userId={newServiceId} type="service" />

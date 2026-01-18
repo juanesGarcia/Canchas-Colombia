@@ -8,6 +8,8 @@ import RecaudosPorPagoChart from './RecaudosPorPagoChart';
 import ReservasPorHoraChart from './ReservasPorHoraChart';
 import ReservasPeriodicasCard from './ReservasPeriodicasCard';
 import HotColdHoursCard from './HotColdHoursCard';
+import { getSubcourtName } from "../../api/auth";
+import { Subcourt } from "../../types/types";
 
 const meses = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -33,6 +35,7 @@ const monthMap: Record<string, number> = {
 const PruebaChart: React.FC = () => {
     const { subcourtId } = useParams<{ subcourtId: string }>();
     const navigate = useNavigate();
+     const [subcourts, setSubcourts] = useState<Subcourt>();
 
     const [loading, setLoading] = useState(true);
 
@@ -46,8 +49,20 @@ const PruebaChart: React.FC = () => {
     const handleGoBack = () => navigate(-1);
 
     useEffect(() => {
+        const fetchSubcourts = async () => {
+              try {
+                const fetchedSubcourts = await getSubcourtName(subcourtId);
+               
+                setSubcourts(fetchedSubcourts[0]);
+            
+              } catch (err) {
+                console.error("Error fetching subcourts:", err);
+              } 
+            };
         setTimeout(() => setLoading(false), 800);
+         fetchSubcourts();
     }, []);
+
 
     const handleSearch = () => {
         if (year === "" && month === "") return;
@@ -88,7 +103,7 @@ const PruebaChart: React.FC = () => {
                 </h1>
 
                 <p className="text-lg font-medium text-indigo-600 mt-1">
-                    Subcancha: <span className="bg-indigo-100 px-2 py-1 rounded">{currentSubcourtId}</span>
+                    Subcancha: <span className="bg-indigo-100 px-2 py-1 rounded">{subcourts?.subcourt_name}</span>
                 </p>
             </header>
 

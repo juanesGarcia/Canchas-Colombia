@@ -216,7 +216,7 @@ export const ReservationCalendar: React.FC = () => {
             reservation_date: format(selectedDate, 'yyyy-MM-dd'),
             reservation_time: selectedTime,
             duration: Number(duration),
-            price_reservation: Number(price),
+            price_reservation: Number(price)*(Number(duration)/60),
             transfer: Number(transferCode) || 0,
             state: true,
             payment_method: paymentMethod,
@@ -382,10 +382,10 @@ export const ReservationCalendar: React.FC = () => {
                                     type="number"
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
                                     placeholder="Ej: 50000"
-                                    value={price}
+                                    value={price * duration === 0 ? price : price * (duration/60)}
                                     readOnly                                />
                             </div>
-                        </div>
+                        </div>      
 
                         {/* Método de pago */}
                         <div>

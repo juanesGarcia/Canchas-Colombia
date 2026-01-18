@@ -105,7 +105,7 @@ const RecaudosPorPagoChart: React.FC<RecaudosPorPagoChartProps> = ({ subcourtId,
         };
 
         const dataForChart = {
-            labels: filteredData.map(d => d.payment_method),
+            labels: filteredData.map(d => d.medio_pago),
             datasets: [
                 {
                     label: 'Recaudo Total',

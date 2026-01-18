@@ -123,10 +123,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
             {service.court_name}
           </h3>
-          <div className="flex items-center text-yellow-500">
-            <Star className="w-4 h-4 fill-current" />
-            <span className="ml-1 text-sm font-medium">5.0</span>
-          </div>
         </div>
 
         <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
