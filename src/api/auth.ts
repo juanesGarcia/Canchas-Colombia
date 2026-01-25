@@ -170,12 +170,11 @@ export async function onReservationDelete(subcourtId: string) {
 
 export async function onReservationUpdate(updateData: {
   reservationId: string;
-  reservationData: ReservationData;
   token: string;
 }) {
   return await axios.put(
-    `${backendUrl}/reservations/${updateData.reservationId}`,
-    updateData.reservationData,
+    `${backendUrl}/reservations/${updateData.reservationId}/pay-all`,
+    {},
     {
       headers: {
         Authorization: `Bearer ${updateData.token}`,
@@ -184,6 +183,7 @@ export async function onReservationUpdate(updateData: {
     }
   );
 }
+
 export async function onReservationReminder(updateData: {
   reservationId: string;
   token: string;

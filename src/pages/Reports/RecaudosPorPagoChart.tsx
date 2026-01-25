@@ -17,6 +17,7 @@ interface DetailedRevenue {
     total_reservas: number;
     recaudo_total: string;
     medio_pago: string;
+    faltante_total: string;
 }
 
 const PALETA_COLORES = [
@@ -24,6 +25,7 @@ const PALETA_COLORES = [
     'rgb(59, 130, 246)',  // Blue
     'rgb(16, 185, 129)',  // Emerald
     'rgb(168, 85, 247)',  // Violet
+    'rgb(239, 68, 68)'  
 ];
 
 interface RecaudosPorPagoChartProps {
@@ -70,55 +72,68 @@ const RecaudosPorPagoChart: React.FC<RecaudosPorPagoChartProps> = ({ subcourtId,
         fetchData();
     }, [subcourtId, year, month]);
 
-    const { chartData, totalRecaudo, options } = useMemo(() => {
-        const filteredData = recaudosData.filter(
-            d => d && d.medio_pago && d.medio_pago.toLowerCase() !== 'total general'
-        );
+const { chartData, totalRecaudo, options } = useMemo(() => {
+  const filteredData = recaudosData.filter(d => d && d.medio_pago);
 
-        const total = filteredData.reduce((sum, d) => sum + Number(d.recaudo_total), 0);
+  const totalRecaudo = filteredData.reduce(
+    (sum, d) => sum + Number(d.recaudo_total),
+    0
+  );
 
-        const chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '80%',
-            plugins: {
-                legend: {
-                    position: 'bottom' as const,
-                    labels: { usePointStyle: true, padding: 20, font: { size: 12 } }
-                },
-                title: {
-                    display: true,
-                    text: 'Recaudo por Método de Pago',
-                    font: { size: 18, weight: '700' }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: (context: any) => {
-                            const currentValue = context.raw;
-                            const percentage = total > 0 ? ((currentValue / total) * 100).toFixed(1) : '0.0';
-                            const formattedValue = currentValue.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 });
-                            return `${context.label}: ${formattedValue} (${percentage}%)`;
-                        }
-                    }
-                }
-            }
-        };
+  const totalFaltante = filteredData.reduce(
+    (sum, d) => sum + Number(d.faltante_total),
+    0
+  );
 
-        const dataForChart = {
-            labels: filteredData.map(d => d.medio_pago),
-            datasets: [
-                {
-                    label: 'Recaudo Total',
-                    data: filteredData.map(d => Number(d.recaudo_total)),
-                    backgroundColor: PALETA_COLORES.slice(0, filteredData.length).map(c => c.replace('rgb', 'rgba').replace(')', ', 0.8)')),
-                    borderColor: PALETA_COLORES.slice(0, filteredData.length),
-                    borderWidth: 2,
-                }
-            ]
-        };
+  console.log("TOTAL FALTANTE:", totalFaltante); // 👈 debug
 
-        return { chartData: dataForChart, totalRecaudo: total, options: chartOptions };
-    }, [recaudosData]);
+  const labels = [
+    ...filteredData.map(d => d.medio_pago),
+    ...(totalFaltante > 0 ? ['Faltante'] : [])
+  ];
+
+  const dataValues = [
+    ...filteredData.map(d => Number(d.recaudo_total)),
+    ...(totalFaltante > 0 ? [totalFaltante] : [])
+  ];
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '80%',
+    plugins: {
+      legend: { position: 'bottom' as const },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const value = context.raw;
+            const total = totalRecaudo + totalFaltante;
+            const percent = ((value / total) * 100).toFixed(1);
+            return `${context.label}: $${value} (${percent}%)`;
+          }
+        }
+      }
+    }
+  };
+
+  const dataForChart = {
+    labels,
+    datasets: [
+      {
+        data: dataValues,
+        backgroundColor: PALETA_COLORES
+          .slice(0, dataValues.length)
+          .map(c => c.replace('rgb', 'rgba').replace(')', ', 0.8)')),
+        borderColor: PALETA_COLORES.slice(0, dataValues.length),
+        borderWidth: 2,
+      }
+    ]
+  };
+
+  return { chartData: dataForChart, totalRecaudo, options: chartOptions };
+}, [recaudosData]);
+
+
 
     const BaseCard = ({ children }: { children: React.ReactNode }) => (
         <div className="p-6 bg-white rounded-xl shadow-2xl border border-gray-100 h-[450px] w-full flex flex-col items-center justify-center font-sans">
@@ -158,10 +173,10 @@ const RecaudosPorPagoChart: React.FC<RecaudosPorPagoChartProps> = ({ subcourtId,
 
     return (
         <BaseCard>
-            <div className="w-full max-w-md h-full max-h-[400px] relative">
+            <div className="w-full max-w-md h-[320px] relative flex items-center justify-center">
                 <Doughnut options={options as any} data={chartData} />
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-sm text-gray-500 mb-1">Total General</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none transform -translate-y-4">
+                    <p className="text-sm text-gray-500 mb-1">Total Recaudado</p>
                     <p className="text-3xl font-extrabold text-emerald-600 tracking-tight">
                         {totalRecaudo.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 })}
                     </p>

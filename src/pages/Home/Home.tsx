@@ -7,13 +7,6 @@ import { Button } from "../../components/UI/Button";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { ServiceCard } from "../../components/Cards/ServiceCard";
 import { FC } from "../../utils/depencies";
-import PruebaChart from "../Reports/PruebaChart";
-import  ReservasPorDiaChart from "../Reports/ReservasPorDiaChart";
-import RecaudosPorPagoChart from "../Reports/RecaudosPorPagoChart";
-import ClientesFrecuentesTable from "../Reports/ClientesFrecuentesTable"
-import ReservasPorHoraChart from "../Reports/ReservasPorHoraChart"
-import HotColdHoursCard from "../Reports/HotColdHoursCard"
-import ReservasPeriodicasCard from "../Reports/ReservasPeriodicasCard"
 
 
 export const Home: FC = () => {

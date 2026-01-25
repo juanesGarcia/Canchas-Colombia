@@ -12,7 +12,8 @@ import {
 import {
   getReservationsBySubcourtAndDate,
   onReservationDelete,
-  onReservationReminder
+  onReservationReminder,
+  onReservationUpdate
 } from '../../api/auth';
 import Swal from 'sweetalert2';
 import '../../css/App.css';
@@ -72,6 +73,10 @@ export const ReservationInfo: React.FC = () => {
   // ✅ RECORDATORIO WHATSAPP
   const ReminderWhassapt = async () => {
     if (!selectedReservation) return;
+    if (!user || !user.token) {
+      setError('Faltan datos de autenticación. Por favor, vuelve a iniciar sesión.');
+      return;
+    }
 
     try {
       await onReservationReminder({
@@ -86,8 +91,7 @@ export const ReservationInfo: React.FC = () => {
         timer: 2000,
         showConfirmButton: false
       });
-
-    } catch (error) {
+        } catch (error) {
       console.error("Error enviando recordatorio:", error);
       Swal.fire({
         icon: "error",
@@ -96,6 +100,45 @@ export const ReservationInfo: React.FC = () => {
       });
     }
   };
+      const handlePayAll = async () => {
+        if (!selectedReservation) return;
+
+        if (!user || !user.token) {
+          setError("No estás autenticado");
+          return;
+        }
+
+        try {
+              const response = await onReservationUpdate({
+      reservationId: selectedReservation.reservation_id,
+      token: user.token
+    });
+
+    const updatedReservation = response.data.reservation;
+          Swal.fire({
+            icon: "success",
+            title: "¡Paz y Salvo!",
+            text: "La reserva ya quedó totalmente pagada",
+            timer: 2000,
+            showConfirmButton: false
+          });
+              setBookedReservations(prev =>
+      prev.map(r =>
+        r.reservation_id === updatedReservation.reservation_id
+          ? updatedReservation
+          : r
+      )
+    );
+        setSelectedReservation(null)
+        } catch (error) {
+          console.error("Error paz y salvo:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "No se pudo marcar como pagada"
+          });
+        }
+      };
 
   const handleDeleteReservation = async (reservationId: string) => {
     try {
@@ -175,6 +218,10 @@ export const ReservationInfo: React.FC = () => {
                 className="flex-1 bg-yellow-500 text-white py-2 rounded"
               >
                 Recordatorio
+              </button>
+
+              <button onClick={handlePayAll} className="flex-1 bg-green-600 text-white py-2 rounded">
+                Paz y Salvo
               </button>
 
               <button
