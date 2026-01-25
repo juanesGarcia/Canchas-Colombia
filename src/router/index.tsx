@@ -141,6 +141,24 @@ const ServicesDetail = lazy(() =>
   }))
 );
 
+const Terms = lazy(() =>
+  import("../pages/Legal/Terms").then((module) => ({
+    default: module.Terms,
+  }))
+);
+
+const Privacy = lazy(() =>
+  import("../pages/Legal/Privacy").then((module) => ({
+    default: module.Privacy,
+  }))
+);
+
+const Cancellation = lazy(() =>
+  import("../pages/Legal/Cancellation").then((module) => ({
+    default: module.Cancellation,
+  }))
+);
+
 const CourtDetail = lazy(() =>
   import("../pages/Fields/FieldDetailPage/CourtDetail").then((module) => ({
     default: module.CourtDetail,
@@ -176,56 +194,17 @@ export const AppRouter: React.FC = () => {
           {/* Legal Pages */}
           <Route
             path="/terms"
-            element={
-              <>
-                <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                  <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                      Términos y Condiciones
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Contenido próximamente disponible
-                    </p>
-                  </div>
-                </div>
-              </>
-            }
+            element={<Terms/>}
           />
 
           <Route
             path="/privacy"
-            element={
-              <>
-                <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                  <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                      Política de Privacidad
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Contenido próximamente disponible
-                    </p>
-                  </div>
-                </div>
-              </>
-            }
+            element={<Privacy/>}
           />
 
           <Route
             path="/cancellation"
-            element={
-              <>
-                <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                  <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                      Política de Cancelación
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Contenido próximamente disponible
-                    </p>
-                  </div>
-                </div>
-              </>
-            }
+            element={<Cancellation/>}
           />
 <Route path="/ReservationRegister/:subcourtId" element={<ReservationRegister />} />
 <Route path="/ReservationCalendar/:subcourtId" element={<ReservationCalendar />} />

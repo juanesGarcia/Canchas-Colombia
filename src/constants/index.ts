@@ -160,13 +160,13 @@ export const SERVICES: Service[] = [
 export const COMPANY_INFO = {
   name: "CANCHAS COLOMBIA S.A.S.",
   description: "Tu espacio deportivo ideal",
-  phone: "+57 (1) 234-5678",
-  email: "info@sportspace.com",
-  address: "Carrera 15 #85-32, Bogotá, Colombia",
+  phone: "+573186699925",
+  email: "juanesgym2018@gmail.com",
+  address: "Calle 48 csur #25-94, Bogota, Colombia",
   ogImage: "",
   social: {
-    facebook: " ",
-    instagram: "",
+    facebook: "https://www.facebook.com/juanesteban.cubillosgarcia.7/?locale=es_LA",
+    instagram: "https://www.instagram.com/juanestebancubillos/",
     twitter: "",
   },
 };

@@ -95,12 +95,6 @@ export const Footer: React.FC = () => {
                 Alquiler de Canchas
               </Link>
               <Link
-                to="/services"
-                className="block text-gray-500 dark:text-stone-100 dark:hover:text-green-500  hover:text-green-400 transition-colors duration-200"
-              >
-                Servicios Adicionales
-              </Link>
-              <Link
                 to="/contact"
                 className="block text-gray-500 dark:text-stone-100 dark:hover:text-green-500  hover:text-green-400 transition-colors duration-200"
               >

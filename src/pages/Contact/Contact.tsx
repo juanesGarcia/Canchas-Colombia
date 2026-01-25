@@ -108,7 +108,7 @@ export const Contact: React.FC = () => {
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Teléfono</h3>
                     <p className="text-gray-600 dark:text-gray-400">{COMPANY_INFO.phone}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">Lunes a Domingo, 6AM - 11PM</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">Lunes a Domingo, 7AM - 8PM</p>
                   </div>
                 </div>
 
@@ -130,7 +130,7 @@ export const Contact: React.FC = () => {
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Dirección</h3>
                     <p className="text-gray-600 dark:text-gray-400">{COMPANY_INFO.address}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">Zona Norte, Bogotá</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">Zona Sur, Bogotá</p>
                   </div>
                 </div>
 
@@ -141,8 +141,8 @@ export const Contact: React.FC = () => {
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Horarios</h3>
                     <div className="text-gray-600 dark:text-gray-400">
-                      <p>Lunes - Viernes: 6:00 AM - 11:00 PM</p>
-                      <p>Sábados - Domingos: 7:00 AM - 10:00 PM</p>
+                      <p>Lunes - Viernes: 7:00 AM - 8:00 PM</p>
+                      <p>Sábados - Domingos: 7:00 AM - 9:00 PM</p>
                     </div>
                   </div>
                 </div>
