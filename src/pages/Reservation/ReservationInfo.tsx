@@ -100,45 +100,43 @@ export const ReservationInfo: React.FC = () => {
       });
     }
   };
-      const handlePayAll = async () => {
-        if (!selectedReservation) return;
+
+  const handlePayAll = async () => {
+  if (!selectedReservation) return;
 
         if (!user || !user.token) {
           setError("No estás autenticado");
           return;
         }
 
-        try {
-              const response = await onReservationUpdate({
+  try {
+    await onReservationUpdate({
       reservationId: selectedReservation.reservation_id,
       token: user.token
     });
 
-    const updatedReservation = response.data.reservation;
-          Swal.fire({
-            icon: "success",
-            title: "¡Paz y Salvo!",
-            text: "La reserva ya quedó totalmente pagada",
-            timer: 2000,
-            showConfirmButton: false
-          });
-              setBookedReservations(prev =>
-      prev.map(r =>
-        r.reservation_id === updatedReservation.reservation_id
-          ? updatedReservation
-          : r
-      )
-    );
-        setSelectedReservation(null)
-        } catch (error) {
-          console.error("Error paz y salvo:", error);
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "No se pudo marcar como pagada"
-          });
-        }
-      };
+    Swal.fire({
+      icon: "success",
+      title: "¡Paz y Salvo!",
+      text: "La reserva ya quedó totalmente pagada",
+      timer: 2000,
+      showConfirmButton: false
+    });
+
+    // 🔥 recargar desde backend
+    const updatedReservations = await getReservationsBySubcourtAndDate(subcourtId!, selectedDate);
+    setBookedReservations(updatedReservations);
+    setSelectedReservation(null);
+
+  } catch (error) {
+           console.error("Error al paz y salvo:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo marcar como pagada.'
+      });
+  }
+};
 
   const handleDeleteReservation = async (reservationId: string) => {
     try {
@@ -204,8 +202,7 @@ export const ReservationInfo: React.FC = () => {
               <DollarSign />
               Faltante: ${Number(selectedReservation.missing_quantity).toFixed(0)}
             </div>
-
-            <div className="flex gap-2 mt-4">
+             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
               <button
                 onClick={() => setSelectedReservation(null)}
                 className="flex-1 bg-blue-600 text-white py-2 rounded"
@@ -219,11 +216,17 @@ export const ReservationInfo: React.FC = () => {
               >
                 Recordatorio
               </button>
-
-              <button onClick={handlePayAll} className="flex-1 bg-green-600 text-white py-2 rounded">
+              <button
+                onClick={handlePayAll}
+                disabled={Number(selectedReservation.missing_quantity) === 0}
+                className={`flex-1 py-2 rounded ${
+                  Number(selectedReservation.missing_quantity) === 0
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 text-white"
+                }`}
+              >
                 Paz y Salvo
               </button>
-
               <button
                 onClick={() => handleDeleteReservation(selectedReservation.reservation_id)}
                 className="flex-1 bg-red-600 text-white py-2 rounded"
