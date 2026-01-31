@@ -161,9 +161,13 @@ export const Home: FC = () => {
               Error: {error}
             </div>
           )}
-          {!isLoading && !error && featuredFields.length > 0 && featuredFields.map((field) => (
-            <FieldCard key={field.court_id} field={field} />
-          ))}
+          {!isLoading && !error && featuredFields.length > 0 &&
+            featuredFields
+              .filter(field => field.state === true)
+              .map(field => (
+                <FieldCard key={field.court_id} field={field} />
+              ))
+          }
           {!isLoading && !error && featuredFields.length === 0 && (
             <div className="col-span-full text-center text-gray-500">
               No hay canchas destacadas disponibles.
