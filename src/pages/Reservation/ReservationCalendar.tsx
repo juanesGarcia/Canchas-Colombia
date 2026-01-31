@@ -264,7 +264,7 @@ export const ReservationCalendar: React.FC = () => {
                 const whatsappMessage = `
         ¡Hola! 👋
 
-        Se ha realizado una nueva reserva con los siguientes datos:
+        Se ha realizado una nueva reserva a través de Canchas Colombia con los siguientes datos:
 
         Cliente: ${userName}
         Cédula: ${cedula}
