@@ -35,6 +35,7 @@ export interface Reservation {
   court_id: string;
   court_name: string;
   missing_quantity: number;
+  phone: string;
 }
 
 export const ReservationInfo: React.FC = () => {
@@ -84,10 +85,6 @@ export const ReservationInfo: React.FC = () => {
       const formattedDate = new Date(selectedReservation.reservation_date)
         .toLocaleDateString('es-CO');
 
-      const formattedTime = new Date(selectedReservation.reservation_time)
-        .toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-      const myWhatsappNumber = '573186699925';
-
       const whatsappMessage = `
       RECORDATORIO DE RESERVA
       Hola ${selectedReservation.client_name}, te recordamos tu reserva:
@@ -100,7 +97,7 @@ export const ReservationInfo: React.FC = () => {
         `;
 
       const encodedMessage = encodeURIComponent(whatsappMessage);
-      const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
+      const whatsappUrl = `https://wa.me/${selectedReservation.client_phone}?text=${encodedMessage}`;
 
       // 1. Abre WhatsApp
       window.open(whatsappUrl, '_blank');

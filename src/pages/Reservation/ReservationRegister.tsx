@@ -78,8 +78,6 @@ export const ReservationRegister: React.FC = () => {
                     timer: 2000
                 });
                 if (success) {
-                    const myWhatsappNumber = '573186699925';
-
                     const whatsappMessage = `
                         ¡Hola! 👋
 
@@ -102,7 +100,7 @@ export const ReservationRegister: React.FC = () => {
                         `;
 
                     const encodedMessage = encodeURIComponent(whatsappMessage);
-                    const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
+                    const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
 
                     // 1. Abre WhatsApp
                     window.open(whatsappUrl, '_blank');

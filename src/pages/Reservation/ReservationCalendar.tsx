@@ -189,7 +189,7 @@ export const ReservationCalendar: React.FC = () => {
 
         const transferValue = Number(transferCode) || 0;
 
-        if (transferValue < 20000) {
+        if (transferValue < 20000 && price!==0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Monto insuficiente',
