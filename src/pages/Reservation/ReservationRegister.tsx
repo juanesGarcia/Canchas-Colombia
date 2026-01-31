@@ -37,61 +37,100 @@ export const ReservationRegister: React.FC = () => {
     }, [subcourtId]);
     // En ReservationRegister.tsx, dentro de handleSubmit
 
-const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
 
-    if (!subcourtId) {
-        setError("ID de subcancha no encontrado. No se puede registrar la reserva.");
-        setLoading(false);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de URL',
-            text: 'ID de subcancha no encontrado en la URL.',
-        });
-        return; // Detiene la ejecución si subcourtId no existe
-    }
-
-    const dataToSend = {
-        user_id: cedula,
-        user_name: userName,
-        phone,
-        subcourt_id: subcourtId, // TypeScript ahora sabe que es un string porque salimos del if si no lo es
-        reservation_date: reservationDate,
-        reservation_time: reservationTime,
-        duration: Number(duration),
-        price_reservation: Number(price),
-        transfer: Number(transferCode),
-        state:true
-    };
-
-   try {
-        const success = await onReservationRegister(dataToSend, subcourtId);
-
-        if (success) {
+        if (!subcourtId) {
+            setError("ID de subcancha no encontrado. No se puede registrar la reserva.");
+            setLoading(false);
             Swal.fire({
-                icon: 'success',
-                title: '¡Reserva Exitosa!',
-                text: 'La subcancha ha sido reservada correctamente.',
-                showConfirmButton: false,
-                timer: 2000
+                icon: 'error',
+                title: 'Error de URL',
+                text: 'ID de subcancha no encontrado en la URL.',
             });
-            navigate('/');
-        } 
-    } catch (err:any) {
-        // Esta es la parte modificada.
-        const errorMessage = err.response?.data?.error || err.message || 'Error desconocido al crear la reserva.';
-        setError('Error al crear la reserva. ' + errorMessage);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de Reserva',
-            text: errorMessage, // Aquí se muestra el mensaje de error del backend.
-        });
-    } finally {
-        setLoading(false);
-    }
-};
+            return; // Detiene la ejecución si subcourtId no existe
+        }
+
+        const dataToSend = {
+            user_id: cedula,
+            user_name: userName,
+            phone,
+            subcourt_id: subcourtId, // TypeScript ahora sabe que es un string porque salimos del if si no lo es
+            reservation_date: reservationDate,
+            reservation_time: reservationTime,
+            duration: Number(duration),
+            price_reservation: Number(price),
+            transfer: Number(transferCode),
+            state: true
+        };
+
+        try {
+            const success = await onReservationRegister(dataToSend, subcourtId);
+
+            if (success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Reserva Exitosa!',
+                    text: 'La subcancha ha sido reservada correctamente.',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                if (success) {
+                    const myWhatsappNumber = '573186699925';
+
+                    const whatsappMessage = `
+                        ¡Hola! 👋
+
+                        Se ha realizado una nueva reserva con los siguientes datos:
+
+                        Cliente: ${userName}
+                        Cédula: ${cedula}
+                        Teléfono: ${phone}
+
+                        Fecha: ${reservationDate}
+                        Hora: ${reservationTime}
+                        Duración: ${duration} minutos
+                        Precio: $${price}
+
+                        Código de transferencia: ${transferCode || 'No aplica'}
+
+                        Subcancha ID: ${subcourtId}
+
+                        ¡Gracias!
+                        `;
+
+                    const encodedMessage = encodeURIComponent(whatsappMessage);
+                    const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
+
+                    // 1. Abre WhatsApp
+                    window.open(whatsappUrl, '_blank');
+
+                    // 2. Alerta visual
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Reserva Exitosa!',
+                        text: 'La reserva fue creada y se enviaron los datos por WhatsApp.',
+                        confirmButtonText: 'Aceptar'
+                    });
+
+                    navigate('/');
+                }
+            }
+        } catch (err: any) {
+            // Esta es la parte modificada.
+            const errorMessage = err.response?.data?.error || err.message || 'Error desconocido al crear la reserva.';
+            setError('Error al crear la reserva. ' + errorMessage);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Reserva',
+                text: errorMessage, // Aquí se muestra el mensaje de error del backend.
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -204,7 +243,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                                 />
                             </div>
                         </div>
-                        
+
                         <div>
                             <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Duración (en minutos)

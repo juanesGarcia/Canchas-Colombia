@@ -5,15 +5,14 @@ import ImageSelector from '../images/ImageSelector'; // Importa el componente de
 import {
     MapPin,
     Tag,
-    Info,
-    CheckCircle,
-    CircleOff,
     Wrench,
     Smartphone,
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { onRegisterServices } from '../../api/auth';
+
+
 
 export const RegisterService: React.FC = () => {
     // Estados del Formulario de Servicio
@@ -30,10 +29,8 @@ export const RegisterService: React.FC = () => {
     const [error, setError] = useState('');
     const [isRegistered, setIsRegistered] = useState(false);
     // Estado para guardar el ID del servicio creado para ImageSelector
-    const [newServiceId, setNewServiceId] = useState<string | null>(null); 
-
-    const { user } = useAuth(); // Obtenemos el usuario logueado
-    const navigate = useNavigate();
+    const [newServiceId, setNewServiceId] = useState<string | null>(null);
+    const [courtType, setCourtType] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -46,7 +43,7 @@ export const RegisterService: React.FC = () => {
             try {
                 const authData = JSON.parse(authDataString);
                 // El ID del proveedor logueado
-                userId = authData.user?.id; 
+                userId = authData.user?.id;
             } catch (error) {
                 console.error("Error al parsear authData del localStorage:", error);
             }
@@ -61,20 +58,21 @@ export const RegisterService: React.FC = () => {
         const dataToSend = {
             // Nombre del Servicio
             courtName,
-            courtAddress, 
-            courtCity, 
+            courtAddress,
+            courtCity,
             courtPhone,
             price: price === '' ? 0 : Number(price),
             description,
             state,
             court_type: 'services', // Tipo fijo para servicios
             is_court: false, // Indica que no es una cancha
+            type:courtType
         };
         try {
             const response = await onRegisterServices(dataToSend, userId);
             console.log(response)
             // Asumiendo que onRegisterServices devuelve un objeto con la propiedad 'serviceId'
-            if (response && response.success === true && response.user) { 
+            if (response && response.success === true && response.user) {
                 setNewServiceId(response.promotionId); // Guardamos el ID del servicio
                 setIsRegistered(true); // Marcamos como registrado para mostrar el ImageSelector
 
@@ -137,7 +135,7 @@ export const RegisterService: React.FC = () => {
                                     {error}
                                 </div>
                             )}
-                            
+
                             {/* Nombre del Servicio */}
                             <div>
                                 <label htmlFor="courtName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -194,7 +192,7 @@ export const RegisterService: React.FC = () => {
                                     />
                                 </div>
                             </div>
-                            
+
                             {/* Teléfono */}
                             <div>
                                 <label htmlFor="courtPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -263,6 +261,43 @@ export const RegisterService: React.FC = () => {
                                 </label>
                             </div>
                         </div>
+                         <div>
+                                            <label
+                                              htmlFor="courtType"
+                                              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                                            >
+                                              Tipo de cancha
+                                            </label>
+                                            <div className="relative">
+                                              <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                              <select
+                                                id="courtType"
+                                                required
+                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
+                                                value={courtType}
+                                                onChange={(e) =>
+                                                  setCourtType(
+                                                    e.target.value as
+                                                      | 'equipacion'
+                                                      | 'entrenamiento'
+                                                      | 'iluminacion'
+                                                      | 'camerinos'
+                                                      | 'arbitraje'
+                                                      | ''
+                                                  )
+                                                }
+                                              >
+                                                <option value="">Selecciona un tipo</option>
+                                                <option value="equipacion">Equipación</option>
+                                                <option value="entrenamiento">Entrenamiento</option>
+                                                <option value="iluminacion">Iluminación</option>
+                                                <option value="camerinos">Camerinos</option>
+                                                <option value="arbitraje">Arbitraje</option>
+                                              </select>
+                                            </div>
+                                          </div>
+                        
+                    
 
                         <div>
                             <Button
@@ -280,7 +315,7 @@ export const RegisterService: React.FC = () => {
                         <div className="mt-12">
 
                             {/* Pasamos el ID del servicio como userId. Asumo que ImageSelector maneja esto. */}
-                    
+
                             <ImageSelector userId={newServiceId} type="service" />
 
                             <p className='mt-4 text-sm text-gray-600 dark:text-gray-400'>

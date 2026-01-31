@@ -112,7 +112,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
         {/* Etiqueta */}
         <div className="absolute top-4 left-4">
           <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-            Servicio
+            {service.type}
           </span>
         </div>
       </div>

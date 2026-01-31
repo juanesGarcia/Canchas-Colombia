@@ -123,23 +123,6 @@ export const Promotions: React.FC = () => {
           {showFilters && (
             <AnimatePresence>
               <motion.div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Service Type Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Tipo de Servicio
-                  </label>
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    value={selectedService}
-                    onChange={(e) => setSelectedService(e.target.value)}
-                  >
-                    {serviceTypes.map((service) => (
-                      <option key={service.value} value={service.value}>
-                        {service.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
                 {/* Price Range Filter */}
                 <div>

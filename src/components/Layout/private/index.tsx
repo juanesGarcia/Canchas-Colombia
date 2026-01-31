@@ -60,7 +60,8 @@ export const PrivateLayout = () => {
         );
       case "superadmin":
         return PRIVATE_NAVIGATION_ITEMS.filter(
-          (item) => item.name === "Registro"
+          (item) => item.name === "Registro" ||
+            item.name === "Canchas"
         );
       default:
         return [];

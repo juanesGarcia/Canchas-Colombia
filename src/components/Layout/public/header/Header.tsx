@@ -24,9 +24,9 @@ export const Header: React.FC = () => {
     setIsUserMenuOpen(false);
   };
 
-  const publicNavItems = NAVIGATION_ITEMS;
-  const privateNavItems = isAuthenticated ? PRIVATE_NAVIGATION_ITEMS : [];
-  const allNavItems = [...publicNavItems, ...privateNavItems];
+  const allNavItems = isAuthenticated
+  ? PRIVATE_NAVIGATION_ITEMS
+  : NAVIGATION_ITEMS;
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50">
@@ -75,20 +75,23 @@ export const Header: React.FC = () => {
             {isAuthenticated ? (
               <div className="relative">
                 <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400 transition-colors duration-200"
-                >
-                  {user?.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                  <span className="text-sm font-medium">{user?.name}</span>
-                </button>
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center space-x-2 max-w-[180px] text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400 transition-colors duration-200"
+              >
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full shrink-0"
+                  />
+                ) : (
+                  <User className="w-5 h-5 shrink-0" />
+                )}
+                
+                <span className="text-sm font-medium truncate">
+                  {user?.name}
+                </span>
+              </button>
 
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">

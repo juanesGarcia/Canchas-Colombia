@@ -73,25 +73,47 @@ export const ReservationInfo: React.FC = () => {
   // ✅ RECORDATORIO WHATSAPP
   const ReminderWhassapt = async () => {
     if (!selectedReservation) return;
+
     if (!user || !user.token) {
       setError('Faltan datos de autenticación. Por favor, vuelve a iniciar sesión.');
       return;
     }
 
     try {
-      await onReservationReminder({
-        reservationId: selectedReservation.reservation_id,
-        token: user.token
-      });
 
+      const formattedDate = new Date(selectedReservation.reservation_date)
+        .toLocaleDateString('es-CO');
+
+      const formattedTime = new Date(selectedReservation.reservation_time)
+        .toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+      const myWhatsappNumber = '573186699925';
+
+      const whatsappMessage = `
+      RECORDATORIO DE RESERVA
+      Hola ${selectedReservation.client_name}, te recordamos tu reserva:
+      Fecha: ${formattedDate}
+      Hora: ${selectedReservation.reservation_time}
+      Duración: ${selectedReservation.duration} minutos
+      Precio: $${selectedReservation.price_reservation}
+      Falta de pago : $${selectedReservation.missing_quantity}
+      ¡Gracias!
+        `;
+
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
+
+      // 1. Abre WhatsApp
+      window.open(whatsappUrl, '_blank');
+
+      // 2. Alerta visual
       Swal.fire({
-        icon: "success",
-        title: "Recordatorio enviado",
-        text: "El mensaje fue enviado por WhatsApp al cliente",
-        timer: 2000,
-        showConfirmButton: false
+        icon: 'success',
+        title: '¡Reserva Exitosa!',
+        text: 'La reserva fue creada y se enviaron los datos por WhatsApp.',
+        confirmButtonText: 'Aceptar'
       });
-        } catch (error) {
+    }
+    catch (error) {
       console.error("Error enviando recordatorio:", error);
       Swal.fire({
         icon: "error",
@@ -102,41 +124,41 @@ export const ReservationInfo: React.FC = () => {
   };
 
   const handlePayAll = async () => {
-  if (!selectedReservation) return;
+    if (!selectedReservation) return;
 
-        if (!user || !user.token) {
-          setError("No estás autenticado");
-          return;
-        }
+    if (!user || !user.token) {
+      setError("No estás autenticado");
+      return;
+    }
 
-  try {
-    await onReservationUpdate({
-      reservationId: selectedReservation.reservation_id,
-      token: user.token
-    });
+    try {
+      await onReservationUpdate({
+        reservationId: selectedReservation.reservation_id,
+        token: user.token
+      });
 
-    Swal.fire({
-      icon: "success",
-      title: "¡Paz y Salvo!",
-      text: "La reserva ya quedó totalmente pagada",
-      timer: 2000,
-      showConfirmButton: false
-    });
+      Swal.fire({
+        icon: "success",
+        title: "¡Paz y Salvo!",
+        text: "La reserva ya quedó totalmente pagada",
+        timer: 2000,
+        showConfirmButton: false
+      });
 
-    // 🔥 recargar desde backend
-    const updatedReservations = await getReservationsBySubcourtAndDate(subcourtId!, selectedDate);
-    setBookedReservations(updatedReservations);
-    setSelectedReservation(null);
+      // 🔥 recargar desde backend
+      const updatedReservations = await getReservationsBySubcourtAndDate(subcourtId!, selectedDate);
+      setBookedReservations(updatedReservations);
+      setSelectedReservation(null);
 
-  } catch (error) {
-           console.error("Error al paz y salvo:", error);
+    } catch (error) {
+      console.error("Error al paz y salvo:", error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'No se pudo marcar como pagada.'
       });
-  }
-};
+    }
+  };
 
   const handleDeleteReservation = async (reservationId: string) => {
     try {
@@ -202,7 +224,7 @@ export const ReservationInfo: React.FC = () => {
               <DollarSign />
               Faltante: ${Number(selectedReservation.missing_quantity).toFixed(0)}
             </div>
-             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
               <button
                 onClick={() => setSelectedReservation(null)}
                 className="flex-1 bg-blue-600 text-white py-2 rounded"
@@ -219,11 +241,10 @@ export const ReservationInfo: React.FC = () => {
               <button
                 onClick={handlePayAll}
                 disabled={Number(selectedReservation.missing_quantity) === 0}
-                className={`flex-1 py-2 rounded ${
-                  Number(selectedReservation.missing_quantity) === 0
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-green-600 text-white"
-                }`}
+                className={`flex-1 py-2 rounded ${Number(selectedReservation.missing_quantity) === 0
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 text-white"
+                  }`}
               >
                 Paz y Salvo
               </button>

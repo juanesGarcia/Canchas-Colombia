@@ -24,7 +24,7 @@ import {
 import { format } from 'date-fns';
 axios.defaults.withCredentials = true;
 
-const backendUrl = "https://backend-canchas-production.up.railway.app";//'http://localhost:3000';
+const backendUrl = 'http://localhost:8080';
 
 interface GetCourtsResponse {
   success: boolean;
@@ -363,6 +363,7 @@ export async function getSubcourtName(subcourtId: string): Promise<Subcourt[]> {
 }
 // Actualizar una cancha
 export async function onUpdateCourt(updateData: { id: string; fieldData : CourtUpdate; token: string }) {
+  console.log(updateData.id)
   return await axios.put(`${backendUrl}/courts/${updateData.id}`, updateData.fieldData, {
     headers: {
       'Authorization': `Bearer ${updateData.token}`,
@@ -506,6 +507,18 @@ export async function deleteSubcourt(subcourtId: string, token : string): Promis
         // Return false to indicate that the deletion failed.
         return false;
     }
+}
+
+export async function deleteCourt(courtId: string): Promise<boolean> {
+  try {
+    const response = await axios.delete(`${backendUrl}/courts/${courtId}`, {
+    });
+
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error eliminando cancha:", error);
+    return false;
+  }
 }
 
 export async function getUserReservation(id: string): Promise<Reservation[]>{
