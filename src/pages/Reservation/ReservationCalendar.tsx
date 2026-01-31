@@ -12,9 +12,11 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import Swal from 'sweetalert2';
-import { onReservationRegister, getReservationsBySubcourtAndDate, getSubcourtPriceByDate } from '../../api/auth';
+import { onReservationRegister, getReservationsBySubcourtAndDate, getSubcourtPriceByDate, getCourtsPhone} from '../../api/auth';
 import { format, addHours, parse } from 'date-fns';
 import '../../css/App.css';
+import { Reservation } from './Reservation';
+import { CourtUpdate } from "../../types/types";
 
 interface ReservationData {
     user_id: string;
@@ -38,6 +40,7 @@ export const ReservationCalendar: React.FC = () => {
     const [userName, setUserName] = useState('');
     const [day, setDay] = useState('');
     const [phone, setPhone] = useState('');
+     const [courtPhone, setCourtPhone] = useState('');
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [bookedTimes, setBookedTimes] = useState<string[]>([]);
@@ -89,6 +92,7 @@ export const ReservationCalendar: React.FC = () => {
             try {
                 const reservations = await getReservationsBySubcourtAndDate(subcourtId, selectedDate);
                 let allBookedTimes: string[] = [];
+                
 
                 reservations.forEach((res: any) => {
                     if (res.reservation_time && res.end_time) {
@@ -114,6 +118,17 @@ export const ReservationCalendar: React.FC = () => {
             } finally {
                 setIsFetchingTimes(false);
             }
+
+                      try {
+                const fetchedPhone = await getCourtsPhone(subcourtId);
+                setCourtPhone(fetchedPhone)
+
+                
+
+            } catch (err) {
+                console.error("Error al obtener el precio:", err);
+                setPrice('');
+            }
         };
         const fetchPrice = async () => {
             if (!subcourtId || !selectedDate) return;
@@ -122,6 +137,7 @@ export const ReservationCalendar: React.FC = () => {
                 const fetchedPrice = await getSubcourtPriceByDate(subcourtId, selectedDate);
                 setPrice(fetchedPrice.price);
                 setDay(fetchedPrice.day_of_week)
+                
 
             } catch (err) {
                 console.error("Error al obtener el precio:", err);
@@ -260,9 +276,9 @@ export const ReservationCalendar: React.FC = () => {
         Cantida a transferencia: $${transferCode}
         ¡Gracias!
         `;
-
+console.log(courtPhone)
                 const encodedMessage = encodeURIComponent(whatsappMessage);
-                const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
+                const whatsappUrl = `https://wa.me/${courtPhone}?text=${encodedMessage}`;
 
                 // 1. Abre WhatsApp
                 window.open(whatsappUrl, '_blank');

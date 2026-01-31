@@ -24,7 +24,7 @@ import {
 import { format } from 'date-fns';
 axios.defaults.withCredentials = true;
 
-const backendUrl = "https://backend-canchas-production.up.railway.app";//'http://localhost:3000';
+const backendUrl = "http://localhost:8080";
 
 interface GetCourtsResponse {
   success: boolean;
@@ -292,6 +292,11 @@ export async function getCourts(): Promise<Court[]> {
   return response.data.courts;
 }
 
+export async function getCourtsPhone(id: string): Promise<CourtUpdate> {
+  const response = await axios.get(`${backendUrl}/courtsPhone/${id}`);
+  console.log(response.data.courts)
+  return response.data.courts.phone;
+} 
 export async function getPromotionsByUserId(id: string): Promise<Court[]> {
   console.log(id)
   const response = await axios.get<GetCourtsResponse>(`${backendUrl}/getPromotions/${id}`);
