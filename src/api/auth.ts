@@ -24,7 +24,7 @@ import {
 import { format } from 'date-fns';
 axios.defaults.withCredentials = true;
 
-const backendUrl = "http://localhost:8080";
+const backendUrl = "https://backend-canchas-production.up.railway.app";//"http://localhost:8080";
 
 interface GetCourtsResponse {
   success: boolean;
