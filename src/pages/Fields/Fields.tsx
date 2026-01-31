@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCourts } from "../../api/auth";
-import { Court } from "../../types/types";
+  import { Court } from "../../types/types";
 import { Search, Filter, MapPin } from "lucide-react";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { Button } from "../../components/UI/Button";
@@ -205,13 +205,15 @@ const filteredFields = courts.filter((court) => {
           </div>
         ) : filteredFields.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredFields.map((field) => (
+              {filteredFields
+            .filter(field => field.state === true)
+            .map((field) => (
               <FieldCard
                 key={field.court_id}
                 field={field}
                 onBook={handleBookField}
               />
-            ))}
+          ))}
           </div>
         ) : (
           <div className="text-center py-12">
