@@ -33,9 +33,13 @@ export const Services: React.FC = () => {
             state: item.state,
             price: item.price,
             court_type: item.court_type,
-            type: item.type // Asegúrate de que esta propiedad existe en tu tipo Court
+            type: item.type,
+            owner_name : item.owner_name // Asegúrate de que esta propiedad existe en tu tipo Court
           }));
+      
         setServices(fetchedServices);
+        console.log(services)
+
       } catch (err) {
         setError("No se pudieron cargar los servicios.");
         console.error("Error fetching services:", err);

@@ -33,7 +33,8 @@ export const Promotions: React.FC = () => {
             state: item.state,
             price: item.price,
             court_type: item.court_type,// Asegúrate de que esta propiedad existe en tu tipo Court
-            type: item.type
+            type: item.type,
+            owner_name:item.owner_name
           }));
         setServices(fetchedServices);
       } catch (err) {

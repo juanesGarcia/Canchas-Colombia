@@ -149,6 +149,7 @@ export interface Service {
   price: number;
   court_type: string;
   type: string;
+  owner_name:string;
   // Agrega cualquier otra propiedad que un servicio pueda tener
 }
 

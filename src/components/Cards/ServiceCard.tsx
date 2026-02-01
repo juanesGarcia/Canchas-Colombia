@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { MapPin, Star, DollarSign, Phone, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, DollarSign, Phone, ChevronLeft, ChevronRight } from "lucide-react";
 import { Service } from "../../types/types";
 import { Button } from "../UI/Button";
 import { useNavigate } from "react-router-dom";
@@ -66,7 +66,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
-      
+
       {/* 📸 Carrusel */}
       <div className="relative h-48" onClick={handleImageClick}>
         <div className="overflow-hidden h-full" ref={emblaRef}>
@@ -142,13 +142,23 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
             <DollarSign className="w-4 h-4 mr-2" />
             Precio: {service.price}
           </div>
+
+          {service.type === 'promotion' && service.owner_name && (
+            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              ⚽ Nombre de la cancha: {service.owner_name}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-end space-x-2">
           <Button
             variant="primary"
             size="md"
-            onClick={() => navigate(`/ServicesDetail/${service.court_id}`)}
+           onClick={() => 
+  navigate(`/ServicesDetail/${service.court_id}`, {
+    state: { owner_name: service.owner_name }
+  })
+}
           >
             {"Detalles"}
           </Button>

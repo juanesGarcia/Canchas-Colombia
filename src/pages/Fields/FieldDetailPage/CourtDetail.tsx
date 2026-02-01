@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MapPin, Star, Clock, ArrowLeft, Loader, XCircle, ChevronLeft, ChevronRight , Phone} from "lucide-react";
+import { MapPin, Star, ArrowLeft, Loader, XCircle, ChevronLeft, ChevronRight , Phone} from "lucide-react";
 import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
 
 import { getCourtById } from "../../../api/auth";

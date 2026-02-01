@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MapPin, Star, Phone , ArrowLeft, Loader, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import useEmblaCarousel from 'embla-carousel-react'; 
+import { MapPin, Star, Phone, ArrowLeft, Loader, XCircle, ChevronLeft, ChevronRight, DollarSign } from "lucide-react";
+import useEmblaCarousel from 'embla-carousel-react';
 // Importa la función de tu API para obtener un servicio por su ID.
 import { getCourtById } from "../../api/auth";
 import { Service } from "../../types/types";
 import { useAuth } from '../../contexts/AuthContext';
-
+import { useLocation } from "react-router-dom";
 
 interface ArrowButtonProps {
     onClick: () => void;
@@ -49,10 +49,14 @@ export const ServiceDetail: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     // INICIALIZACIÓN DE EMBLA CAROUSEL
-    const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         duration: 30,
     });
+
+    const location = useLocation();
+    const ownerName =
+        location.state?.owner_name || service?.owner_name;
 
     // Funciones de control del carrusel
     const scrollPrev = useCallback(() => {
@@ -155,7 +159,7 @@ ${service.city}, ${service.address}
     return (
         <div className="bg-gray-100 dark:bg-gray-900 min-h-screen p-4 sm:p-8">
             <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-                
+
                 {/* INICIO DEL CARRUSEL (Área de la imagen) */}
                 <div className="relative h-96">
                     <div className="overflow-hidden h-full" ref={emblaRef}>
@@ -165,7 +169,7 @@ ${service.city}, ${service.address}
                                     <div key={index} className="flex-shrink-0 flex-grow-0 w-full relative">
                                         <img
                                             src={photo.url}
-                                            alt={`${service.court_name} - Imagen ${index + 1}`} 
+                                            alt={`${service.court_name} - Imagen ${index + 1}`}
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
@@ -185,19 +189,19 @@ ${service.city}, ${service.address}
                     {/* Flechas de Navegación (solo si hay más de una foto) */}
                     {hasPhotos && service.photos.length > 1 && (
                         <>
-                            <ArrowButton 
-                                direction="prev" 
-                                onClick={scrollPrev} 
-                                disabled={false} 
+                            <ArrowButton
+                                direction="prev"
+                                onClick={scrollPrev}
+                                disabled={false}
                             />
-                            <ArrowButton 
-                                direction="next" 
-                                onClick={scrollNext} 
-                                disabled={false} 
+                            <ArrowButton
+                                direction="next"
+                                onClick={scrollNext}
+                                disabled={false}
                             />
                         </>
                     )}
-                    
+
                     {/* Etiqueta de tipo de servicio */}
                     <div className="absolute bottom-4 left-4">
                         <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -238,28 +242,37 @@ ${service.city}, ${service.address}
                                 {service.city}, {service.address}
                             </span>
                         </div>
-                         <div className="flex items-center text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center text-gray-600 dark:text-gray-400">
                             <Phone className="w-5 h-5 mr-3 flex-shrink-0" />
                             <span className="text-base font-medium">
                                 Telefono: {service.phone}
                             </span>
                         </div>
                         <div className="flex items-center text-gray-600 dark:text-gray-400">
+                            <DollarSign className="w-5 h-5 mr-3 flex-shrink-0" />
                             <span className="text-base font-medium">
-                                 $  Precio: {service.price}
+                                Precio: {service.price}
                             </span>
                         </div>
+                        {service.type === 'promotion' && ownerName && (
+                            <div className="flex items-center text-base text-gray-500 dark:text-gray-400">
+
+                                <span className="text-base font-medium">
+                                    ⚽ Nombre de la cancha: {ownerName}
+                                </span>
+                            </div>
+                        )}
                     </div>
-               {!isAuthenticated && (
-                      <div className="flex justify-end">
-                          <button
-                              onClick={handleWhatsAppClick}
-                              className="px-8 py-3 rounded-full text-white font-bold bg-green-600 hover:bg-green-700 transition-colors duration-200 shadow-lg"
-                          >
-                              {service.type === 'services' ? 'Obtener servicio' : 'Aprovechar Oferta'}
-                          </button>
-                      </div>
-                  )}
+                    {!isAuthenticated && (
+                        <div className="flex justify-end">
+                            <button
+                                onClick={handleWhatsAppClick}
+                                className="px-8 py-3 rounded-full text-white font-bold bg-green-600 hover:bg-green-700 transition-colors duration-200 shadow-lg"
+                            >
+                                {service.type === 'services' ? 'Obtener servicio' : 'Aprovechar Oferta'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
