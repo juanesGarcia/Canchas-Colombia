@@ -40,12 +40,8 @@ export const Contact: React.FC = () => {
     `;
     const encodedMessage = encodeURIComponent(whatsappMessage);
     const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
+     window.open(whatsappUrl, '_blank');
 
-    // Paso 1: Redirigir a WhatsApp
-    window.location.href = whatsappUrl;
-
-    // Simula el tiempo que el usuario podría tomar en WhatsApp y volver
-    // Para que la alerta se muestre de forma asíncrona después de la redirección
     setTimeout(() => {
         // Paso 2: Mostrar la alerta de éxito al regresar
         Swal.fire({

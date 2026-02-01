@@ -16,24 +16,24 @@ export const Login: React.FC = () => {
 
   const from = location.state?.from?.pathname || '/dashboard';
 
-// En tu componente Login.tsx
-// ...
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
+  // En tu componente Login.tsx
+  // ...
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-  try {
-        await login(email, password);
-        navigate(from, { replace: true });
-  } catch (err) {
-    setError('Error al iniciar sesión. Verifica tus credenciales.');
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      await login(email, password);
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError('Error al iniciar sesión. Verifica tus credenciales.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -106,46 +106,19 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
             </div>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded-sm"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                Recordarme
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-green-600 hover:text-green-500">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
-          </div>
-
-          <div>
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              loading={loading}
-              className="w-full"
-            >
-              Iniciar Sesión
-            </Button>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Usuario demo: admin@sportspace.com | Contraseña: cualquiera
-            </p>
-          </div>
-        </form>
+      <div>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          loading={loading}
+          className="w-full"
+        >
+          Iniciar Sesión
+        </Button>
       </div>
-    </div>
+    </form>
+      </div >
+    </div >
   );
 };

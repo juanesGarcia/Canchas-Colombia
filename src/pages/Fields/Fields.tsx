@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCourts } from "../../api/auth";
-  import { Court } from "../../types/types";
+import { Court } from "../../types/types";
 import { Search, Filter, MapPin } from "lucide-react";
 import { FieldCard } from "../../components/Cards/FieldCard";
 import { Button } from "../../components/UI/Button";
@@ -54,30 +54,30 @@ export const Fields: React.FC = () => {
     { value: "high", label: "Más de $50,000" },
   ];
 
-const filteredFields = courts.filter((court) => {
-  const matchesSearch =
-    court.court_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    court.city?.toLowerCase().includes(searchTerm.toLowerCase())
-  const matchesType =
+  const filteredFields = courts.filter((court) => {
+    const matchesSearch =
+      court.court_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      court.city?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesType =
       selectedType === "all" || court.court_type?.toLowerCase().includes(selectedType);
-  const matchesPrice =
-    priceRange === "all" ||
-    (priceRange === "low" && court.price <= 30000) ||
-    (priceRange === "medium" && court.price > 30000 && court.price <= 50000) ||
-    (priceRange === "high" && court.price > 50000);
-    
+    const matchesPrice =
+      priceRange === "all" ||
+      (priceRange === "low" && court.price <= 30000) ||
+      (priceRange === "medium" && court.price > 30000 && court.price <= 50000) ||
+      (priceRange === "high" && court.price > 50000);
+
     const matchesCity =
       selectedCity === "all" || court.city?.toLowerCase() === selectedCity.toLowerCase();
-  const isCourt = court.type === "court";
+    const isCourt = court.type === "court";
 
-  return (
-    matchesSearch &&
-    matchesType &&
-    matchesPrice &&
-    matchesCity &&
-    isCourt 
-  );
-});
+    return (
+      matchesSearch &&
+      matchesType &&
+      matchesPrice &&
+      matchesCity &&
+      isCourt
+    );
+  });
   const handleBookField = (court: Court) => {
     console.log("Reservar cancha:", court);
   };
@@ -154,22 +154,22 @@ const filteredFields = courts.filter((court) => {
                     ))}
                   </select>
                 </div>
-                            <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Ciudad
-                    </label>
-                    <select
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      value={selectedCity}
-                      onChange={(e) => setSelectedCity(e.target.value)}
-                    >
-                      {cities.map((city) => (
-                        <option key={city.value} value={city.value}>
-                          {city.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Ciudad
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    value={selectedCity}
+                    onChange={(e) => setSelectedCity(e.target.value)}
+                  >
+                    {cities.map((city) => (
+                      <option key={city.value} value={city.value}>
+                        {city.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <div className="flex items-end">
                   <Button
@@ -192,7 +192,9 @@ const filteredFields = courts.filter((court) => {
         {/* Results */}
         <div className="mb-6">
           <p className="text-gray-600 dark:text-gray-300">
-            {filteredFields.length} cancha{filteredFields.length !== 1 ? "s" : ""} encontrada{filteredFields.length !== 1 ? "s" : ""}
+            {filteredFields.filter(f => f.state).length} cancha
+            {filteredFields.filter(f => f.state).length !== 1 ? "s" : ""} encontrada
+            {filteredFields.filter(f => f.state).length !== 1 ? "s" : ""}
           </p>
         </div>
 
@@ -205,15 +207,15 @@ const filteredFields = courts.filter((court) => {
           </div>
         ) : filteredFields.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredFields
-            .filter(field => field.state === true)
-            .map((field) => (
-              <FieldCard
-                key={field.court_id}
-                field={field}
-                onBook={handleBookField}
-              />
-          ))}
+            {filteredFields
+              .filter(field => field.state === true)
+              .map((field) => (
+                <FieldCard
+                  key={field.court_id}
+                  field={field}
+                  onBook={handleBookField}
+                />
+              ))}
           </div>
         ) : (
           <div className="text-center py-12">

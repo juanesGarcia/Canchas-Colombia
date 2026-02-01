@@ -157,8 +157,6 @@ export const PrivateLayout = () => {
                   : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
               }`}
             >
-              <SettingsIcon className="w-5 h-5 mr-3" />
-              Configuración
             </Link>
 
             <button
@@ -282,23 +280,15 @@ export const PrivateLayout = () => {
               })}
             </nav>
 
-            {/* Configuración y logout */}
+            {/* logout */}
             <div className="border-t border-gray-700 p-4 space-y-2">
-              <Link
-                to="/settings"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700"
-              >
-                <SettingsIcon className="w-5 h-5 mr-3" />
-                Configuración
-              </Link>
               <button
                 onClick={handleLogout}
                 className="flex items-center w-full px-4 py-3 rounded-lg text-red-500 hover:bg-red-900/30"
               >
                 <LogOutIcon className="w-5 h-5 mr-3" />
                 Cerrar Sesión
-              </button>
+              </button> 
             </div>
           </div>
         </div>

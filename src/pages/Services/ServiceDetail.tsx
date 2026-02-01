@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MapPin, Star, Clock, ArrowLeft, Loader, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, Star, Phone , ArrowLeft, Loader, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from 'embla-carousel-react'; 
 // Importa la función de tu API para obtener un servicio por su ID.
 import { getCourtById } from "../../api/auth";
@@ -201,7 +201,7 @@ ${service.city}, ${service.address}
                     {/* Etiqueta de tipo de servicio */}
                     <div className="absolute bottom-4 left-4">
                         <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                            Servicio
+                            {service.type}
                         </span>
                     </div>
 
@@ -238,10 +238,15 @@ ${service.city}, ${service.address}
                                 {service.city}, {service.address}
                             </span>
                         </div>
-                        <div className="flex items-center text-gray-600 dark:text-gray-400">
-                            <Clock className="w-5 h-5 mr-3 flex-shrink-0" />
+                         <div className="flex items-center text-gray-600 dark:text-gray-400">
+                            <Phone className="w-5 h-5 mr-3 flex-shrink-0" />
                             <span className="text-base font-medium">
-                                Precio: {service.price}
+                                Telefono: {service.phone}
+                            </span>
+                        </div>
+                        <div className="flex items-center text-gray-600 dark:text-gray-400">
+                            <span className="text-base font-medium">
+                                 $  Precio: {service.price}
                             </span>
                         </div>
                     </div>

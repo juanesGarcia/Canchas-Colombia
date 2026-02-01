@@ -21,7 +21,7 @@ export const Services: React.FC = () => {
       try {
         const fetchedItems: Court[] = await getCourts();
         const fetchedServices = fetchedItems
-          .filter(item => item.type === 'services')
+          .filter(item => item.type === 'services' && item.state === true)
           .map(item => ({
             court_id: item.court_id,
             court_name: item.court_name,
@@ -179,8 +179,9 @@ export const Services: React.FC = () => {
         {/* Results */}
         <div className="mb-6">
           <p className="text-gray-600 dark:text-gray-300">
-            {filteredServices.length} servicio{filteredServices.length !== 1 ? "s" : ""} encontrado{filteredServices.length !== 1 ? "s" : ""}
-          </p>
+            {filteredServices.filter(f => f.state).length} cancha
+            {filteredServices.filter(f => f.state).length !== 1 ? "s" : ""} encontrada
+            {filteredServices.filter(f => f.state).length !== 1 ? "s" : ""}          </p>
         </div>
 
         {isLoading ? (

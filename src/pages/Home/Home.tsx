@@ -35,6 +35,7 @@ export const Home: FC = () => {
             photos: item.photos,
             price: item.price,
             state: item.state,
+            type: item.type
           }));
 
         setCourts(courtsData);
@@ -211,9 +212,13 @@ export const Home: FC = () => {
                 Error: {error}
               </div>
             )}
-            {!isLoading && !error && featuredServices.length > 0 && featuredServices.map((service) => (
-              <ServiceCard key={service.court_id} service={service} />
-            ))}
+{!isLoading && !error &&
+  featuredServices
+    .filter(service => service.state && service.type === 'services')
+    .map(service => (
+      <ServiceCard key={service.court_id} service={service} />
+    ))
+}
             {!isLoading && !error && featuredServices.length === 0 && (
               <div className="col-span-full text-center text-gray-500">
                 No hay servicios adicionales destacados disponibles.
@@ -235,15 +240,15 @@ export const Home: FC = () => {
           </div>
         </div>
       </section>
-        {/* Featured Promociones */}
+      {/* Featured Promociones */}
       <section className=" py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Promociones 
+              Promociones
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              Mira todas las promociones 
+              Mira todas las promociones
             </p>
           </div>
 
@@ -258,9 +263,13 @@ export const Home: FC = () => {
                 Error: {error}
               </div>
             )}
-            {!isLoading && !error && featuredServices.length > 0 && featuredServices.map((service) => (
-              <ServiceCard key={service.court_id} service={service} />
-            ))}
+            {!isLoading && !error &&
+              featuredServices
+                .filter(service => service.state && service.type === 'promotion')
+                .map(service => (
+                  <ServiceCard key={service.court_id} service={service} />
+                ))
+            }
             {!isLoading && !error && featuredServices.length === 0 && (
               <div className="col-span-full text-center text-gray-500">
                 No hay servicios adicionales destacados disponibles.

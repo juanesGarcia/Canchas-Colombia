@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"; // Importar useCallback
 import { MapPin, Users, Star, DollarSign, Phone, ChevronLeft, ChevronRight } from "lucide-react"; // Nuevos iconos
-import { Court } from "../../types/types"; 
+import { Court } from "../../types/types";
 import { Button } from "../UI/Button";
 import { useNavigate } from "react-router-dom";
 import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react'; // Importar EmblaCarouselType si Court no lo tiene
@@ -52,7 +52,7 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
     const defaultImageUrl = "https://via.placeholder.com/600x400?text=Cancha+No+Disponible";
 
     // 🚀 INICIALIZACIÓN DE EMBLA CAROUSEL CON LÓGICA DE CONTROL
-    const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         duration: 30,
         dragFree: true, // Permite arrastrar libremente para una mejor UX móvil
@@ -74,7 +74,7 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
     return (
         // El contenedor principal lleva la clase 'group' para el hover de las flechas
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
-            
+
             {/* 🚀 CARRUSEL DE IMÁGENES (relative para posicionar flechas) */}
             <div className="relative h-48" onClick={handleImageClick}>
                 <div className="overflow-hidden h-full" ref={emblaRef}>
@@ -100,33 +100,42 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
                         )}
                     </div>
                 </div>
-                
+
                 {/* Flechas de Navegación (solo si hay fotos) */}
                 {hasPhotos && field.photos.length > 1 && (
                     <>
-                        <ArrowButton 
-                            direction="prev" 
-                            onClick={scrollPrev} 
-                            disabled={!emblaApi || emblaApi.scrollSnapList().length <= 1} 
+                        <ArrowButton
+                            direction="prev"
+                            onClick={scrollPrev}
+                            disabled={!emblaApi || emblaApi.scrollSnapList().length <= 1}
                         />
-                        <ArrowButton 
-                            direction="next" 
-                            onClick={scrollNext} 
-                            disabled={!emblaApi || emblaApi.scrollSnapList().length <= 1} 
+                        <ArrowButton
+                            direction="next"
+                            onClick={scrollNext}
+                            disabled={!emblaApi || emblaApi.scrollSnapList().length <= 1}
                         />
                     </>
                 )}
 
                 {/* Etiqueta de tipo de cancha */}
-                <div className="absolute top-4 left-4">
+                <div className="absolute top-4 left-4 flex gap-2">
+                    {/* Tipo de cancha */}
                     <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
                         {field.court_type}
                     </span>
-                </div>
+
+                    {/* Estado */}
+                    <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${field.state
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-red-600 text-white'
+                            }`}
+                    >
+                        {field.state ? 'Activo' : 'Inactivo'}
+                    </span>
+                </div>  
             </div>
-
             {/* ----------------- */}
-
             <div className="p-6">
                 <div className="flex items-start justify-between mb-3">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">

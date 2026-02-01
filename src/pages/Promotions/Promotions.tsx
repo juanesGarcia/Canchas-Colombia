@@ -21,7 +21,7 @@ export const Promotions: React.FC = () => {
       try {
         const fetchedItems: Court[] = await getCourts();
         const fetchedServices = fetchedItems
-          .filter(item => item.type === 'promotion')
+          .filter(item => item.type === 'promotion' && item.state === true)
           .map(item => ({
             court_id: item.court_id,
             court_name: item.court_name,
@@ -32,7 +32,7 @@ export const Promotions: React.FC = () => {
             photos: item.photos,
             state: item.state,
             price: item.price,
-            court_type: item.court_type ,// Asegúrate de que esta propiedad existe en tu tipo Court
+            court_type: item.court_type,// Asegúrate de que esta propiedad existe en tu tipo Court
             type: item.type
           }));
         setServices(fetchedServices);
@@ -162,8 +162,9 @@ export const Promotions: React.FC = () => {
         {/* Results */}
         <div className="mb-6">
           <p className="text-gray-600 dark:text-gray-300">
-            {filteredServices.length} promocion{filteredServices.length !== 1 ? "es" : ""} encontrada{filteredServices.length !== 1 ? "s" : ""}
-          </p>
+            {filteredServices.filter(f => f.state).length} cancha
+            {filteredServices.filter(f => f.state).length !== 1 ? "s" : ""} encontrada
+            {filteredServices.filter(f => f.state).length !== 1 ? "s" : ""}          </p>
         </div>
 
         {isLoading ? (
