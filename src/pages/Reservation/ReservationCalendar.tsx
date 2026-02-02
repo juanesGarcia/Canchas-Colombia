@@ -12,11 +12,9 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import Swal from 'sweetalert2';
-import { onReservationRegister, getReservationsBySubcourtAndDate, getSubcourtPriceByDate, getCourtsPhone} from '../../api/auth';
+import { onReservationRegister, getReservationsBySubcourtAndDate, getSubcourtPriceByDate, getCourtsPhone } from '../../api/auth';
 import { format, addHours, parse } from 'date-fns';
 import '../../css/App.css';
-import { Reservation } from './Reservation';
-import { CourtUpdate } from "../../types/types";
 
 interface ReservationData {
     user_id: string;
@@ -40,7 +38,7 @@ export const ReservationCalendar: React.FC = () => {
     const [userName, setUserName] = useState('');
     const [day, setDay] = useState('');
     const [phone, setPhone] = useState('');
-     const [courtPhone, setCourtPhone] = useState('');
+    const [courtPhone, setCourtPhone] = useState('');
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [bookedTimes, setBookedTimes] = useState<string[]>([]);
@@ -50,7 +48,6 @@ export const ReservationCalendar: React.FC = () => {
     const [paymentMethod, setPaymentMethod] = useState<'transferencia' | 'tarjeta' | 'efectivo' | 'pending' | string>('pending');
     const [loading, setLoading] = useState(false);
     const [isFetchingTimes, setIsFetchingTimes] = useState(false);
-    const [error, setError] = useState('');
 
     // 🔹 Solo permite seleccionar fechas válidas (hoy o futuras)
     const handleDateChange = (date: Date) => {
@@ -92,7 +89,7 @@ export const ReservationCalendar: React.FC = () => {
             try {
                 const reservations = await getReservationsBySubcourtAndDate(subcourtId, selectedDate);
                 let allBookedTimes: string[] = [];
-                
+
 
                 reservations.forEach((res: any) => {
                     if (res.reservation_time && res.end_time) {
@@ -119,11 +116,11 @@ export const ReservationCalendar: React.FC = () => {
                 setIsFetchingTimes(false);
             }
 
-                      try {
+            try {
                 const fetchedPhone = await getCourtsPhone(subcourtId);
                 setCourtPhone(fetchedPhone)
 
-                
+
 
             } catch (err) {
                 console.error("Error al obtener el precio:", err);
@@ -137,7 +134,7 @@ export const ReservationCalendar: React.FC = () => {
                 const fetchedPrice = await getSubcourtPriceByDate(subcourtId, selectedDate);
                 setPrice(fetchedPrice.price);
                 setDay(fetchedPrice.day_of_week)
-                
+
 
             } catch (err) {
                 console.error("Error al obtener el precio:", err);
@@ -194,7 +191,6 @@ export const ReservationCalendar: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
 
         const now = new Date();
         const selectedDateTime = new Date(selectedDate);
@@ -205,7 +201,7 @@ export const ReservationCalendar: React.FC = () => {
 
         const transferValue = Number(transferCode) || 0;
 
-        if (transferValue < 20000 && price!==0) {
+        if (transferValue < 20000 && price !== 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Monto insuficiente',
@@ -225,7 +221,7 @@ export const ReservationCalendar: React.FC = () => {
             return;
         }
 
-        if (!subcourtId || !cedula || !userName || !phone || !selectedTime || !duration || paymentMethod === 'pending') {
+        if (!subcourtId || !cedula || !userName || !phone || !selectedTime || !duration) {
             Swal.fire({
                 icon: 'error',
                 title: 'Datos incompletos',
@@ -236,18 +232,20 @@ export const ReservationCalendar: React.FC = () => {
         }
 
         console.log(selectedDate)
+        const isFree = Number(price) === 0;
+
         const dataToSend: ReservationData = {
             user_id: cedula,
             user_name: userName,
             phone,
             subcourt_id: subcourtId,
             reservation_date: format(selectedDate, 'yyyy-MM-dd'),
-            reservation_time: selectedTime,
+            reservation_time: selectedTime!,
             duration: Number(duration),
-            price_reservation: Number(price) * (Number(duration) / 60),
-            transfer: Number(transferCode) || 0,
+            price_reservation: isFree ? 0 : Number(price) * (Number(duration) / 60),
+            transfer: isFree ? 0 : Number(transferCode) || 0,
             state: true,
-            payment_method: paymentMethod,
+            payment_method: isFree ? 'gratis' : paymentMethod,
         };
 
         try {
@@ -258,25 +256,22 @@ export const ReservationCalendar: React.FC = () => {
                 minute: '2-digit'
             });
             if (success) {
-
-                const myWhatsappNumber = '573186699925';
-
                 const whatsappMessage = `
-        ¡Hola! 👋
+                ¡Hola! 👋
 
-        Se ha realizado una nueva reserva a través de Canchas Colombia con los siguientes datos:
+                Se ha realizado una nueva reserva a través de Canchas Colombia con los siguientes datos:
 
-        Cliente: ${userName}
-        Cédula: ${cedula}
-        Teléfono: ${phone}
-        Fecha: ${formattedDate}
-        Hora: ${formattedTime}
-        Duración: ${duration} minutos
-        Precio: $${price}
-        Cantida a transferencia: $${transferCode}
-        ¡Gracias!
-        `;
-console.log(courtPhone)
+                Cliente: ${userName}
+                Cédula: ${cedula}
+                Teléfono: ${phone}
+                Fecha: ${formattedDate}
+                Hora: ${formattedTime}
+                Duración: ${duration} minutos
+                Precio: $${price}
+                Cantidad a transferir: $${transferCode}
+                ¡Gracias!
+                `;
+                console.log(courtPhone)
                 const encodedMessage = encodeURIComponent(whatsappMessage);
                 const whatsappUrl = `https://wa.me/${courtPhone}?text=${encodedMessage}`;
 
@@ -290,6 +285,8 @@ console.log(courtPhone)
                     text: 'La reserva fue creada y se enviaron los datos por WhatsApp.',
                     confirmButtonText: 'Aceptar'
                 });
+
+                navigate('/');
 
             }
 
@@ -441,47 +438,59 @@ console.log(courtPhone)
                                     type="number"
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
                                     placeholder="Ej: 50000"
-                                    value={price * duration === 0 ? price : price * (duration / 60)}
+                                    value={
+                                        Number(price) * Number(duration) === 0
+                                            ? Number(price)
+                                            : Number(price) * (Number(duration) / 60)
+                                    }
                                     readOnly />
                             </div>
                         </div>
 
-                        {/* Método de pago */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Método de Pago</label>
-                            <div className="relative">
-                                <Wallet className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <select
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                                    value={paymentMethod}
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
-                                >
-                                    <option value="pending" disabled>Selecciona método</option>
-                                    <option value="efectivo">Efectivo</option>
-                                    <option value="tarjeta">Tarjeta</option>
-                                    <option value="transferencia">Transferencia</option>
-                                </select>
-                            </div>
-                        </div>
+                        {Number(price) !== 0 && (
+                            <>
+                                {/* Método de pago */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Método de Pago
+                                    </label>
+                                    <div className="relative">
+                                        <Wallet className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                        <select
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
+                                            value={paymentMethod}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                        >
+                                            <option value="pending" disabled>Selecciona método</option>
+                                            <option value="efectivo">Efectivo</option>
+                                            <option value="tarjeta">Tarjeta</option>
+                                            <option value="transferencia">Transferencia</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-                        {/* Código de transferencia */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Monto de confirmación (min 20.000)</label>
-                            <div className="relative">
-                                <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    type="text"
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-                                    placeholder="Cantidad pagada"
-                                    value={transferCode}
-                                    onChange={(e) => {
-                                        // Solo deja números
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setTransferCode(value);
-                                    }}
-                                />
-                            </div>
-                        </div>
+                                {/* Código de transferencia */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Monto de confirmación (min 20.000)
+                                    </label>
+                                    <div className="relative">
+                                        <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                        <input
+                                            type="text"
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
+                                            placeholder="Cantidad pagada"
+                                            value={transferCode}
+                                            onChange={(e) => {
+                                                const value = e.target.value.replace(/\D/g, "");
+                                                setTransferCode(value);
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
                     </div>
 
                     <div>
