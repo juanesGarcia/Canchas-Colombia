@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useLocation , useNavigate} from "react-router-dom";
 import {
     CheckCircle,
@@ -11,8 +11,13 @@ import { Court } from "../../../types/types";
 
 export const FieldDetailPage: React.FC = () => {
     const location = useLocation();
-    const court = location.state?.court as Court;
-    const navigate = useNavigate();
+  const court = location.state?.court as Court;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+    
 
     const [showForm, setShowForm] = useState(false);
 
