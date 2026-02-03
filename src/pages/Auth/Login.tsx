@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { useAuth } from '../../contexts/AuthContext'; // Mantén el AuthContext si es necesario para gestionar el estado global del usuario
+import Swal from 'sweetalert2';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -18,20 +19,23 @@ export const Login: React.FC = () => {
 
   // En tu componente Login.tsx
   // ...
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      await login(email, password);
-      navigate(from, { replace: true });
-    } catch (err) {
-      setError('Error al iniciar sesión. Verifica tus credenciales.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    await login(email, password);
+    navigate(from, { replace: true });
+  } catch (err: any) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error al iniciar sesión',
+      text: err.message, // 👈 mensaje real del backend
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 
