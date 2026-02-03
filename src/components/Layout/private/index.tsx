@@ -3,7 +3,6 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LogOut as LogOutIcon,
   User as UserIcon,
-  Settings as SettingsIcon,
   Home as HomeIcon,
   Calendar as CalendarIcon,
   Menu as MenuIcon,
@@ -114,11 +113,10 @@ export const PrivateLayout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center px-4 py-3 mb-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                    location.pathname === item.path
+                  className={`flex items-center px-4 py-3 mb-2 text-sm font-medium rounded-lg transition-colors duration-200 ${location.pathname === item.path
                       ? "text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400"
                       : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-5 h-5 mr-3" />
                   {item.name}
@@ -151,11 +149,10 @@ export const PrivateLayout = () => {
 
             <Link
               to="/settings"
-              className={`flex items-center px-4 py-3 mb-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                location.pathname === "/settings"
+              className={`flex items-center px-4 py-3 mb-2 text-sm font-medium rounded-lg transition-colors duration-200 ${location.pathname === "/settings"
                   ? "text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400"
                   : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
+                }`}
             >
             </Link>
 
@@ -224,9 +221,8 @@ export const PrivateLayout = () => {
 
         {/* 🔹 Menú móvil ocupa el 100% del ancho */}
         <div
-          className={`fixed inset-0 z-50 transform transition-transform duration-300 ${
-            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className={`fixed inset-0 z-50 transform transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
         >
           <div className="w-full h-full bg-gray-800 text-white overflow-y-auto">
             {/* Header del menú */}
@@ -267,11 +263,10 @@ export const PrivateLayout = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
-                      location.pathname === item.path
+                    className={`flex items-center px-4 py-3 rounded-lg transition-colors ${location.pathname === item.path
                         ? "bg-green-700 text-white"
                         : "hover:bg-gray-700 text-gray-300"
-                    }`}
+                      }`}
                   >
                     <Icon className="w-5 h-5 mr-3" />
                     {item.name}
@@ -288,7 +283,7 @@ export const PrivateLayout = () => {
               >
                 <LogOutIcon className="w-5 h-5 mr-3" />
                 Cerrar Sesión
-              </button> 
+              </button>
             </div>
           </div>
         </div>

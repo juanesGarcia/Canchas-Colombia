@@ -21,9 +21,11 @@ export const Home: FC = () => {
         const fetchedItems = await getCourts();
         console.log(fetchedItems);
         // Filtra la data para separar canchas y servicios
-        const courtsData = fetchedItems.filter(item => item.is_court);
+        const courtsData = fetchedItems.filter(item => item.type==='court' && item.state===true);
+
+        console.log(courtsData)
         const servicesData = fetchedItems
-          .filter(item => !item.is_court)
+          .filter(item => item.type !=='court' && item.state===true)
           .map(item => ({
             // Mapea las propiedades para que coincidan con la interfaz Service
             court_id: item.court_id,
@@ -164,7 +166,6 @@ export const Home: FC = () => {
           )}
           {!isLoading && !error && featuredFields.length > 0 &&
             featuredFields
-              .filter(field => field.state === true)
               .map(field => (
                 <FieldCard key={field.court_id} field={field} />
               ))
@@ -212,13 +213,13 @@ export const Home: FC = () => {
                 Error: {error}
               </div>
             )}
-{!isLoading && !error &&
-  featuredServices
-    .filter(service => service.state && service.type === 'services')
-    .map(service => (
-      <ServiceCard key={service.court_id} service={service} />
-    ))
-}
+            {!isLoading && !error &&
+              featuredServices
+                .filter(service => service.type === 'services')
+                .map(service => (
+                  <ServiceCard key={service.court_id} service={service} />
+                ))
+            }
             {!isLoading && !error && featuredServices.length === 0 && (
               <div className="col-span-full text-center text-gray-500">
                 No hay servicios adicionales destacados disponibles.
@@ -265,7 +266,7 @@ export const Home: FC = () => {
             )}
             {!isLoading && !error &&
               featuredServices
-                .filter(service => service.state && service.type === 'promotion')
+                .filter(service => service.type === 'promotion')
                 .map(service => (
                   <ServiceCard key={service.court_id} service={service} />
                 ))

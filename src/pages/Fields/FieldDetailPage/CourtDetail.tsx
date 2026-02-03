@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MapPin, Star, ArrowLeft, Loader, XCircle, ChevronLeft, ChevronRight , Phone} from "lucide-react";
-import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
+import { MapPin, Star, ArrowLeft, Loader, XCircle, ChevronLeft, ChevronRight, Phone } from "lucide-react";
+import useEmblaCarousel from 'embla-carousel-react';
 
 import { getCourtById } from "../../../api/auth";
-import { Service as Court} from "../../../types/types"; 
-import {Map} from "../../Map/Map";
+import { Service as Court } from "../../../types/types";
+import { Map } from "../../Map/Map";
 
 // -----------------------------------------------------------
 // 1. COMPONENTE AUXILIAR: Botón de flecha para el carrusel
@@ -40,13 +40,7 @@ const ArrowButton: React.FC<ArrowButtonProps> = ({ onClick, direction, disabled 
         </button>
     );
 };
-// -----------------------------------------------------------
-
-
-// -----------------------------------------------------------
-// 2. COMPONENTE PRINCIPAL: CourtDetail
-// -----------------------------------------------------------
-
+    
 export const CourtDetail: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
@@ -71,29 +65,29 @@ export const CourtDetail: React.FC = () => {
     }, [emblaApi]);
 
     // Lógica de carga de datos
-   useEffect(() => {
-  if (!id) {
-    setIsLoading(false);
-            setError("No se proporcionó un ID de cancha."); 
-    return;
-  }
+    useEffect(() => {
+        if (!id) {
+            setIsLoading(false);
+            setError("No se proporcionó un ID de cancha.");
+            return;
+        }
 
-        const fetchCourtDetails = async () => { 
-  setIsLoading(true);
-  setError(null);
+        const fetchCourtDetails = async () => {
+            setIsLoading(true);
+            setError(null);
             try {
                 const fetchedCourt = await getCourtById(id);
-                setCourt(fetchedCourt); 
+                setCourt(fetchedCourt);
             } catch (err) {
-                console.error("Error al obtener los detalles de la cancha:", err); 
-      setError("No se pudo cargar la información de la cancha.");
+                console.error("Error al obtener los detalles de la cancha:", err);
+                setError("No se pudo cargar la información de la cancha.");
             } finally {
-      setIsLoading(false);
+                setIsLoading(false);
             }
         };
 
         fetchCourtDetails();
-}, [id]);
+    }, [id]);
     const hasPhotos = court?.photos && court.photos.length > 0;
     const defaultImageUrl = "https://placehold.co/800x600/cccccc/333333?text=Sin+Imagen";
 
@@ -229,7 +223,7 @@ export const CourtDetail: React.FC = () => {
                         </div>
                         <div className="flex items-center text-gray-600 dark:text-gray-400">
                             <span className="text-base font-medium">
-                               $ Precio: {court.price}
+                                $ Precio: {court.price}
                             </span>
                         </div>
                         <div className="flex items-center text-gray-600 dark:text-gray-400">

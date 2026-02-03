@@ -25,8 +25,8 @@ export const Header: React.FC = () => {
   };
 
   const allNavItems = isAuthenticated
-  ? PRIVATE_NAVIGATION_ITEMS
-  : NAVIGATION_ITEMS;
+    ? PRIVATE_NAVIGATION_ITEMS
+    : NAVIGATION_ITEMS;
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50">
@@ -48,11 +48,10 @@ export const Header: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  location.pathname === item.path
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${location.pathname === item.path
                     ? "text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400"
                     : "text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400"
-                }`}
+                  }`}
               >
                 {item.name}
               </Link>
@@ -75,23 +74,23 @@ export const Header: React.FC = () => {
             {isAuthenticated ? (
               <div className="relative">
                 <button
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center space-x-2 max-w-[180px] text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400 transition-colors duration-200"
-              >
-                {user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full shrink-0"
-                  />
-                ) : (
-                  <User className="w-5 h-5 shrink-0" />
-                )}
-                
-                <span className="text-sm font-medium truncate">
-                  {user?.name}
-                </span>
-              </button>
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 max-w-[180px] text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400 transition-colors duration-200"
+                >
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full shrink-0"
+                    />
+                  ) : (
+                    <User className="w-5 h-5 shrink-0" />
+                  )}
+
+                  <span className="text-sm font-medium truncate">
+                    {user?.name}
+                  </span>
+                </button>
 
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
@@ -159,11 +158,10 @@ export const Header: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
-                  location.pathname === item.path
+                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${location.pathname === item.path
                     ? "text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400"
                     : "text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400"
-                }`}
+                  }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}

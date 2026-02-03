@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import ImageSelector from '../images/ImageSelector'; // Importa el componente de carga de imágenes
 import {
@@ -9,7 +8,6 @@ import {
     Smartphone,
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
-import { useAuth } from '../../contexts/AuthContext';
 import { onRegisterServices } from '../../api/auth';
 
 
@@ -66,7 +64,7 @@ export const RegisterService: React.FC = () => {
             state,
             court_type: 'services', // Tipo fijo para servicios
             is_court: false, // Indica que no es una cancha
-            type:courtType
+            type: courtType
         };
         try {
             const response = await onRegisterServices(dataToSend, userId);
@@ -261,43 +259,43 @@ export const RegisterService: React.FC = () => {
                                 </label>
                             </div>
                         </div>
-                         <div>
-                                            <label
-                                              htmlFor="courtType"
-                                              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                                            >
-                                              Tipo de cancha
-                                            </label>
-                                            <div className="relative">
-                                              <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                              <select
-                                                id="courtType"
-                                                required
-                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
-                                                value={courtType}
-                                                onChange={(e) =>
-                                                  setCourtType(
-                                                    e.target.value as
-                                                      | 'equipacion'
-                                                      | 'entrenamiento'
-                                                      | 'iluminacion'
-                                                      | 'camerinos'
-                                                      | 'arbitraje'
-                                                      | ''
-                                                  )
-                                                }
-                                              >
-                                                <option value="">Selecciona un tipo</option>
-                                                <option value="equipacion">Equipación</option>
-                                                <option value="entrenamiento">Entrenamiento</option>
-                                                <option value="iluminacion">Iluminación</option>
-                                                <option value="camerinos">Camerinos</option>
-                                                <option value="arbitraje">Arbitraje</option>
-                                              </select>
-                                            </div>
-                                          </div>
-                        
-                    
+                        <div>
+                            <label
+                                htmlFor="courtType"
+                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                            >
+                                Tipo de cancha
+                            </label>
+                            <div className="relative">
+                                <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <select
+                                    id="courtType"
+                                    required
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white appearance-none"
+                                    value={courtType}
+                                    onChange={(e) =>
+                                        setCourtType(
+                                            e.target.value as
+                                            | 'equipacion'
+                                            | 'entrenamiento'
+                                            | 'iluminacion'
+                                            | 'camerinos'
+                                            | 'arbitraje'
+                                            | ''
+                                        )
+                                    }
+                                >
+                                    <option value="">Selecciona un tipo</option>
+                                    <option value="equipacion">Equipación</option>
+                                    <option value="entrenamiento">Entrenamiento</option>
+                                    <option value="iluminacion">Iluminación</option>
+                                    <option value="camerinos">Camerinos</option>
+                                    <option value="arbitraje">Arbitraje</option>
+                                </select>
+                            </div>
+                        </div>
+
+
 
                         <div>
                             <Button

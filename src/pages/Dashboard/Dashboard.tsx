@@ -4,7 +4,7 @@ import { Button } from "../../components/UI/Button";
 import { useNavigate } from 'react-router-dom';
 import { getUserReservation } from '../../api/auth';
 import { Reservation } from "../../types/types";
-import { Clock, Calendar, ArrowRight, User, DollarSign, Bell } from 'lucide-react';
+import { Clock, Calendar, ArrowRight } from 'lucide-react';
 
 
 
@@ -16,7 +16,7 @@ interface BookingUI {
     status: string;
     price: number;
     // Guardamos la fecha y hora originales para la ordenación
-    sortDate: string; 
+    sortDate: string;
     sortTime: string;
     endTime: string;
 }
@@ -36,7 +36,7 @@ export const Dashboard: React.FC = () => {
         const year = date.getUTCFullYear();
         return `${day}/${month}/${year}`;
     };
-    
+
 
     useEffect(() => {
         const fetchReservations = async () => {
@@ -50,7 +50,7 @@ export const Dashboard: React.FC = () => {
                 console.log(data)
                 // Filtra solo las reservas activas (state = true)
                 const activeReservations = data.filter((r: Reservation) => r.state);
-                
+
                 setReservations(activeReservations);
                 setError(null);
             } catch (err) {
@@ -88,10 +88,10 @@ export const Dashboard: React.FC = () => {
                 const dateB = new Date(`${b.sortDate}T${b.sortTime}`);
                 return dateB.getTime() - dateA.getTime();
             });
-            
+
         // Últimas 5 reservas para la vista del dashboard
         const recentBookingsUI = sortedBookings.slice(0, 5);
-        
+
         // Calcular estadísticas
         const activeCount = reservations.length;
         const totalDurationMinutes = reservations.reduce((sum, r) => sum + r.duration, 0);
@@ -109,8 +109,8 @@ export const Dashboard: React.FC = () => {
     const handleNewReservationClick = () => {
         navigate('/bookings');
     };
-    
-    const handleMyReservationsClick = () => { navigate(`/Reservation`);};
+
+    const handleMyReservationsClick = () => { navigate(`/Reservation`); };
     const handleSettingsClick = () => { navigate('/UserUpdate'); };
 
 
@@ -151,7 +151,7 @@ export const Dashboard: React.FC = () => {
                 return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
         }
     };
-    
+
     const getStatusLabel = (status: string) => {
         switch (status) {
             case "confirmed":
@@ -169,11 +169,11 @@ export const Dashboard: React.FC = () => {
     if (loading) {
         return (
             <div className="text-center py-10 text-gray-600 dark:text-gray-400">
-                Cargando dashboard... 
+                Cargando dashboard...
             </div>
         );
     }
-    
+
     // Manejo si el usuario no tiene ID
     if (!user?.id) {
         return (
@@ -189,13 +189,13 @@ export const Dashboard: React.FC = () => {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                        Bienvenido, {user?.name} 
+                        Bienvenido, {user?.name}
                     </h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">
                         Gestiona tus reservas y actividad deportiva
                     </p>
                 </div>
-                
+
                 {error && (
                     <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 dark:bg-red-900/20 dark:border-red-700 dark:text-red-400 rounded-lg" role="alert">
                         {error}
@@ -226,77 +226,77 @@ export const Dashboard: React.FC = () => {
                     ))}
                 </div>
 
-{/* Reservas Recientes (Data dinámica) */}
-<div className="lg:col-span-2">
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6">
-        <div className="flex items-center justify-between mb-6">
-            {/* Título de la sección */}
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Reservas Recientes
-            </h2>
-            {/* Botón de acción (Asegúrate de tener un componente Button definido) */}
-            <Button size="sm" onClick={handleMyReservationsClick}>Ver Todas</Button>
-        </div>
+                {/* Reservas Recientes (Data dinámica) */}
+                <div className="lg:col-span-2">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            {/* Título de la sección */}
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                                Reservas Recientes
+                            </h2>
+                            {/* Botón de acción (Asegúrate de tener un componente Button definido) */}
+                            <Button size="sm" onClick={handleMyReservationsClick}>Ver Todas</Button>
+                        </div>
 
-        <div className="space-y-4">
-            {/* Iteración sobre la lista de reservas */}
-            {processedData.recentBookingsUI.length > 0 ? (
-                processedData.recentBookingsUI.map((booking) => (
-                    <div
-                        key={booking.id}
-                        // CLAVES DE RESPONSIVIDAD: 
-                        // flex-col en móvil, sm:flex-row en tablet/desktop.
-                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between 
+                        <div className="space-y-4">
+                            {/* Iteración sobre la lista de reservas */}
+                            {processedData.recentBookingsUI.length > 0 ? (
+                                processedData.recentBookingsUI.map((booking) => (
+                                    <div
+                                        key={booking.id}
+                                        // CLAVES DE RESPONSIVIDAD: 
+                                        // flex-col en móvil, sm:flex-row en tablet/desktop.
+                                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between 
                                    p-4 border border-gray-200 dark:border-gray-700 rounded-lg 
                                    hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                    >
-                        {/* Bloque de Información Principal (Nombre y Horario) */}
-                        <div className="flex-1 mb-3 sm:mb-0">
-                            <h3 className="font-semibold text-gray-900 dark:text-white truncate">
-                                {booking.field}
-                            </h3>
-                            <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                {/* Icono de Calendario (Asegúrate de que 'Calendar' esté definido) */}
-                                <Calendar className="w-4 h-4 mr-1 text-indigo-500" />
-                                <span className="mr-4">{booking.formattedDate}</span>
-                                
-                                {/* Icono de Reloj (Hora de inicio) */}
-                                <Clock className="w-4 h-4 mr-1 text-indigo-500" />
-                                <span className="mr-1">{booking.formattedTime}</span>
-                                
-                                {/* Separador visual de tiempo (Asegúrate de que 'ArrowRight' esté definido) */}
-                                <ArrowRight className="w-3 h-3 mx-1 text-gray-400" />
-                                <span className="mr-4">{booking.endTime}</span>
-                            </div>
-                        </div>
-                        
-                        {/* Bloque de Precio y Estado */}
-                        {/* Separador vertical/horizontal responsivo para móvil/desktop */}
-                        <div className="flex items-center space-x-4 pt-3 sm:pt-0 
+                                    >
+                                        {/* Bloque de Información Principal (Nombre y Horario) */}
+                                        <div className="flex-1 mb-3 sm:mb-0">
+                                            <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                                                {booking.field}
+                                            </h3>
+                                            <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                                {/* Icono de Calendario (Asegúrate de que 'Calendar' esté definido) */}
+                                                <Calendar className="w-4 h-4 mr-1 text-indigo-500" />
+                                                <span className="mr-4">{booking.formattedDate}</span>
+
+                                                {/* Icono de Reloj (Hora de inicio) */}
+                                                <Clock className="w-4 h-4 mr-1 text-indigo-500" />
+                                                <span className="mr-1">{booking.formattedTime}</span>
+
+                                                {/* Separador visual de tiempo (Asegúrate de que 'ArrowRight' esté definido) */}
+                                                <ArrowRight className="w-3 h-3 mx-1 text-gray-400" />
+                                                <span className="mr-4">{booking.endTime}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Bloque de Precio y Estado */}
+                                        {/* Separador vertical/horizontal responsivo para móvil/desktop */}
+                                        <div className="flex items-center space-x-4 pt-3 sm:pt-0 
                                         border-t border-gray-200 dark:border-gray-700 
                                         sm:border-t-0 sm:border-l sm:pl-4 sm:ml-4">
-                            <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
-                                {/* Asegúrate de que 'formatPrice' esté definido */}
-                                {formatPrice(booking.price)}
-                            </span>
-                            <span
-                                className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
-                                    // Asegúrate de que 'getStatusColor' y 'getStatusLabel' estén definidos
-                                    getStatusColor(booking.status)
-                                }`}
-                            >
-                                {getStatusLabel(booking.status)}
-                            </span>
+                                            <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
+                                                {/* Asegúrate de que 'formatPrice' esté definido */}
+                                                {formatPrice(booking.price)}
+                                            </span>
+                                            <span
+                                                className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
+                                                    // Asegúrate de que 'getStatusColor' y 'getStatusLabel' estén definidos
+                                                    getStatusColor(booking.status)
+                                                    }`}
+                                            >
+                                                {getStatusLabel(booking.status)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+                                    ¡No tienes reservas recientes!
+                                </p>
+                            )}
                         </div>
                     </div>
-                ))
-            ) : (
-                <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-                    ¡No tienes reservas recientes!
-                </p>
-            )}
-        </div>
-    </div>
 
 
                     {/* Quick Actions */}

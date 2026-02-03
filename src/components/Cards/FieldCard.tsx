@@ -1,9 +1,9 @@
 import React, { useCallback } from "react"; // Importar useCallback
-import { MapPin, Users, Star, DollarSign, Phone, ChevronLeft, ChevronRight } from "lucide-react"; // Nuevos iconos
+import { MapPin, DollarSign, Phone, ChevronLeft, ChevronRight } from "lucide-react"; // Nuevos iconos
 import { Court } from "../../types/types";
 import { Button } from "../UI/Button";
 import { useNavigate } from "react-router-dom";
-import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react'; // Importar EmblaCarouselType si Court no lo tiene
+import useEmblaCarousel from 'embla-carousel-react'; // Importar EmblaCarouselType si Court no lo tiene
 
 // -----------------------------------------------------------
 // 🚀 NUEVO COMPONENTE: Botón de flecha para el carrusel
@@ -46,7 +46,7 @@ interface FieldCardProps {
     onBook?: (field: Court) => void;
 }
 
-export const FieldCard: React.FC<FieldCardProps> = ({ field, onBook }) => {
+export const FieldCard: React.FC<FieldCardProps> = ({ field }) => {
     const navigate = useNavigate();
     const hasPhotos = field.photos && field.photos.length > 0;
     const defaultImageUrl = "https://via.placeholder.com/600x400?text=Cancha+No+Disponible";

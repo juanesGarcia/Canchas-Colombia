@@ -3,7 +3,7 @@ import { Phone, Mail, MapPin, Send, Clock } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import { COMPANY_INFO } from '../../constants';
 import Swal from 'sweetalert2';
-import {Map} from "../Map/Map";
+import { Map } from "../Map/Map";
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -16,14 +16,14 @@ export const Contact: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const { name, email, phone, subject, message } = formData;
-    const myWhatsappNumber = '573186699925';
+    try {
+      const { name, email, phone, subject, message } = formData;
+      const myWhatsappNumber = '573186699925';
 
-    const whatsappMessage = `
+      const whatsappMessage = `
     ¡Hola! 👋
 
     Tengo un mensaje de contacto a través de la página web. Aquí están los detalles:
@@ -38,33 +38,33 @@ export const Contact: React.FC = () => {
 
     ¡Espero tu respuesta!
     `;
-    const encodedMessage = encodeURIComponent(whatsappMessage);
-    const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
-     window.open(whatsappUrl, '_blank');
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
+      window.open(whatsappUrl, '_blank');
 
-    setTimeout(() => {
+      setTimeout(() => {
         // Paso 2: Mostrar la alerta de éxito al regresar
         Swal.fire({
-            icon: 'success',
-            title: '¡Mensaje enviado!',
-            text: 'Tu mensaje ha sido enviado a WhatsApp. Revisa la conversación para confirmar el envío.',
-            confirmButtonText: 'Aceptar'
+          icon: 'success',
+          title: '¡Mensaje enviado!',
+          text: 'Tu mensaje ha sido enviado a WhatsApp. Revisa la conversación para confirmar el envío.',
+          confirmButtonText: 'Aceptar'
         });
-    }, 2000); // 2 segundos de retraso para simular la vuelta del usuario
+      }, 2000); // 2 segundos de retraso para simular la vuelta del usuario
 
-  } catch (error) {
-    // Si hay un error (por ejemplo, si la redirección falla por alguna razón)
-    Swal.fire({
-      icon: 'error',
-      title: 'Error al enviar',
-      text: 'Hubo un problema al intentar abrir WhatsApp. Por favor, inténtalo de nuevo.'+error,
-      confirmButtonText: 'Aceptar'
-    });
-  } finally {
-    setLoading(false);
-    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-  }
-};
+    } catch (error) {
+      // Si hay un error (por ejemplo, si la redirección falla por alguna razón)
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al enviar',
+        text: 'Hubo un problema al intentar abrir WhatsApp. Por favor, inténtalo de nuevo.' + error,
+        confirmButtonText: 'Aceptar'
+      });
+    } finally {
+      setLoading(false);
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+    }
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
@@ -146,12 +146,12 @@ export const Contact: React.FC = () => {
             </div>
 
             {/* Map placeholder */}
-          <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-64">
-            <div className="h-full w-full">
-              <Map address="Calle 48csur #25-94" />
+            <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-64">
+              <div className="h-full w-full">
+                <Map address="Calle 48csur #25-94" />
+              </div>
             </div>
           </div>
-        </div>
           {/* Contact Form */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">

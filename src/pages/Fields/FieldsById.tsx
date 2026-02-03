@@ -151,7 +151,7 @@ export const FieldsById: React.FC = () => {
 
       const formattedSubcourt: Subcourt = {
         subcourt_id: addedSubcourtFromApi.subcourt_id,
-        subcourt_name: addedSubcourtFromApi.name,
+        subcourt_name: addedSubcourtFromApi.subcourt_name,
         state: addedSubcourtFromApi.state,
         id: addedSubcourtFromApi.id,
       };

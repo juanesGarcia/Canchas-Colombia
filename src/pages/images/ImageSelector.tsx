@@ -53,13 +53,13 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({ userId, type }) =>
         // 👇 Si se pasa type (service o promotion), usar la API especializada
         await onUploadImagesServices({
           id: userId,
-          files: [...acceptedFiles] 
+          files: [...acceptedFiles]
         });
       } else {
         // 👇 Si no se pasa type, usar la API genérica
         await onUploadImages({
           id: userId,
-          files: [...acceptedFiles] ,
+          files: [...acceptedFiles],
         });
       }
 

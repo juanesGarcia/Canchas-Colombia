@@ -34,7 +34,7 @@ export const Promotions: React.FC = () => {
             price: item.price,
             court_type: item.court_type,// Asegúrate de que esta propiedad existe en tu tipo Court
             type: item.type,
-            owner_name:item.owner_name
+            owner_name: item.owner_name
           }));
         setServices(fetchedServices);
       } catch (err) {
@@ -46,15 +46,6 @@ export const Promotions: React.FC = () => {
     };
     fetchServices();
   }, []);
-
-  const serviceTypes = [
-    { value: "all", label: "Todos los servicios" },
-    { value: "equipacion", label: "Equipación" },
-    { value: "entrenamiento", label: "Entrenamiento" },
-    { value: "iluminacion", label: "Iluminación" },
-    { value: "camerinos", label: "Camerinos" },
-    { value: "arbitraje", label: "Arbitraje" },
-  ];
 
   const priceRanges = [
     { value: "all", label: "Todos los precios" },

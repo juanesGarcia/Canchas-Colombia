@@ -1,10 +1,8 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { ArrowRight, Unplug } from "lucide-react";
+import { Unplug } from "lucide-react";
 import { Button } from "../../components/UI/Button";
 import { FC, useEffect } from "../../utils/depencies";
-
-// import MapCustom from "@/components/ui/map/index2";
 
 const NotFound: FC = () => {
   const { isAuthenticated } = useAuth();

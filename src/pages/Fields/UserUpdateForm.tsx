@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { User, Lock, Mail } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
 import Swal from 'sweetalert2';
@@ -8,9 +7,7 @@ import { useAuth } from "../../contexts/AuthContext";
 
 
 export const UserUpdateForm: React.FC = () => {
-    const navigate = useNavigate();
-    const { user , logout} = useAuth();
-    
+    const { user, logout } = useAuth();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -66,11 +63,11 @@ export const UserUpdateForm: React.FC = () => {
             });
             try {
                 await logout();
-          } catch (err) {
-            setError('Error al iniciar sesión. Verifica tus credenciales.'+err);
-          } finally {
-            setLoading(false);
-          }
+            } catch (err) {
+                setError('Error al iniciar sesión. Verifica tus credenciales.' + err);
+            } finally {
+                setLoading(false);
+            }
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || err.message || 'Error desconocido al actualizar el perfil.';
             setError('Error: ' + errorMessage);

@@ -9,7 +9,6 @@ interface seoProps {
   description?: string;
   keywords?: string;
   canonicalUrl?: string;
-  ogImage?: string;
 }
 
 export const Layout: FC<seoProps> = ({

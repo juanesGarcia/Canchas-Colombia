@@ -5,14 +5,11 @@ import {
   Clock,
   User,
   DollarSign,
-  Phone,
-  Trash2,
-  Pencil
+  Phone
 } from 'lucide-react';
 import {
   getReservationsBySubcourtAndDate,
   onReservationDelete,
-  onReservationReminder,
   onReservationUpdate
 } from '../../api/auth';
 import Swal from 'sweetalert2';
@@ -45,13 +42,11 @@ export const ReservationInfo: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [bookedReservations, setBookedReservations] = useState<Reservation[]>([]);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
-  const [isFetchingTimes, setIsFetchingTimes] = useState(false);
-  const [error, setError] = useState('');
+
 
   useEffect(() => {
     const fetchReservations = async () => {
       if (!subcourtId) return;
-      setIsFetchingTimes(true);
       try {
         const reservations = await getReservationsBySubcourtAndDate(subcourtId, selectedDate);
         setBookedReservations(reservations);
@@ -59,8 +54,6 @@ export const ReservationInfo: React.FC = () => {
       } catch (err) {
         console.error("Error al obtener las reservas:", err);
         setBookedReservations([]);
-      } finally {
-        setIsFetchingTimes(false);
       }
     };
 
@@ -124,7 +117,6 @@ export const ReservationInfo: React.FC = () => {
     if (!selectedReservation) return;
 
     if (!user || !user.token) {
-      setError("No estás autenticado");
       return;
     }
 

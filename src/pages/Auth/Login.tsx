@@ -10,7 +10,6 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth(); // Mantenemos el contexto si necesitas actualizar el estado de autenticación.
@@ -19,23 +18,23 @@ export const Login: React.FC = () => {
 
   // En tu componente Login.tsx
   // ...
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    await login(email, password);
-    navigate(from, { replace: true });
-  } catch (err: any) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error al iniciar sesión',
-      text: err.message, // 👈 mensaje real del backend
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      await login(email, password);
+      navigate(from, { replace: true });
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al iniciar sesión',
+        text: err.message, // 👈 mensaje real del backend
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -61,12 +60,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md">
-                {error}
-              </div>
-            )}
-
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email
@@ -110,18 +103,18 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
             </div>
           </div>
-      <div>
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          loading={loading}
-          className="w-full"
-        >
-          Iniciar Sesión
-        </Button>
-      </div>
-    </form>
+          <div>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              loading={loading}
+              className="w-full"
+            >
+              Iniciar Sesión
+            </Button>
+          </div>
+        </form>
       </div >
     </div >
   );

@@ -119,9 +119,6 @@ export const ReservationCalendar: React.FC = () => {
             try {
                 const fetchedPhone = await getCourtsPhone(subcourtId);
                 setCourtPhone(fetchedPhone)
-
-
-
             } catch (err) {
                 console.error("Error al obtener el precio:", err);
                 setPrice('');
@@ -158,7 +155,7 @@ export const ReservationCalendar: React.FC = () => {
         const now = new Date();
 
         return timeSlots.filter((time) => {
-            const [hour, minute] = time.split(':').map(Number);
+            const [hour] = time.split(':').map(Number);
             const selectedDateIsToday =
                 selectedDate.getDate() === now.getDate() &&
                 selectedDate.getMonth() === now.getMonth() &&

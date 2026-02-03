@@ -12,10 +12,6 @@ import {
   Building,
   MapPin,
   Tag,
-  Info,
-  CheckCircle,
-  CircleOff,
-  ClipboardList,
   PlusCircle,
   MinusCircle,
   UserCheck,
@@ -105,7 +101,7 @@ export const Register: React.FC = () => {
     let registerFunction: (data: any) => Promise<any>;
 
     if (role === 'admin') {
-      dataToSend = {
+       dataToSend = {
         email,
         password,
         name,
@@ -141,34 +137,34 @@ export const Register: React.FC = () => {
     try {
       const response = await registerFunction(dataToSend);
       console.log(response)
-      if(response.success === true){
-      const createdUser = response?.user;
+      if (response.success === true) {
+        const createdUser = response?.user;
 
-      if (createdUser) {
-        setNewUser({ id: createdUser });
-        setIsRegistered(true);
+        if (createdUser) {
+          setNewUser({ id: createdUser });
+          setIsRegistered(true);
 
-        Swal.fire({
-          icon: 'success',
-          title: '¡Registro exitoso!',
-          text: 'Serás redirigido a tu panel',
-          timer: 2500,
-          timerProgressBar: true,
-        });
+          Swal.fire({
+            icon: 'success',
+            title: '¡Registro exitoso!',
+            text: 'Serás redirigido a tu panel',
+            timer: 2500,
+            timerProgressBar: true,
+          });
 
-             if (role === 'proveedor') {
+          if (role === 'proveedor') {
             // Redirigir inmediatamente al dashboard del proveedor
             // Asume que la ruta es /proveedor/dashboard o similar
-            navigate('/dashboard'); 
-        } else {
+            navigate('/dashboard');
+          } else {
             // Lógica existente para el Admin (continúa con la subida de imágenes)
             setNewUser({ id: createdUser });
             setIsRegistered(true);
-        }
+          }
 
-      } else {
-        throw new Error('No se pudo obtener información de usuario registrado');
-      }
+        } else {
+          throw new Error('No se pudo obtener información de usuario registrado');
+        }
       }
     } catch (err: any) {
       console.error('Registration failed:', err);
@@ -462,11 +458,11 @@ export const Register: React.FC = () => {
                         onChange={(e) =>
                           setCourtType(
                             e.target.value as
-                              | 'futbol'
-                              | 'basketball'
-                              | 'tennis'
-                              | 'volleyball'
-                              | ''
+                            | 'futbol'
+                            | 'basketball'
+                            | 'tennis'
+                            | 'volleyball'
+                            | ''
                           )
                         }
                       >

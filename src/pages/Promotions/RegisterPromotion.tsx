@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ImageSelector from '../images/ImageSelector';
 import {
-    MapPin,
     Tag,
-    Info,
-    CheckCircle,
-    CircleOff,
     Gift,
     Smartphone,
 } from 'lucide-react';
 import { Button } from '../../components/UI/Button';
-import { useAuth } from '../../contexts/AuthContext';
 import { onRegisterPromotions } from '../../api/auth'; // Asumo que esta API es correcta
 import Swal from 'sweetalert2';
 
@@ -29,7 +24,6 @@ export const RegisterPromotion: React.FC = () => {
     const [newPromotionId, setNewPromotionId] = useState<string | null>(null);
     const [isRegistered, setIsRegistered] = useState(false);
 
-    const { user } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {

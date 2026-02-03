@@ -1,24 +1,21 @@
-import React, { useState,useEffect } from "react";
-import { useLocation , useNavigate} from "react-router-dom";
+import React, { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
     CheckCircle,
     XCircle,
     CalendarCheck,
-    ArrowLeft, 
+    ArrowLeft,
 } from "lucide-react";
 import { Court } from "../../../types/types";
 
 export const FieldDetailPage: React.FC = () => {
     const location = useLocation();
-  const court = location.state?.court as Court;
-  const navigate = useNavigate();
+    const court = location.state?.court as Court;
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-    
-
-    const [showForm, setShowForm] = useState(false);
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     if (!court) {
         return <div>Cancha no encontrada.</div>;
@@ -30,7 +27,7 @@ export const FieldDetailPage: React.FC = () => {
 
     return (
         <div className="relative p-6 sm:p-8 bg-white dark:bg-gray-800 min-h-screen">
-            
+
             {/* Botón de Volver */}
             <button
                 onClick={() => navigate(-1)}
@@ -42,7 +39,7 @@ export const FieldDetailPage: React.FC = () => {
             {/* Fin Botón de Volver */}
 
             <div className="max-w-7xl mx-auto">
-                <div className="mb-8 pt-4"> 
+                <div className="mb-8 pt-4">
                     <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
                         {court.court_name}
                     </h1>

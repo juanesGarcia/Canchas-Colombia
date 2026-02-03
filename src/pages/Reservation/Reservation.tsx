@@ -3,16 +3,14 @@ import { useNavigate } from "react-router-dom";
 import {
     CheckCircle,
     XCircle,
-    Plus,
     CalendarCheck,
     MapPin,
-    Loader,
-    Pencil,
+    Loader
 } from "lucide-react";
 import Swal from "sweetalert2";
-import { Subcourt, RegistrationSubCourt } from "../../types/types";
+import { Subcourt } from "../../types/types";
 import { useAuth } from "../../contexts/AuthContext";
-import { getSubcourtsByUserId, onSubCourt, deleteSubcourt } from "../../api/auth";
+import { getSubcourtsByUserId, deleteSubcourt } from "../../api/auth";
 
 /**
  * Componente que muestra la lista de subcanchas de un usuario y un formulario para añadir nuevas.
@@ -24,10 +22,6 @@ export const Reservation: React.FC = () => {
     const [subcourts, setSubcourts] = useState<Subcourt[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    const [showForm, setShowForm] = useState(false);
-    const [newSubcourtName, setNewSubcourtName] = useState("");
-    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         const fetchSubcourts = async () => {
@@ -174,7 +168,7 @@ export const Reservation: React.FC = () => {
                                         className="w-full sm:w-auto px-3 py-1.5 bg-gray-500 text-white rounded-md flex items-center justify-center hover:bg-gray-600 transition-colors"
                                     >
                                         <CalendarCheck className="w-4 h-4 mr-2" />
-                                        Ver reservas 
+                                        Ver reservas
                                     </button>
                                 )}
                             </div>

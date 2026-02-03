@@ -69,6 +69,7 @@ export interface Subcourt {
   subcourt_name: string;
   state: boolean;
   subcourt_id:string;
+  name: string;
 }
 
 

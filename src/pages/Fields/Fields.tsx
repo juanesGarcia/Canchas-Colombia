@@ -46,7 +46,7 @@ export const Fields: React.FC = () => {
     { value: "Cali", label: "Cali" },
     { value: "Barranquilla", label: "Barranquilla" },
     { value: "Cartagena", label: "Cartagena" },
-     { value: "Santa Marta", label: "Santa Marta" }
+    { value: "Santa Marta", label: "Santa Marta" }
   ];
   const priceRanges = [
     { value: "all", label: "Todos los precios" },

@@ -3,8 +3,6 @@ import {
   User,
   RegistrationData,
   Court,
-  Post,
-  Photo,
   LoginData, 
   RegistrationDataService,
   ReservationData,
@@ -12,7 +10,6 @@ import {
   Service,
   RegistrationSubCourt,
   RegistrationDataProveedor,
-  SubcourtAdd,
   SubCourtPrice,
   UserUpdate,
   CourtUpdate,
@@ -24,7 +21,7 @@ import {
 import { format } from 'date-fns';
 axios.defaults.withCredentials = true;
 
-const backendUrl = "https://backend-canchas-production.up.railway.app";//"http://localhost:8080";
+const backendUrl = "http://localhost:8080";
 
 interface GetCourtsResponse {
   success: boolean;
@@ -53,12 +50,6 @@ interface GetSubcourtsResponse {
   success: boolean;
   subcourts: Subcourt[]; // El backend ahora devuelve directamente este campo
 }
-
-interface GetSubcourtsResponsePrice {
-  success: boolean;
-  subcourts: SubCourtPrice[]; // El backend ahora devuelve directamente este campo
-}
-
 
 export interface ReservaMensual {
     anio: number;
@@ -209,11 +200,18 @@ export async function onRegisterServices(registrationData: RegistrationDataServi
 
 // Inicio de sesión
 export async function onLogin(loginData: LoginData) {
-  // Aquí solo especificas el tipo de la respuesta (LoginResponse)
-
-    const response = await axios.post<LoginResponse>(`${backendUrl}/login`, loginData);
+  try {
+    const response = await axios.post<LoginResponse>(
+      `${backendUrl}/login`,
+      loginData
+    );
     return response.data;
-
+  } catch (error: any) {
+    console.log( error.response?.data?.message)
+    throw new Error(
+      error.response?.data?.message || "Error al iniciar sesión"
+    );
+  }
 }
 // Cierre de sesión
 export async function onLogout() {
@@ -418,50 +416,6 @@ export async function deletePromotionById(data: { courtId: string; token: string
   });
 }
 
-// --- Rutas de Posts ---
-
-// Crear un nuevo post
-export async function onCreatePost(postData: { title: string; content: string; files?: File[]; token: string }) {
-  const formData = new FormData();
-  formData.append('title', postData.title);
-  formData.append('content', postData.content);
-  if (postData.files) {
-    postData.files.forEach(file => {
-      formData.append('post_images', file);
-    });
-  }
-
-  return await axios.post(`${backendUrl}/post`, formData, {
-    headers: {
-      'Authorization': `Bearer ${postData.token}`,
-      'Content-Type': 'multipart/form-data'
-    }
-  });
-}
-
-// Obtener todos los posts
-export async function getPosts(): Promise<Post[]> {
-  const response = await axios.get<Post[]>(`${backendUrl}/posts`);
-  return response.data;
-}
-
-// Obtener un post específico por su ID
-export async function getPostById(id: string): Promise<Post> {
-  const response = await axios.get<Post>(`${backendUrl}/post/${id}`);
-  return response.data;
-}
-
-// Actualizar un post
-export async function onUpdatePost(updateData: { id: string; postData: Partial<Post>; token: string }) {
-  return await axios.put(`${backendUrl}/post/${updateData.id}`, updateData.postData, {
-    headers: {
-      'Authorization': `Bearer ${updateData.token}`,
-      'Content-Type': 'application/json'
-    }
-  });
-}
-
-// Eliminar un post
 export async function onSubCourt(id: string, RegistrationSubCourt: RegistrationSubCourt, token: string): Promise<Subcourt> {
   try {
     const response = await axios.post<GetSubcourtResponse>(

@@ -39,10 +39,9 @@ const ArrowButton: React.FC<ArrowButtonProps> = ({ onClick, direction, disabled 
 
 interface ServiceCardProps {
   service: Service;
-  onSelect?: (service: Service) => void;
 }
 
-export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) => {
+export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
   const navigate = useNavigate();
   const hasPhotos = service.photos && service.photos.length > 0;
   const defaultImageUrl = "https://via.placeholder.com/600x400?text=Servicio+No+Disponible";
@@ -142,8 +141,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
             <DollarSign className="w-4 h-4 mr-2" />
             Precio: {service.price}
           </div>
-
-          {service.type === 'promotion' && service.owner_name && (
+          {service.type === 'promotion'  && service.owner_name && (
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
               ⚽ Nombre de la cancha: {service.owner_name}
             </div>
@@ -154,11 +152,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onSelect }) =
           <Button
             variant="primary"
             size="md"
-           onClick={() => 
-  navigate(`/ServicesDetail/${service.court_id}`, {
-    state: { owner_name: service.owner_name }
-  })
-}
+            onClick={() =>
+              navigate(`/ServicesDetail/${service.court_id}`, {
+                state: { owner_name: service.owner_name }
+              })
+            }
           >
             {"Detalles"}
           </Button>
