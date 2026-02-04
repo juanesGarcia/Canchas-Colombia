@@ -107,7 +107,7 @@ export const FieldsWithDelete: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Search */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
@@ -173,7 +173,7 @@ export const FieldsWithDelete: React.FC = () => {
                 ) : error ? (
                     <p className="text-red-500">{error}</p>
                 ) : filteredFields.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredFields
                             .filter(field => field.state === true)
                             .map((field) => (
