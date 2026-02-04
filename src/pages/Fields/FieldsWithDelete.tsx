@@ -174,19 +174,20 @@ export const FieldsWithDelete: React.FC = () => {
                     <p className="text-red-500">{error}</p>
                 ) : filteredFields.length > 0 ? (
                     <div className="grid grid-cols-3 gap-8">
-                        {filteredFields.map((field) => (
-                            <div key={field.court_id} className="relative">
-                                <FieldCard field={field} onBook={() => { }} />
-
-                                {/* BOTÓN ELIMINAR */}
-                                <button
-                                    onClick={() => handleDelete(field.court_id)}
-                                    className="absolute top-3 right-3 bg-red-600 text-white p-2 rounded-full hover:bg-red-700"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
-                        ))}
+                        {filteredFields
+                            .filter(field => field.state === true)
+                            .map((field) => (
+                                <div key={field.court_id} className="relative">
+                                    <FieldCard field={field} onBook={() => { }} />
+                                    {/* BOTÓN ELIMINAR */}
+                                    <button
+                                        onClick={() => handleDelete(field.court_id)}
+                                        className="absolute top-3 right-3 bg-red-600 text-white p-2 rounded-full hover:bg-red-700"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
                     </div>
                 ) : (
                     <div className="text-center py-12">
