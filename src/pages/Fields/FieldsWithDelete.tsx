@@ -56,7 +56,7 @@ export const FieldsWithDelete: React.FC = () => {
     ];
 
     const filteredFields = courts.filter((court) => {
-        const matchesTypeCourt = court.type === "court";
+        const matchesTypeCourt = court.type === "court" ||  court.type === "services";
         const matchesSearch =
             court.court_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             court.city?.toLowerCase().includes(searchTerm.toLowerCase());
