@@ -23,21 +23,21 @@ export const Contact: React.FC = () => {
       const { name, email, phone, subject, message } = formData;
       const myWhatsappNumber = '573186699925';
 
-      const whatsappMessage = `
-    ¡Hola! 👋
+const whatsappMessage = `
+¡Hola! 👋
 
-    Tengo un mensaje de contacto a través de la página web. Aquí están los detalles:
+Recibiste un nuevo mensaje de contacto desde la página web:
 
-    Nombre: ${name}
-    Email: ${email}
-    Teléfono: ${phone}
-    Asunto: ${subject}
+👤 Nombre: ${name}
+📧 Email: ${email}
+📱 Teléfono: ${phone}
+📝 Asunto: ${subject}
 
-    Mensaje:
-    ${message}
+💬 Mensaje:
+${message}
 
-    ¡Espero tu respuesta!
-    `;
+Quedo atento/a a tu respuesta.
+`;
       const encodedMessage = encodeURIComponent(whatsappMessage);
       const whatsappUrl = `https://wa.me/${myWhatsappNumber}?text=${encodedMessage}`;
       window.open(whatsappUrl, '_blank');

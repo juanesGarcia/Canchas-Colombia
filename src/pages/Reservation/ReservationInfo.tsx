@@ -79,15 +79,19 @@ export const ReservationInfo: React.FC = () => {
         .toLocaleDateString('es-CO');
 
       const whatsappMessage = `
-      RECORDATORIO DE RESERVA
-      Hola ${selectedReservation.client_name}, te recordamos tu reserva:
-      Fecha: ${formattedDate}
-      Hora: ${selectedReservation.reservation_time}
-      Duración: ${selectedReservation.duration} minutos
-      Precio: $${selectedReservation.price_reservation}
-      Falta de pago : $${selectedReservation.missing_quantity}
-      ¡Gracias!
-        `;
+          recordatorio de reserva a través de Canchas Colombia:
+
+          Hola ${selectedReservation.client_name}, 👋  
+          te recordamos tu reserva:
+
+          📅 Fecha: ${formattedDate}  
+          ⏰ Hora: ${selectedReservation.reservation_time}  
+          ⏳ Duración: ${selectedReservation.duration} minutos  
+          💰 Precio: $${selectedReservation.price_reservation}  
+          💳 Saldo pendiente: $${selectedReservation.missing_quantity}
+
+          ¡Gracias por reservar con Canchas Colombia!
+          `;
 
       const encodedMessage = encodeURIComponent(whatsappMessage);
       const whatsappUrl = `https://wa.me/${selectedReservation.client_phone}?text=${encodedMessage}`;

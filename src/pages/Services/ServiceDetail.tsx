@@ -97,16 +97,21 @@ export const ServiceDetail: React.FC = () => {
             console.error("Número de teléfono no disponible.");
             return;
         }
+            const whatsappMessage = `
+            ¡Hola! 👋
 
-        const whatsappMessage = `
-¡Hola! 👋
-Estoy interesado/a en el servicio "${service.court_name}".
-Descripción:
-${service.description}
-Ubicación:
-${service.city}, ${service.address}
-¿Podrías darme más información sobre cómo puedo obtener este servicio?
-`;
+            Estoy interesado/a en el servicio "${service.court_name}" que vi a través de Canchas Colombia.
+
+            📄 Descripción:
+            ${service.description}
+
+            📍 Ubicación:
+            ${service.city}, ${service.address}
+
+            ¿Podrías brindarme más información sobre disponibilidad, proceso de reserva y formas de pago?
+
+            Quedo atento/a. ¡Gracias!
+            `;
         const encodedMessage = encodeURIComponent(whatsappMessage);
         const whatsappUrl = `https://wa.me/${service.phone}?text=${encodedMessage}`;
         window.open(whatsappUrl, '_blank');

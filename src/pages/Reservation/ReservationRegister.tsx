@@ -79,25 +79,24 @@ export const ReservationRegister: React.FC = () => {
                 });
                 if (success) {
                     const whatsappMessage = `
-                        ¡Hola! 👋
+                    ¡Hola! 👋
 
-                        Se ha realizado una nueva reserva con los siguientes datos:
+                    Nueva reserva realizada a través de Canchas Colombia 🏟️
 
-                        Cliente: ${userName}
-                        Cédula: ${cedula}
-                        Teléfono: ${phone}
+                    👤 Cliente: ${userName}
+                    🆔 Cédula: ${cedula}
+                    📱 Teléfono: ${phone}
 
-                        Fecha: ${reservationDate}
-                        Hora: ${reservationTime}
-                        Duración: ${duration} minutos
-                        Precio: $${price}
+                    📅 Fecha: ${reservationDate}
+                    ⏰ Hora: ${reservationTime}
+                    ⏳ Duración: ${duration} minutos
+                    💰 Precio: $${price}
 
-                        Código de transferencia: ${transferCode || 'No aplica'}
+                    💳 Código de transferencia: ${transferCode || 'No aplica'}
 
-                        Subcancha ID: ${subcourtId}
-
-                        ¡Gracias!
-                        `;
+                    Por favor confirmar cuando se reciba el pago.
+                    Gracias.
+                    `;
 
                     const encodedMessage = encodeURIComponent(whatsappMessage);
                     const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;

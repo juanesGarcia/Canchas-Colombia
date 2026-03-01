@@ -256,17 +256,20 @@ export const ReservationCalendar: React.FC = () => {
                 const whatsappMessage = `
                 ¡Hola! 👋
 
-                Se ha realizado una nueva reserva a través de Canchas Colombia con los siguientes datos:
+                Se ha realizado una nueva reserva a través de Canchas Colombia 🏟️
 
-                Cliente: ${userName}
-                Cédula: ${cedula}
-                Teléfono: ${phone}
-                Fecha: ${formattedDate}
-                Hora: ${formattedTime}
-                Duración: ${duration} minutos
-                Precio: $${price}
-                Cantidad a transferir: $${transferCode}
-                ¡Gracias!
+                Detalles de la reserva:
+                👤 Cliente: ${userName}
+                🆔 Cédula: ${cedula}
+                📱 Teléfono: ${phone}
+                📅 Fecha: ${formattedDate}
+                ⏰ Hora: ${formattedTime}
+                ⏳ Duración: ${duration} minutos
+                💰 Precio: $${price}
+                💳 Cantidad a transferir: $${transferCode}
+
+                Por favor confirmar cuando se reciba el pago.
+                Gracias.
                 `;
                 console.log(courtPhone)
                 const encodedMessage = encodeURIComponent(whatsappMessage);
