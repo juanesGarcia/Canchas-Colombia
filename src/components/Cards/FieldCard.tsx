@@ -126,12 +126,12 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field }) => {
 
                     {/* Estado */}
                     <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${field.state
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${field.is_paid
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-red-600 text-white'
                             }`}
                     >
-                        {field.state ? 'Activo' : 'Inactivo'}
+                        {field.is_paid ? 'Activo' : 'Inactivo'}
                     </span>
                 </div>  
             </div>
@@ -164,13 +164,15 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field }) => {
 
                 {/* Botones de acción */}
                 <div className="flex items-center justify-end space-x-2">
-                    <Button
-                        variant="primary"
-                        size="md"
-                        onClick={() => navigate(`/fields/${field.court_id}`, { state: { court: field } })}
-                    >
-                        {"Reserva"}
-                    </Button>
+                 {field.is_paid && (
+                        <Button
+                            variant="primary"
+                            size="md"
+                            onClick={() => navigate(`/fields/${field.court_id}`, { state: { court: field } })}
+                        >
+                            Reserva
+                        </Button>
+                    )}
                     <Button
                         variant="secondary"
                         size="md"

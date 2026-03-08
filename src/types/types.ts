@@ -37,7 +37,8 @@ export interface RegistrationData {
   is_public: boolean;
   description?: string;
   state?: boolean;
-  subcourts?: Subcourt[];
+  subcourts?: Subcourt[]
+  is_paid: boolean;
 }
 
 export interface RegistrationDataProveedor {
@@ -129,7 +130,7 @@ export interface Court {
   court_prices: CourtPrice[]; // Define esta interfaz según tu tabla
   court_socials: CourtSocial[]; // Define esta interfaz según tu tabla
   photos: Photo[];
-  is_court: boolean
+  is_paid: boolean;
 }
 
 export interface Photo {

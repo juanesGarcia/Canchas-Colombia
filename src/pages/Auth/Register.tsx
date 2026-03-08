@@ -28,7 +28,7 @@ export const Register: React.FC = () => {
   const [phone, setPhone] = useState('');
 
   const [role, setRole] = useState<'admin' | 'proveedor'>('admin');
-
+  const [isPaid, setIsPaid] = useState(false);
   const [courtName, setCourtName] = useState('');
   const [courtAddress, setCourtAddress] = useState('');
   const [courtCity, setCourtCity] = useState('');
@@ -116,6 +116,7 @@ export const Register: React.FC = () => {
         is_public: isPublic,
         description,
         state,
+        is_paid: isPaid,
         subcourts: subcourts.map((sc) => ({
           subcourtName: sc.subcourtName,
           state: sc.state,
@@ -497,6 +498,18 @@ export const Register: React.FC = () => {
                     </div>
                   </div>
 
+                  <div className="flex items-center space-x-3">
+                    <input
+                      id="isPaid"
+                      type="checkbox"
+                      checked={isPaid}
+                      onChange={(e) => setIsPaid(e.target.checked)}
+                      className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="isPaid" className="text-sm text-gray-700 dark:text-gray-300">
+                      Cancha pagada
+                    </label>
+                  </div>
                   <div className="flex items-center space-x-3">
                     <input
                       id="isPublic"
