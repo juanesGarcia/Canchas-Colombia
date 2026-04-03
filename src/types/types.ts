@@ -152,6 +152,8 @@ export interface Service {
   court_type: string;
   type: string;
   owner_name:string;
+  latitude: number;
+  longitude: number;
   // Agrega cualquier otra propiedad que un servicio pueda tener
 }
 

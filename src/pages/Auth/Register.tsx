@@ -41,7 +41,8 @@ export const Register: React.FC = () => {
   const [subcourts, setSubcourts] = useState<{ subcourtName: string; state: boolean }[]>([
     { subcourtName: '', state: true },
   ]);
-
+  const [latitude, setLatitude] = useState<number | ''>('');
+const [longitude, setLongitude] = useState<number | ''>('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -117,6 +118,8 @@ export const Register: React.FC = () => {
         description,
         state,
         is_paid: isPaid,
+        latitude: latitude === '' ? null : Number(latitude),
+        longitude: longitude === '' ? null : Number(longitude), 
         subcourts: subcourts.map((sc) => ({
           subcourtName: sc.subcourtName,
           state: sc.state,
@@ -496,6 +499,35 @@ export const Register: React.FC = () => {
                         onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
                       />
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Latitud
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Ej: 4.580476"
+                      value={latitude}
+                      onChange={(e) => setLatitude(e.target.value === '' ? '' : Number(e.target.value))}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Longitud
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Ej: -74.132156"
+                      value={longitude}
+                      onChange={(e) => setLongitude(e.target.value === '' ? '' : Number(e.target.value))}
+                      required
+                    />
                   </div>
 
                   <div className="flex items-center space-x-3">

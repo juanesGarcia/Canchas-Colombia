@@ -210,9 +210,11 @@ export const CourtDetail: React.FC = () => {
                         </div>
                     </div>
 
-                    <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
-                        {court.description}
-                    </p>
+                    <div className="text-gray-600 dark:text-gray-300 text-lg mb-6 space-y-2">
+                        {court.description?.split('\n').map((line, index) => (
+                            <p key={index}>{line}</p>
+                        ))}
+                    </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-6">
                         <div className="flex items-center text-gray-600 dark:text-gray-400">
@@ -238,7 +240,9 @@ export const CourtDetail: React.FC = () => {
             </div>
             <div className="mt-8 max-w-4xl mx-auto">
                 <div className="w-full h-[300px] sm:h-[400px] rounded-xl overflow-hidden shadow-lg">
-                    <Map address={court?.address} />
+                   {court?.latitude && court?.longitude && (
+                      <Map lat={court.latitude} lng={court.longitude} />
+                    )} 
                 </div>
             </div>
         </div>
