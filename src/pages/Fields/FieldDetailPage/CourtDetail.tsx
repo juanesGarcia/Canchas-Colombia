@@ -206,7 +206,7 @@ export const CourtDetail: React.FC = () => {
                         </h1>
                         <div className="flex items-center text-yellow-500">
                             <Star className="w-5 h-5 fill-current" />
-                            <span className="ml-1 text-base font-semibold">5.0</span>
+                            <span className="ml-1 text-base font-semibold">Verificado</span>
                         </div>
                     </div>
 
