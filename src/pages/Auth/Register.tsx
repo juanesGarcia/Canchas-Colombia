@@ -33,7 +33,7 @@ export const Register: React.FC = () => {
   const [courtAddress, setCourtAddress] = useState('');
   const [courtCity, setCourtCity] = useState('');
   const [courtPhone, setCourtPhone] = useState('');
-  const [courtType, setCourtType] = useState<'futbol' | 'basketball' | 'tennis' | 'volleyball' | ''>('');
+  const [courtType, setCourtType] = useState<'futbol' | 'basketball' | 'tennis' | 'paddle' | ''>('');
   const [price, setPrice] = useState<number | ''>('');
   const [isPublic, setIsPublic] = useState(true);
   const [description, setDescription] = useState('');
@@ -465,7 +465,7 @@ const [longitude, setLongitude] = useState<number | ''>('');
                             | 'futbol'
                             | 'basketball'
                             | 'tennis'
-                            | 'volleyball'
+                            | 'paddle'
                             | ''
                           )
                         }
@@ -474,7 +474,7 @@ const [longitude, setLongitude] = useState<number | ''>('');
                         <option value="futbol">Fútbol</option>
                         <option value="basketball">Basketball</option>
                         <option value="tennis">Tennis</option>
-                        <option value="volleyball">Volleyball</option>
+                        <option value="paddle">Paddle</option>
                       </select>
                     </div>
                   </div>

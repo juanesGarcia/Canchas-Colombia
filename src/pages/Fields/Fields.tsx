@@ -37,7 +37,7 @@ export const Fields: React.FC = () => {
     { value: "futbol", label: "futbol" },
     { value: "basketball", label: "Básquet" },
     { value: "tennis", label: "Tenis" },
-    { value: "volleyball", label: "Voleibol" },
+    { value: "paddle", label: "Paddle" },
   ];
   const cities = [
     { value: "all", label: "Todos" },

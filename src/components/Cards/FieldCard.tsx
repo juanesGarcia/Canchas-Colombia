@@ -131,7 +131,7 @@ export const FieldCard: React.FC<FieldCardProps> = ({ field }) => {
                                 : 'bg-red-600 text-white'
                             }`}
                     >
-                        {field.is_paid ? 'Activo' : 'Inactivo'}
+                        {field.is_paid ? 'Pro +' : 'Free'}
                     </span>
                 </div>  
             </div>
