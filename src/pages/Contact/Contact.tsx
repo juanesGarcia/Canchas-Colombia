@@ -21,7 +21,7 @@ export const Contact: React.FC = () => {
 
     try {
       const { name, email, phone, subject, message } = formData;
-      const myWhatsappNumber = '573186699925';
+      const myWhatsappNumber = '573046382901'; // Reemplaza con tu número de WhatsApp en formato internacional sin signos ni espacios
 
 const whatsappMessage = `
 ¡Hola! 👋
@@ -82,7 +82,7 @@ Quedo atento/a a tu respuesta.
               Contáctanos
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Estamos aquí para ayudarte con todas tus necesidades deportivas
+              Las canchas de tu ciudad en un solo lugar. ¡Estamos aquí para ayudarte!
             </p>
           </div>
         </div>
@@ -126,7 +126,7 @@ Quedo atento/a a tu respuesta.
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Dirección</h3>
                     <p className="text-gray-600 dark:text-gray-400">{COMPANY_INFO.address}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">Zona Sur, Bogotá</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">Santa Marta, Magdalena</p>
                   </div>
                 </div>
 
@@ -148,7 +148,7 @@ Quedo atento/a a tu respuesta.
             {/* Map placeholder */}
             <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-64">
               <div className="h-full w-full">
-                <Map address="Calle 48csur #25-94" />
+                <Map address="Cra. 33a #9A-50, Santa Marta, Magdalena" />
               </div>
             </div>
           </div>
