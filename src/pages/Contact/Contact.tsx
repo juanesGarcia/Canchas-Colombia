@@ -21,9 +21,9 @@ export const Contact: React.FC = () => {
 
     try {
       const { name, email, phone, subject, message } = formData;
-      const myWhatsappNumber = '573186699925';
+      const myWhatsappNumber = '573046382901'; // Reemplaza con tu número de WhatsApp en formato internacional sin signos ni espacios
 
-const whatsappMessage = `
+      const whatsappMessage = `
 ¡Hola! 👋
 
 Recibiste un nuevo mensaje de contacto desde la página web:
@@ -82,7 +82,7 @@ Quedo atento/a a tu respuesta.
               Contáctanos
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Estamos aquí para ayudarte con todas tus necesidades deportivas
+              Las canchas de tu ciudad en un solo lugar. ¡Estamos aquí para ayudarte!
             </p>
           </div>
         </div>
@@ -126,7 +126,7 @@ Quedo atento/a a tu respuesta.
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Dirección</h3>
                     <p className="text-gray-600 dark:text-gray-400">{COMPANY_INFO.address}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">Zona Sur, Bogotá</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">Santa Marta, Magdalena</p>
                   </div>
                 </div>
 
@@ -148,7 +148,14 @@ Quedo atento/a a tu respuesta.
             {/* Map placeholder */}
             <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-64">
               <div className="h-full w-full">
-                <Map address="Calle 48csur #25-94" />
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3913.4586448827804!2d-74.17897293948668!3d11.227632801239293!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sco!4v1777393009441!5m2!1ses-419!2sco"
+                  className="w-full h-64 rounded-lg"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  />
               </div>
             </div>
           </div>

@@ -3,14 +3,14 @@ import { navigateElement } from "../types";
 export const COMPANY_INFO = {
   name: "CANCHAS COLOMBIA S.A.S.",
   description: "Tu espacio deportivo ideal",
-  phone: "+573186699925",
-  email: "juanesgym2018@gmail.com",
-  address: "Calle 48 csur #25-94, Bogota, Colombia",
+  phone: "+573046382901",
+  email: "canchascolombia@gmail.com",
+  address: "Santa Marta, Colombia",
   ogImage: "",
   social: {
-    facebook: "https://www.facebook.com/juanesteban.cubillosgarcia.7/?locale=es_LA",
-    instagram: "https://www.instagram.com/juanestebancubillos/",
-    twitter: "",
+    facebook: "#",
+    instagram: "https://www.instagram.com/canchascolombia",
+    twitter: "#",
   },
 };
 
