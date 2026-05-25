@@ -52,7 +52,7 @@ export const Login: React.FC = () => {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             ¿No tienes cuenta?{' '}
-            <Link to="/register" className="font-medium text-green-600 hover:text-green-500">
+            <Link to="/contact" className="font-medium text-green-600 hover:text-green-500">
               Regístrate aquí
             </Link>
           </p>
