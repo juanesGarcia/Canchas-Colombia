@@ -200,7 +200,7 @@ export const Header: React.FC = () => {
                     Iniciar Sesión
                   </Button>
                 </Link>
-                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="primary" size="sm">
                     Registrarse
                   </Button>
