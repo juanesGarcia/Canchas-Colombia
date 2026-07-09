@@ -40,7 +40,7 @@ const ArrowButton: React.FC<ArrowButtonProps> = ({ onClick, direction, disabled 
         </button>
     );
 };
-    
+
 export const CourtDetail: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
@@ -230,9 +230,17 @@ export const CourtDetail: React.FC = () => {
                         </div>
                         <div className="flex items-center text-gray-600 dark:text-gray-400">
                             <Phone className="w-5 h-5 mr-3 flex-shrink-0" />
-                            <span className="text-base font-medium">
-                                Telefono: {court.phone}
-                            </span>
+
+                            <a
+                                href={`https://wa.me/57${court.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                                    `Hola, vengo de la plataforma web Canchas Colombia. Quisiera saber si tienen espacios disponibles para reservar una cancha. ¡Gracias!`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-base font-medium text-green-600 hover:text-green-700 hover:underline"
+                            >
+                                Teléfono: {court.phone}
+                            </a>
                         </div>
 
                     </div>
@@ -240,9 +248,9 @@ export const CourtDetail: React.FC = () => {
             </div>
             <div className="mt-8 max-w-4xl mx-auto">
                 <div className="w-full h-[300px] sm:h-[400px] rounded-xl overflow-hidden shadow-lg">
-                   {court?.latitude && court?.longitude && (
-                      <Map lat={court.latitude} lng={court.longitude} />
-                    )} 
+                    {court?.latitude && court?.longitude && (
+                        <Map lat={court.latitude} lng={court.longitude} />
+                    )}
                 </div>
             </div>
         </div>

@@ -27,7 +27,7 @@ interface ReservationData {
     price_reservation: number;
     transfer: number;
     state: boolean;
-    payment_method: 'transferencia' | 'tarjeta' | 'efectivo' | 'pending' | string;
+    payment_method: 'transferencia' | 'efectivo' | 'pending' | string;
 }
 
 export const ReservationCalendar: React.FC = () => {
@@ -45,7 +45,7 @@ export const ReservationCalendar: React.FC = () => {
     const [duration, setDuration] = useState<number | ''>('');
     const [price, setPrice] = useState<number | ''>('');
     const [transferCode, setTransferCode] = useState<string>("");
-    const [paymentMethod, setPaymentMethod] = useState<'transferencia' | 'tarjeta' | 'efectivo' | 'pending' | string>('pending');
+    const [paymentMethod, setPaymentMethod] = useState<'transferencia' | 'efectivo' | 'pending' | string>('pending');
     const [loading, setLoading] = useState(false);
     const [isFetchingTimes, setIsFetchingTimes] = useState(false);
 
@@ -198,11 +198,11 @@ export const ReservationCalendar: React.FC = () => {
 
         const transferValue = Number(transferCode) || 0;
 
-        if (transferValue < 20000 && price !== 0) {
+        if (transferValue < 30000 && price !== 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Monto insuficiente',
-                text: 'El monto mínimo de confirmación por transferencia es $20.000',
+                text: 'El monto mínimo de confirmación por transferencia es $30.000',
             });
             setLoading(false);
             return;
@@ -463,7 +463,6 @@ export const ReservationCalendar: React.FC = () => {
                                         >
                                             <option value="pending" disabled>Selecciona método</option>
                                             <option value="efectivo">Efectivo</option>
-                                            <option value="tarjeta">Tarjeta</option>
                                             <option value="transferencia">Transferencia</option>
                                         </select>
                                     </div>
@@ -472,7 +471,7 @@ export const ReservationCalendar: React.FC = () => {
                                 {/* Código de transferencia */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Monto de confirmación (min 20.000)
+                                        Monto de confirmación (min 30.000)
                                     </label>
                                     <div className="relative">
                                         <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
