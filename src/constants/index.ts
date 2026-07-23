@@ -37,8 +37,10 @@ export const PRIVATE_NAVIGATION_ITEMS: navigateElement[] = [
   { name: "Info Canchas", path: "/FieldForm", public: false },
   { name: "Registro", path: "/register", public: false },
   { name: "Canchas", path: "/courtsAdmin", public: false },
+  { name: "Usuarios Inactivos", path: "/inactiveUsers", public: false },
   { name: "Imagenes", path: "/ImageSelectorUser", public: false },
   { name: "Registro Servicios", path: "/RegisterService", public: false },
   { name: "Registro Promociones", path: "/RegisterPromotion", public: false },
   { name: "Promociones o Servicios", path: "/GetPromotions", public: false }
+  
 ];

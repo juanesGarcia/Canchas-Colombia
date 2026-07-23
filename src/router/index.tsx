@@ -36,6 +36,12 @@ const FieldsWithDelete = lazy(() =>
     default: module.FieldsWithDelete,
   }))
 );
+
+const InactiveUsers = lazy(() =>
+  import("../pages/Fields/InactiveUsers").then((module) => ({
+    default: module.InactiveUsers,
+  }))
+);
 const Services = lazy(() =>
   import("../pages/Services/Services").then((module) => ({
     default: module.Services,
@@ -255,6 +261,7 @@ export const AppRouter: React.FC = () => {
               <Route element={<AdminRoute />}>
                 <Route path="/register" element={<Register />} />
                 <Route path="/courtsAdmin" element={<FieldsWithDelete />} />
+                <Route path="/inactiveUsers" element={<InactiveUsers />} />
             </Route>
              <Route element={<Proveedor/>}>
        

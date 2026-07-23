@@ -667,6 +667,21 @@ export async function getRevenueByPaymentMethod(
     }
 }
 
+
+export async function usersFilter(): Promise<User[]> {
+  const response = await axios.get<User[]>(`${backendUrl}/usersFilter`);
+  return response.data;
+}
+
+export async function activateUser(userId: string): Promise<boolean> {
+  await axios.patch(`${backendUrl}/activate/${userId}`);
+  return true;
+}
+
+export async function deactivateUser(userId: string): Promise<boolean> {
+  await axios.patch(`${backendUrl}/deactivate/${userId}`);
+  return true;
+}
 // ====================================================================
 // FUNCIÓN ADICIONAL (Para el endpoint detallado que creamos previamente)
 // ====================================================================

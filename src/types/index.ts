@@ -48,6 +48,7 @@ export interface User {
   role: "admin" | "superadmin"| "proveedor";
   avatar?: string;
   token?: string; 
+  state: boolean;
 }
 
 export interface Booking {

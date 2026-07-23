@@ -60,7 +60,8 @@ export const PrivateLayout = () => {
       case "superadmin":
         return PRIVATE_NAVIGATION_ITEMS.filter(
           (item) => item.name === "Registro" ||
-            item.name === "Canchas"
+            item.name === "Canchas" 
+          || item.name === "Usuarios Inactivos"
         );
       default:
         return [];
@@ -81,6 +82,7 @@ export const PrivateLayout = () => {
       if (item.name === "Perfil") icon = UserIcon;
       if (item.name === "Info Canchas") icon = Volleyball;
       if (item.name === "Registro") icon = FilePenLineIcon;
+      if (item.name === "Usuarios Inactivos") icon = Volleyball;
       if (item.name === "Imagenes") icon = ImageIcon;
       if (item.name === "Registro Servicios") icon = FileUp;
       if (item.name === "Registro Promociones") icon = BadgePercent;
