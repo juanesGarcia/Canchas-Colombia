@@ -674,12 +674,12 @@ export async function usersFilter(): Promise<User[]> {
 }
 
 export async function activateUser(userId: string): Promise<boolean> {
-  await axios.patch(`${backendUrl}/activateUser/${userId}`);
+  await axios.put(`${backendUrl}/activateUser/${userId}`);
   return true;
 }
 
 export async function deactivateUser(userId: string): Promise<boolean> {
-  await axios.patch(`${backendUrl}/deactivateUser/${userId}`);
+  await axios.put(`${backendUrl}/deactivateUser/${userId}`);
   return true;
 }
 // ====================================================================

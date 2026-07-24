@@ -41,18 +41,9 @@ export const InactiveUsers: React.FC = () => {
   };
 
   const roles = [
-    {
-      value: "all",
-      label: "Todos",
-    },
-    {
-      value: "admin",
-      label: "Administrador",
-    },
-    {
-      value: "proveedor",
-      label: "Proveedor",
-    },
+    { value: "all", label: "Todos" },
+    { value: "admin", label: "Administrador" },
+    { value: "proveedor", label: "Proveedor" },
   ];
 
   const filteredUsers = Array.isArray(users) ? users.filter( (user) => {
@@ -95,21 +86,18 @@ export const InactiveUsers: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-
           <div className="flex flex-col sm:flex-row gap-4">
-
             <div className="relative flex-1">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                 size={18}
               />
-
+              {/* ✅ Se agregaron dark: al input */}
               <input
                 type="text"
                 placeholder="Buscar usuario..."
-                className="w-full border rounded-md pl-10 pr-4 py-2"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md pl-10 pr-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -122,38 +110,24 @@ export const InactiveUsers: React.FC = () => {
             >
               Filtros
             </Button>
-
           </div>
 
           {showFilters && (
             <AnimatePresence>
               <motion.div
-                initial={{
-                  opacity: 0,
-                  y: -10,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                exit={{
-                  opacity: 0,
-                  y: -10,
-                }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
                 className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6"
               >
+                {/* ✅ Se agregaron dark: al select */}
                 <select
-                  className="border rounded-md p-2"
+                  className="border border-gray-300 dark:border-gray-600 rounded-md p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   value={selectedRole}
-                  onChange={(e) =>
-                    setSelectedRole(e.target.value)
-                  }
+                  onChange={(e) => setSelectedRole(e.target.value)}
                 >
                   {roles.map((role) => (
-                    <option
-                      key={role.value}
-                      value={role.value}
-                    >
+                    <option key={role.value} value={role.value}>
                       {role.label}
                     </option>
                   ))}
@@ -164,7 +138,7 @@ export const InactiveUsers: React.FC = () => {
         </div>
 
         {isLoading ? (
-          <div className="text-center py-20">
+          <div className="text-center py-20 text-gray-500 dark:text-gray-400">
             Cargando usuarios...
           </div>
         ) : error ? (
@@ -172,81 +146,39 @@ export const InactiveUsers: React.FC = () => {
             {error}
           </div>
         ) : filteredUsers.length > 0 ? (
-          <div className="overflow-x-auto bg-white rounded-lg shadow">
-
+          <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow">
             <table className="min-w-full">
-
-              <thead className="bg-gray-100">
-
+              {/* ✅ Se agregó dark: al thead */}
+              <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>
-
-                  <th className="px-6 py-3 text-left">
-                    Usuario
-                  </th>
-
-                  <th className="px-6 py-3 text-left">
-                    Correo
-                  </th>
-
-                  <th className="px-6 py-3 text-left">
-                    Rol
-                  </th>
-
-                  <th className="px-6 py-3 text-center">
-                    Estado
-                  </th>
-
-                  <th className="px-6 py-3 text-center">
-                    Acción
-                  </th>
-
+                  <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-200">Usuario</th>
+                  <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-200">Correo</th>
+                  <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-200">Rol</th>
+                  <th className="px-6 py-3 text-center text-gray-700 dark:text-gray-200">Estado</th>
+                  <th className="px-6 py-3 text-center text-gray-700 dark:text-gray-200">Acción</th>
                 </tr>
-
               </thead>
 
               <tbody>
-
                 {filteredUsers.map((user) => (
-
-                  <tr
-                    key={user.id}
-                    className="border-b"
-                  >
-
-                    <td className="px-6 py-4">
-                      {user.name}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {user.email}
-                    </td>
-
-                    <td className="px-6 py-4 capitalize">
-                      {user.role}
-                    </td>
-
+                  <tr key={user.id} className="border-b dark:border-gray-700">
+                    <td className="px-6 py-4 text-gray-900 dark:text-white">{user.name}</td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{user.email}</td>
+                    <td className="px-6 py-4 capitalize text-gray-900 dark:text-white">{user.role}</td>
                     <td className="px-6 py-4 text-center">
-
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           user.state
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                         }`}
                       >
-                        {user.state
-                          ? "Activo"
-                          : "Inactivo"}
+                        {user.state ? "Activo" : "Inactivo"}
                       </span>
-
                     </td>
-
                     <td className="px-6 py-4 text-center">
-
                       <button
-                        onClick={() =>
-                          handleToggleStatus(user)
-                        }
+                        onClick={() => handleToggleStatus(user)}
                         className={`inline-flex items-center gap-2 px-4 py-2 rounded text-white ${
                           user.state
                             ? "bg-red-600 hover:bg-red-700"
@@ -254,36 +186,21 @@ export const InactiveUsers: React.FC = () => {
                         }`}
                       >
                         {user.state ? (
-                          <>
-                            <UserX size={18} />
-                            Desactivar
-                          </>
+                          <><UserX size={18} /> Desactivar</>
                         ) : (
-                          <>
-                            <UserCheck size={18} />
-                            Activar
-                          </>
+                          <><UserCheck size={18} /> Activar</>
                         )}
                       </button>
-
                     </td>
-
                   </tr>
-
                 ))}
-
               </tbody>
-
             </table>
-
           </div>
         ) : (
           <div className="text-center py-20">
-            <Users
-              className="mx-auto mb-4 text-gray-400"
-              size={60}
-            />
-            <p>No se encontraron usuarios.</p>
+            <Users className="mx-auto mb-4 text-gray-400" size={60} />
+            <p className="text-gray-500 dark:text-gray-400">No se encontraron usuarios.</p>
           </div>
         )}
       </div>
